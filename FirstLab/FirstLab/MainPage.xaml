@@ -4,11 +4,8 @@
              xmlns:local="clr-namespace:FirstLab"
              x:Class="FirstLab.MainPage">
 
-    <StackLayout>
+    <StackLayout x:Name="myStackLayout">
         <!-- Place new controls here -->
-        <Label Text="Welcome to Xamarin.Forms!" 
-           HorizontalOptions="Center"
-           VerticalOptions="CenterAndExpand" />
     </StackLayout>
 
 </ContentPage>
