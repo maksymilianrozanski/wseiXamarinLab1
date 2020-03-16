@@ -16,6 +16,8 @@ namespace FirstLab
 
         public Label CAqiValue;
 
+        public Frame QualityText;
+
         public MainPage()
         {
             InitializeComponent();
@@ -51,7 +53,28 @@ namespace FirstLab
                 }
             };
 
+            QualityText = new Frame
+            {
+                Content = new StackLayout
+                {
+                    Children =
+                    {
+                        new Label
+                        {
+                            Text = "Świetna jakość!",
+                            FontAttributes = FontAttributes.Bold
+                        },
+
+                        new Label
+                        {
+                            Text = "Możesz bezpiecznie wyjść z domu"
+                        }
+                    }
+                }
+            };
+
             MyStackLayout.Children.Add(Circle);
+            MyStackLayout.Children.Add(QualityText);
         }
     }
 }
