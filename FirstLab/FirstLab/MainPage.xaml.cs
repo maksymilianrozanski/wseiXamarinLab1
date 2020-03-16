@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Mime;
 using System.Text;
 using System.Threading.Tasks;
 using Xamarin.Forms;
@@ -17,6 +18,8 @@ namespace FirstLab
         public Label CAqiValue;
 
         public Frame QualityText;
+
+        public Grid PMValuesGrid;
 
         public MainPage()
         {
@@ -73,8 +76,37 @@ namespace FirstLab
                 }
             };
 
+            PMValuesGrid = new Grid
+            {
+                ColumnDefinitions = new ColumnDefinitionCollection
+                {
+                    new ColumnDefinition
+                    {
+                        Width = GridLength.Star
+                    }
+                },
+
+                RowDefinitions = new RowDefinitionCollection
+                {
+                    new RowDefinition
+                    {
+                        Height = GridLength.Star
+                    },
+                    new RowDefinition
+                    {
+                        Height = GridLength.Star
+                    }
+                }
+            };
+
+            PMValuesGrid.Children.Add(
+                GridItem.CreateGridItem("PM 2.5", 34, "mg/m3", 137), 0, 0);
+            PMValuesGrid.Children.Add(
+                GridItem.CreateGridItem("PM 10", 67, "mg/m3", 135), 1, 0);
+
             MyStackLayout.Children.Add(Circle);
             MyStackLayout.Children.Add(QualityText);
+            MyStackLayout.Children.Add(PMValuesGrid);
         }
     }
 }
