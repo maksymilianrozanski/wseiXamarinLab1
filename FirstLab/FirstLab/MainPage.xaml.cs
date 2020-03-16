@@ -23,8 +23,10 @@ namespace FirstLab
             CAqiValue = new Label
             {
                 FontSize = 32,
-                Text = "56", 
-                TextColor = Xamarin.Forms.Color.Black
+                Text = "56",
+                TextColor = Xamarin.Forms.Color.Black,
+                HorizontalTextAlignment = TextAlignment.Center,
+                VerticalTextAlignment = TextAlignment.Start
             };
 
             Circle = new Frame
@@ -35,7 +37,18 @@ namespace FirstLab
                 CornerRadius = 100,
                 VerticalOptions = LayoutOptions.Start,
                 HorizontalOptions = LayoutOptions.Center,
-                Content = CAqiValue
+                Content = new StackLayout
+                {
+                    Children =
+                    {
+                        CAqiValue,
+                        new Label
+                        {
+                            Text = "CAQI",
+                            HorizontalTextAlignment = TextAlignment.Center
+                        }
+                    }
+                }
             };
 
             MyStackLayout.Children.Add(Circle);
