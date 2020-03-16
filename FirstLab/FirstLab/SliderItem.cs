@@ -12,8 +12,9 @@ namespace FirstLab
 
             var slider = new Slider
             {
+                Maximum = max,
                 Minimum = min,
-                Maximum = max
+                Value = min
             };
 
             slider.ValueChanged += (sender, args) => { sliderValue.Text = args.NewValue.ToString() + " " + unit; };

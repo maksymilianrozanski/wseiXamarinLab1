@@ -23,6 +23,8 @@ namespace FirstLab
 
         public StackLayout HumiditySlider;
 
+        public StackLayout PressureSlider;
+
         public MainPage()
         {
             InitializeComponent();
@@ -107,11 +109,13 @@ namespace FirstLab
                 GridItem.CreateGridItem("PM 10", 67, "mg/m3", 135), 1, 0);
 
             HumiditySlider = SliderItem.CreateSlider("Humidity", 0, 100, "%");
+            PressureSlider = SliderItem.CreateSlider("Pressure", 900, 1100, "hPa");
 
             MyStackLayout.Children.Add(Circle);
             MyStackLayout.Children.Add(QualityText);
             MyStackLayout.Children.Add(PMValuesGrid);
             MyStackLayout.Children.Add(HumiditySlider);
+            MyStackLayout.Children.Add(PressureSlider);
         }
     }
 }
