@@ -13,7 +13,7 @@ namespace FirstLab
                     new Label
                     {
                         FormattedText = new FormattedString
-                            {Spans = {new Span {Text = name, TextColor = Color.Black, FontSize = 14}}}
+                            {Spans = {new Span {Text = name, FontSize = 14}}}
                     },
 
                     new Label
@@ -22,14 +22,25 @@ namespace FirstLab
                         {
                             Spans =
                             {
-                                new Span {Text = value.ToString(), TextColor = Color.Black, FontSize = 20},
-                                new Span {Text = " " + unit, TextColor = Color.Black, FontSize = 14},
+                                new Span {Text = value.ToString(), FontSize = 20},
+                                new Span {Text = " " + unit, FontSize = 14},
                                 new Span {Text = " (" + percentValue + "%)"}
                             }
                         }
                     }
-                }
+                },
+                Resources = CreateResourceDictionary()
             };
+        }
+
+        private static ResourceDictionary CreateResourceDictionary()
+        {
+            var style = new Style(typeof(Span))
+            {
+                Setters = {new Setter {Property = Entry.TextColorProperty, Value = Color.Black}}
+            };
+
+            return new ResourceDictionary {style};
         }
     }
 }
