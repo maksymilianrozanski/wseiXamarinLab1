@@ -10,8 +10,24 @@ namespace FirstLab
             {
                 Children =
                 {
-                    new Label {Text = name},
-                    new Label {Text = value + " " + unit + " (" + percentValue + "%)"}
+                    new Label
+                    {
+                        FormattedText = new FormattedString
+                            {Spans = {new Span {Text = name, TextColor = Color.Black, FontSize = 14}}}
+                    },
+
+                    new Label
+                    {
+                        FormattedText = new FormattedString
+                        {
+                            Spans =
+                            {
+                                new Span {Text = value.ToString(), TextColor = Color.Black, FontSize = 20},
+                                new Span {Text = " " + unit, TextColor = Color.Black, FontSize = 14},
+                                new Span {Text = " (" + percentValue + "%)"}
+                            }
+                        }
+                    }
                 }
             };
         }
