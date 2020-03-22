@@ -8,7 +8,7 @@ namespace FirstLab.controls
         {
             var title = new Label {Text = name};
 
-            var sliderValue = new Label {Text = min.ToString() + " " + unit};
+            var sliderValue = new Label {Text = min + " " + unit};
 
             var slider = new Slider
             {
@@ -17,7 +17,7 @@ namespace FirstLab.controls
                 Value = min
             };
 
-            slider.ValueChanged += (sender, args) => { sliderValue.Text = args.NewValue.ToString() + " " + unit; };
+            slider.ValueChanged += (sender, args) => { sliderValue.Text = args.NewValue + " " + unit; };
 
             return new StackLayout
             {
