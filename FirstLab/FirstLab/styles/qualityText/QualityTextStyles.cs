@@ -17,5 +17,17 @@ namespace FirstLab.styles.qualityText
                 }
             };
         }
+
+        public static Style QualityTextDescriptionStyle()
+        {
+            return new Style(typeof(Label))
+            {
+                Setters =
+                {
+                    new Setter {Property = Label.FontSizeProperty, Value = 14},
+                    new Setter {Property = Label.TextColorProperty, Value = Colors.TextColorMain},
+                }
+            };
+        }
     }
 }
