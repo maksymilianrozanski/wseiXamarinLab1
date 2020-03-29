@@ -6,14 +6,7 @@ namespace FirstLab.controls.circle
     {
         public static Frame CreateCircleFrame()
         {
-            var cAqiValue = new Label
-            {
-                FontSize = 32,
-                Text = "56",
-                TextColor = Color.Black,
-                HorizontalTextAlignment = TextAlignment.Center,
-                VerticalTextAlignment = TextAlignment.Start
-            };
+            var caqiValue = CaqiLabel.CreateCaqiLabel();
 
             var circleFrameStyle = CircleFrameStyle();
 
@@ -24,7 +17,7 @@ namespace FirstLab.controls.circle
                 {
                     Children =
                     {
-                        cAqiValue,
+                        caqiValue,
                         new Label
                         {
                             Text = "CAQI",
