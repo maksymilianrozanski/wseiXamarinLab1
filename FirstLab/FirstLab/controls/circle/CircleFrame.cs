@@ -1,3 +1,4 @@
+using FirstLab.styles;
 using Xamarin.Forms;
 
 namespace FirstLab.controls.circle
@@ -32,11 +33,11 @@ namespace FirstLab.controls.circle
             {
                 Setters =
                 {
-                    new Setter {Property = BackgroundColorProperty, Value = Color.GreenYellow},
+                    new Setter {Property = BackgroundColorProperty, Value = Colors.GoodAirQuality},
                     new Setter {Property = HeightRequestProperty, Value = 100},
                     new Setter {Property = WidthRequestProperty, Value = 100},
                     new Setter {Property = Frame.CornerRadiusProperty, Value = 100},
-                    new Setter {Property = Frame.BorderColorProperty, Value = Color.Gray},
+                    new Setter {Property = Frame.BorderColorProperty, Value = Colors.AccentColorSecondary},
                     new Setter {Property = View.VerticalOptionsProperty, Value = LayoutOptions.Start},
                     new Setter {Property = View.HorizontalOptionsProperty, Value = LayoutOptions.Center}
                 }

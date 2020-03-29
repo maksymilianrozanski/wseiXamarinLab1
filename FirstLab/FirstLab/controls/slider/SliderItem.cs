@@ -45,9 +45,9 @@ namespace FirstLab.controls.slider
             {
                 Setters =
                 {
-                    new Setter {Property = Slider.ThumbColorProperty, Value = Color.CornflowerBlue},
-                    new Setter {Property = Slider.MinimumTrackColorProperty, Value = Color.CornflowerBlue},
-                    new Setter {Property = Slider.MaximumTrackColorProperty, Value = Color.Gray}
+                    new Setter {Property = Slider.ThumbColorProperty, Value = Colors.AccentColorPrimary},
+                    new Setter {Property = Slider.MinimumTrackColorProperty, Value = Colors.AccentColorPrimary},
+                    new Setter {Property = Slider.MaximumTrackColorProperty, Value = Colors.AccentColorSecondary}
                 }
             };
         }
