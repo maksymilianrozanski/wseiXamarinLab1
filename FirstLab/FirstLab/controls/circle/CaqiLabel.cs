@@ -7,11 +7,14 @@ namespace FirstLab.controls.circle
     {
         public static Label CreateCaqiLabel()
         {
-            return new Label
+            var label = new Label
             {
-                Text = "56",
                 Style = CaqiCircleStyles.CaqiValueStyle()
             };
+
+            label.SetBinding(Label.TextProperty, new Binding("CaqiValue"));
+
+            return label;
         }
     }
 }

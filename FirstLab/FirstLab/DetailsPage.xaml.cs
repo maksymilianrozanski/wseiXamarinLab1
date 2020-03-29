@@ -3,6 +3,7 @@ using FirstLab.controls.circle;
 using FirstLab.controls.gridItem;
 using FirstLab.controls.qualityText;
 using FirstLab.controls.slider;
+using FirstLab.viewModels;
 using Xamarin.Forms;
 
 namespace FirstLab
@@ -24,7 +25,9 @@ namespace FirstLab
         public DetailsPage()
         {
             InitializeComponent();
-
+            var vm  = new DetailsViewModel(Navigation);
+            this.BindingContext = vm;
+            
             Circle = CircleFrame.CreateCircleFrame();
 
             QualityText = new Frame
