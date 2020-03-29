@@ -1,3 +1,4 @@
+using FirstLab.styles;
 using Xamarin.Forms;
 
 namespace FirstLab.controls.slider
@@ -33,7 +34,7 @@ namespace FirstLab.controls.slider
                 Setters =
                 {
                     new Setter {Property = Label.FontSizeProperty, Value = 20},
-                    new Setter {Property = Label.TextColorProperty, Value = Color.Black},
+                    new Setter {Property = Label.TextColorProperty, Value = Colors.TextColorMain},
                 }
             };
         }

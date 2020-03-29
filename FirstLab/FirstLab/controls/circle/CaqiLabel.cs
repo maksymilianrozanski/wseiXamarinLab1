@@ -1,3 +1,4 @@
+using FirstLab.styles;
 using Xamarin.Forms;
 
 namespace FirstLab.controls.circle
@@ -20,7 +21,7 @@ namespace FirstLab.controls.circle
                 Setters =
                 {
                     new Setter {Property = Label.FontSizeProperty, Value = 32},
-                    new Setter {Property = Label.TextColorProperty, Value = Color.Black},
+                    new Setter {Property = Label.TextColorProperty, Value = Colors.TextColorMain},
                     new Setter {Property = Label.HorizontalTextAlignmentProperty, Value = TextAlignment.Center},
                     new Setter {Property = Label.VerticalTextAlignmentProperty, Value = TextAlignment.Start}
                 }

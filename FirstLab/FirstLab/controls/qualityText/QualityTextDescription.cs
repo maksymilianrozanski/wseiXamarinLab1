@@ -1,3 +1,4 @@
+using FirstLab.styles;
 using Xamarin.Forms;
 
 namespace FirstLab.controls.qualityText
@@ -20,7 +21,7 @@ namespace FirstLab.controls.qualityText
                 Setters =
                 {
                     new Setter {Property = Label.FontSizeProperty, Value = 14},
-                    new Setter {Property = Label.TextColorProperty, Value = Color.Black},
+                    new Setter {Property = Label.TextColorProperty, Value = Colors.TextColorMain},
                 }
             };
         }

@@ -1,3 +1,4 @@
+using FirstLab.styles;
 using Xamarin.Forms;
 
 namespace FirstLab.controls.gridItem
@@ -37,7 +38,7 @@ namespace FirstLab.controls.gridItem
         {
             var style = new Style(typeof(Span))
             {
-                Setters = {new Setter {Property = Entry.TextColorProperty, Value = Color.Black}}
+                Setters = {new Setter {Property = Entry.TextColorProperty, Value = Colors.TextColorMain}}
             };
 
             return new ResourceDictionary {style};
