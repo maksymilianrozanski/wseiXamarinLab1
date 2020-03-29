@@ -32,11 +32,7 @@ namespace FirstLab
                     Children =
                     {
                         QualityTextLabel.CreateQualityText(),
-
-                        new Label
-                        {
-                            Text = "Możesz bezpiecznie wyjść z domu"
-                        }
+                        QualityTextDescription.CreateQualityTextDescription(),
                     }
                 }
             };
