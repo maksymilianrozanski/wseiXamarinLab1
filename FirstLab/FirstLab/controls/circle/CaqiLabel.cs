@@ -1,4 +1,4 @@
-using FirstLab.styles;
+using FirstLab.styles.circle;
 using Xamarin.Forms;
 
 namespace FirstLab.controls.circle
@@ -10,21 +10,7 @@ namespace FirstLab.controls.circle
             return new Label
             {
                 Text = "56",
-                Style = CaqiLabelStyle()
-            };
-        }
-
-        private static Style CaqiLabelStyle()
-        {
-            return new Style(typeof(Label))
-            {
-                Setters =
-                {
-                    new Setter {Property = Label.FontSizeProperty, Value = 32},
-                    new Setter {Property = Label.TextColorProperty, Value = Colors.TextColorMain},
-                    new Setter {Property = Label.HorizontalTextAlignmentProperty, Value = TextAlignment.Center},
-                    new Setter {Property = Label.VerticalTextAlignmentProperty, Value = TextAlignment.Start}
-                }
+                Style = CaqiCircleStyles.CaqiValueStyle()
             };
         }
     }

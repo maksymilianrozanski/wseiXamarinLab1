@@ -1,4 +1,5 @@
 using FirstLab.styles;
+using FirstLab.styles.circle;
 using Xamarin.Forms;
 
 namespace FirstLab.controls.circle
@@ -9,7 +10,7 @@ namespace FirstLab.controls.circle
         {
             var caqiValue = CaqiLabel.CreateCaqiLabel();
 
-            var circleFrameStyle = CircleFrameStyle();
+            var circleFrameStyle = CaqiCircleStyles.CircleFrameStyle();
 
             var circle = new Frame
             {
@@ -25,23 +26,6 @@ namespace FirstLab.controls.circle
             };
 
             return circle;
-        }
-
-        private static Style CircleFrameStyle()
-        {
-            return new Style(typeof(Label))
-            {
-                Setters =
-                {
-                    new Setter {Property = BackgroundColorProperty, Value = Colors.GoodAirQuality},
-                    new Setter {Property = HeightRequestProperty, Value = 100},
-                    new Setter {Property = WidthRequestProperty, Value = 100},
-                    new Setter {Property = Frame.CornerRadiusProperty, Value = 100},
-                    new Setter {Property = Frame.BorderColorProperty, Value = Colors.AccentColorSecondary},
-                    new Setter {Property = View.VerticalOptionsProperty, Value = LayoutOptions.Start},
-                    new Setter {Property = View.HorizontalOptionsProperty, Value = LayoutOptions.Center}
-                }
-            };
         }
     }
 }
