@@ -1,4 +1,5 @@
 using FirstLab.styles;
+using FirstLab.viewModels;
 using Xamarin.Forms;
 
 namespace FirstLab.controls.qualityText
@@ -7,11 +8,13 @@ namespace FirstLab.controls.qualityText
     {
         public static Label CreateQualityTextDescription()
         {
-            return new Label
+            var label = new Label
             {
                 Text = "Możesz bezpiecznie wyjść z domu bez swojej maski anty-smogowej i nie bać się o swoje zdrowie.",
                 Style = QualityTextDescriptionStyle()
             };
+            label.SetBinding(Label.TextProperty, new Binding(DetailsViewModel.QualityDescriptionBindName));
+            return label;
         }
 
         private static Style QualityTextDescriptionStyle()

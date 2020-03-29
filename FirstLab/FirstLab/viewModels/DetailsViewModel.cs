@@ -21,6 +21,7 @@ namespace FirstLab.viewModels
                     Humidity = now;
                     Pressure = now + 1000;
                     QualityText = now % 2 == 0 ? "Good" : "Bad";
+                    QualityDescription = now % 2 == 0 ? "Hello World!" : "Hi World!";
                 }
             });
             thread.Start();
@@ -34,6 +35,19 @@ namespace FirstLab.viewModels
         private int _pressure;
         public const string QualityTextBindName = "QualityText";
         private string _qualityText;
+        public const string QualityDescriptionBindName = "QualityDescription";
+        private string _qualityDescription;
+
+        public string QualityDescription
+        {
+            get => _qualityDescription;
+            set
+            {
+                if (value == _qualityDescription) return;
+                _qualityDescription = value;
+                OnPropertyChanged(QualityDescriptionBindName);
+            }
+        }
 
         public int CaqiValue
         {
