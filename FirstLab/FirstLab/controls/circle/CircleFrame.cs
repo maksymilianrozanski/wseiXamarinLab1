@@ -1,6 +1,6 @@
 using Xamarin.Forms;
 
-namespace FirstLab.controls
+namespace FirstLab.controls.circle
 {
     public class CircleFrame : ContentPage
     {
