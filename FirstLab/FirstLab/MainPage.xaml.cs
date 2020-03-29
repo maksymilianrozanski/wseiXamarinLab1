@@ -1,5 +1,6 @@
 ﻿using FirstLab.controls;
 using FirstLab.controls.circle;
+using FirstLab.controls.qualityText;
 using Xamarin.Forms;
 
 namespace FirstLab
@@ -30,11 +31,7 @@ namespace FirstLab
                 {
                     Children =
                     {
-                        new Label
-                        {
-                            Text = "Świetna jakość!",
-                            FontAttributes = FontAttributes.Bold
-                        },
+                        QualityTextLabel.CreateQualityText(),
 
                         new Label
                         {
