@@ -70,8 +70,8 @@ namespace FirstLab
             PMValuesGrid.Children.Add(
                 GridItem.CreateGridItem("PM 10", 67, "mg/m3", 135), 1, 0);
 
-            HumiditySlider = SliderItem.CreateSlider("Humidity", 0, 100, "%");
-            PressureSlider = SliderItem.CreateSlider("Pressure", 900, 1100, "hPa");
+            HumiditySlider = SliderItem.CreateSlider("Humidity", 0, 100, "%", "Humidity");
+            PressureSlider = SliderItem.CreateSlider("Pressure", 900, 1100, "hPa", "Pressure");
 
             MyStackLayout.Children.Add(Circle);
             MyStackLayout.Children.Add(QualityText);

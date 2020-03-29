@@ -6,11 +6,11 @@ namespace FirstLab.controls.slider
 {
     public static class SliderItem
     {
-        public static StackLayout CreateSlider(string name, int min, int max, string unit)
+        public static StackLayout CreateSlider(string name, int min, int max, string unit, string bindingName)
         {
             var title = new Label {Text = name, Style = SliderStyles.SliderLabelStyle()};
 
-            var sliderValue = new Label {Text = min + " " + unit, Style = SliderStyles.SliderLabelStyle()};
+            var sliderValueLabel = new Label {Text = min + " " + unit, Style = SliderStyles.SliderLabelStyle()};
 
             var slider = new Slider
             {
@@ -19,12 +19,13 @@ namespace FirstLab.controls.slider
                 Value = min,
                 Style = SliderStyles.SliderStyle()
             };
+            slider.SetBinding(Slider.ValueProperty, new Binding(bindingName));
 
-            slider.ValueChanged += (sender, args) => { sliderValue.Text = args.NewValue + " " + unit; };
+            slider.ValueChanged += (sender, args) => { sliderValueLabel.Text = args.NewValue + " " + unit; };
 
             return new StackLayout
             {
-                Children = {title, sliderValue, slider}
+                Children = {title, sliderValueLabel, slider}
             };
         }
     }
