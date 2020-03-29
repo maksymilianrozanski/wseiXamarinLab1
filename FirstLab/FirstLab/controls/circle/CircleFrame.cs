@@ -18,11 +18,7 @@ namespace FirstLab.controls.circle
                     Children =
                     {
                         caqiValue,
-                        new Label
-                        {
-                            Text = "CAQI",
-                            HorizontalTextAlignment = TextAlignment.Center
-                        }
+                        CaqiText.CreateCaqiTextLabel()
                     }
                 }
             };
