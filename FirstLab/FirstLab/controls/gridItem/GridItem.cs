@@ -1,4 +1,5 @@
 using FirstLab.styles;
+using FirstLab.styles.gridItem;
 using Xamarin.Forms;
 
 namespace FirstLab.controls.gridItem
@@ -30,18 +31,8 @@ namespace FirstLab.controls.gridItem
                         }
                     }
                 },
-                Resources = CreateResourceDictionary()
+                Resources = GridItemStyle.CreateResourceDictionary()
             };
-        }
-
-        private static ResourceDictionary CreateResourceDictionary()
-        {
-            var style = new Style(typeof(Span))
-            {
-                Setters = {new Setter {Property = Entry.TextColorProperty, Value = Colors.TextColorMain}}
-            };
-
-            return new ResourceDictionary {style};
         }
     }
 }
