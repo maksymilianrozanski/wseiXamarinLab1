@@ -26,9 +26,13 @@ namespace FirstLab.viewModels
             thread.Start();
         }
 
+        public const string CaqiValueBindName = "CaqiValue";
         private int _caqiValue;
+        public const string HumidityBindName = "Humidity";
         private int _humidity;
+        public const string PressureBindName = "Pressure";
         private int _pressure;
+        public const string QualityTextBindName = "QualityText";
         private string _qualityText;
 
         public int CaqiValue
@@ -38,7 +42,7 @@ namespace FirstLab.viewModels
             {
                 if (value == _caqiValue) return;
                 _caqiValue = value;
-                OnPropertyChanged("CaqiValue");
+                OnPropertyChanged(CaqiValueBindName);
             }
         }
 
@@ -49,7 +53,7 @@ namespace FirstLab.viewModels
             {
                 if (value == _humidity) return;
                 _humidity = value;
-                OnPropertyChanged("Humidity");
+                OnPropertyChanged(HumidityBindName);
             }
         }
 
@@ -60,7 +64,7 @@ namespace FirstLab.viewModels
             {
                 if (value == _pressure) return;
                 _pressure = value;
-                OnPropertyChanged("Pressure");
+                OnPropertyChanged(PressureBindName);
             }
         }
 
@@ -71,7 +75,7 @@ namespace FirstLab.viewModels
             {
                 if (value == _qualityText) return;
                 _qualityText = value;
-                OnPropertyChanged("QualityText");
+                OnPropertyChanged(QualityTextBindName);
             }
         }
 

@@ -1,4 +1,5 @@
 using FirstLab.styles.circle;
+using FirstLab.viewModels;
 using Xamarin.Forms;
 
 namespace FirstLab.controls.circle
@@ -12,7 +13,7 @@ namespace FirstLab.controls.circle
                 Style = CaqiCircleStyles.CaqiValueStyle()
             };
 
-            label.SetBinding(Label.TextProperty, new Binding("CaqiValue"));
+            label.SetBinding(Label.TextProperty, new Binding(DetailsViewModel.CaqiValueBindName));
 
             return label;
         }

@@ -1,5 +1,5 @@
-using FirstLab.styles;
 using FirstLab.styles.qualityText;
+using FirstLab.viewModels;
 using Xamarin.Forms;
 
 namespace FirstLab.controls.qualityText
@@ -12,7 +12,7 @@ namespace FirstLab.controls.qualityText
             {
                 Style = QualityTextStyles.QualityTextStyle()
             };
-            label.SetBinding(Label.TextProperty, new Binding("QualityText"));
+            label.SetBinding(Label.TextProperty, new Binding(DetailsViewModel.QualityTextBindName));
             return label;
         }
     }

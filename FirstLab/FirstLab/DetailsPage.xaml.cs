@@ -1,5 +1,4 @@
-﻿using FirstLab.controls;
-using FirstLab.controls.circle;
+﻿using FirstLab.controls.circle;
 using FirstLab.controls.gridItem;
 using FirstLab.controls.qualityText;
 using FirstLab.controls.slider;
@@ -25,9 +24,9 @@ namespace FirstLab
         public DetailsPage()
         {
             InitializeComponent();
-            var vm  = new DetailsViewModel(Navigation);
+            var vm = new DetailsViewModel(Navigation);
             this.BindingContext = vm;
-            
+
             Circle = CircleFrame.CreateCircleFrame();
 
             QualityText = new Frame
@@ -70,8 +69,8 @@ namespace FirstLab
             PMValuesGrid.Children.Add(
                 GridItem.CreateGridItem("PM 10", 67, "mg/m3", 135), 1, 0);
 
-            HumiditySlider = SliderItem.CreateSlider("Humidity", 0, 100, "%", "Humidity");
-            PressureSlider = SliderItem.CreateSlider("Pressure", 900, 1100, "hPa", "Pressure");
+            HumiditySlider = SliderItem.CreateSlider("Humidity", 0, 100, "%", DetailsViewModel.HumidityBindName);
+            PressureSlider = SliderItem.CreateSlider("Pressure", 900, 1100, "hPa", DetailsViewModel.PressureBindName);
 
             MyStackLayout.Children.Add(Circle);
             MyStackLayout.Children.Add(QualityText);
