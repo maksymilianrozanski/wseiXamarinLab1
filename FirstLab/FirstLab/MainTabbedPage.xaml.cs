@@ -1,4 +1,7 @@
 using Xamarin.Forms;
+using Xamarin.Forms.PlatformConfiguration;
+using Xamarin.Forms.PlatformConfiguration.AndroidSpecific;
+using TabbedPage = Xamarin.Forms.TabbedPage;
 
 namespace FirstLab
 {
@@ -7,9 +10,9 @@ namespace FirstLab
         public MainTabbedPage()
         {
             InitializeComponent();
-
+            On<Android>().SetToolbarPlacement(ToolbarPlacement.Bottom);
             Children.Add(new NavigationPage(new HomePage()) {Title = "Home"});
-            Children.Add(new NavigationPage(new SettingsPage()){Title = "Settings"});
+            Children.Add(new NavigationPage(new SettingsPage()) {Title = "Settings"});
         }
     }
 }
