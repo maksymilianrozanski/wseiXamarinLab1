@@ -11,7 +11,7 @@ namespace FirstLab
         {
             InitializeComponent();
 
-            MainPage = new NavigationPage(new HomePage());
+            MainPage = new NavigationPage(new MainTabbedPage());
         }
 
         protected override void OnStart()
