@@ -7,7 +7,7 @@ using Xamarin.Forms;
 
 namespace FirstLab
 {
-    public partial class MainPage : ContentPage
+    public partial class DetailsPage : ContentPage
     {
         private StackLayout MyStackLayout => myStackLayout;
 
@@ -21,7 +21,7 @@ namespace FirstLab
 
         public StackLayout PressureSlider;
 
-        public MainPage()
+        public DetailsPage()
         {
             InitializeComponent();
 

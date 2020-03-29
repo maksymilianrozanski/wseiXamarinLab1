@@ -12,7 +12,7 @@ namespace FirstLab
         {
             InitializeComponent();
 
-            MainPage = new MainPage();
+            MainPage = new DetailsPage();
         }
 
         protected override void OnStart()
