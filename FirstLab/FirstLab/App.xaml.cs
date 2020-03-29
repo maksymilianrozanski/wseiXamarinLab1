@@ -1,5 +1,4 @@
-﻿using System;
-using Xamarin.Forms;
+﻿using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
 [assembly: XamlCompilation(XamlCompilationOptions.Compile)]
@@ -12,7 +11,7 @@ namespace FirstLab
         {
             InitializeComponent();
 
-            MainPage = new DetailsPage();
+            MainPage = new NavigationPage(new HomePage());
         }
 
         protected override void OnStart()
