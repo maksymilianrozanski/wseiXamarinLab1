@@ -1,6 +1,7 @@
 ﻿using FirstLab.controls;
 using FirstLab.controls.circle;
 using FirstLab.controls.qualityText;
+using FirstLab.controls.slider;
 using Xamarin.Forms;
 
 namespace FirstLab

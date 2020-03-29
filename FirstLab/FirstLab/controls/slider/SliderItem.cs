@@ -1,6 +1,6 @@
 using Xamarin.Forms;
 
-namespace FirstLab.controls
+namespace FirstLab.controls.slider
 {
     public static class SliderItem
     {
