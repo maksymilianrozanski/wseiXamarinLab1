@@ -13,12 +13,14 @@ namespace FirstLab.viewModels
 
             var thread = new Thread(() =>
             {
-                Thread.Sleep(2000);
+                Thread.Sleep(1000);
                 while (true)
                 {
-                    CaqiValue = DateTime.Now.Second;
-                    Humidity = DateTime.Now.Second;
-                    Pressure = DateTime.Now.Second + 1000;
+                    var now = DateTime.Now.Second;
+                    CaqiValue = now;
+                    Humidity = now;
+                    Pressure = now + 1000;
+                    QualityText = now % 2 == 0 ? "Good" : "Bad";
                 }
             });
             thread.Start();
@@ -27,6 +29,7 @@ namespace FirstLab.viewModels
         private int _caqiValue;
         private int _humidity;
         private int _pressure;
+        private string _qualityText;
 
         public int CaqiValue
         {
@@ -58,6 +61,17 @@ namespace FirstLab.viewModels
                 if (value == _pressure) return;
                 _pressure = value;
                 OnPropertyChanged("Pressure");
+            }
+        }
+
+        public string QualityText
+        {
+            get => _qualityText;
+            set
+            {
+                if (value == _qualityText) return;
+                _qualityText = value;
+                OnPropertyChanged("QualityText");
             }
         }
 

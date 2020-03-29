@@ -7,11 +7,12 @@ namespace FirstLab.controls.qualityText
     {
         public static Label CreateQualityText()
         {
-            return new Label
+            var label = new Label
             {
-                Text = "Świetna jakość!",
                 Style = QualityTextStyle()
             };
+            label.SetBinding(Label.TextProperty, new Binding("QualityText"));
+            return label;
         }
 
         private static Style QualityTextStyle()
