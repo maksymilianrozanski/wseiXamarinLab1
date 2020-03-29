@@ -1,3 +1,4 @@
+using FirstLab.viewModels;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -13,11 +14,11 @@ namespace FirstLab
         public HomePage()
         {
             InitializeComponent();
-            HomePageButton = new Button
-            {
-                Text = "This is home page button",
-            };
-            HomePageButton.Clicked += (sender, e) => Navigation.PushAsync(new DetailsPage());
+
+            var vm = new HomeViewModel(Navigation);
+            BindingContext = vm;
+
+            HomePageButton = new Button {Text = "This is home page button", Command = vm.MyCommand,};
 
             HomePageStackLayout.Children.Add(HomePageButton);
         }
