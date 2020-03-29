@@ -1,4 +1,5 @@
 using FirstLab.styles;
+using FirstLab.styles.qualityText;
 using Xamarin.Forms;
 
 namespace FirstLab.controls.qualityText
@@ -9,24 +10,10 @@ namespace FirstLab.controls.qualityText
         {
             var label = new Label
             {
-                Style = QualityTextStyle()
+                Style = QualityTextStyles.QualityTextStyle()
             };
             label.SetBinding(Label.TextProperty, new Binding("QualityText"));
             return label;
-        }
-
-        private static Style QualityTextStyle()
-        {
-            return new Style(typeof(Label))
-            {
-                Setters =
-                {
-                    new Setter {Property = Label.FontSizeProperty, Value = 20},
-                    new Setter {Property = Label.TextColorProperty, Value = Colors.TextColorMain},
-                    new Setter {Property = Label.FontProperty, Value = FontAttributes.Bold},
-                    new Setter {Property = Label.HorizontalTextAlignmentProperty, Value = TextAlignment.Center},
-                }
-            };
         }
     }
 }
