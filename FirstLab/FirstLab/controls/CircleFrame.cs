@@ -2,7 +2,7 @@ using Xamarin.Forms;
 
 namespace FirstLab.controls
 {
-    public class CircleFrame
+    public class CircleFrame : ContentPage
     {
         public static Frame CreateCircleFrame()
         {
@@ -15,14 +15,11 @@ namespace FirstLab.controls
                 VerticalTextAlignment = TextAlignment.Start
             };
 
+            var circleFrameStyle = CircleFrameStyle();
+
             var circle = new Frame
             {
-                BackgroundColor = Color.GreenYellow,
-                HeightRequest = 100,
-                WidthRequest = 100,
-                CornerRadius = 100,
-                VerticalOptions = LayoutOptions.Start,
-                HorizontalOptions = LayoutOptions.Center,
+                Style = circleFrameStyle,
                 Content = new StackLayout
                 {
                     Children =
@@ -38,6 +35,23 @@ namespace FirstLab.controls
             };
 
             return circle;
+        }
+
+        private static Style CircleFrameStyle()
+        {
+            return new Style(typeof(Label))
+            {
+                Setters =
+                {
+                    new Setter {Property = BackgroundColorProperty, Value = Color.GreenYellow},
+                    new Setter {Property = HeightRequestProperty, Value = 100},
+                    new Setter {Property = WidthRequestProperty, Value = 100},
+                    new Setter {Property = Frame.CornerRadiusProperty, Value = 100},
+                    new Setter {Property = Frame.BorderColorProperty, Value = Color.Gray},
+                    new Setter {Property = View.VerticalOptionsProperty, Value = LayoutOptions.Start},
+                    new Setter {Property = View.HorizontalOptionsProperty, Value = LayoutOptions.Center}
+                }
+            };
         }
     }
 }
