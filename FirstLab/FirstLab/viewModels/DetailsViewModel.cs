@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using Xamarin.Forms;
 
@@ -57,7 +58,7 @@ namespace FirstLab.viewModels
             {
                 if (value == _pmTwoPointFivePercent) return;
                 _pmTwoPointFivePercent = value;
-                OnPropertyChanged(PmTwoPointFivePercentBindName);
+                NotifyPropertyChanged();
             }
         }
 
@@ -68,7 +69,7 @@ namespace FirstLab.viewModels
             {
                 if (value == _pmTwoPointFiveValue) return;
                 _pmTwoPointFiveValue = value;
-                OnPropertyChanged(PmTwoPointFiveValueBindName);
+                NotifyPropertyChanged();
             }
         }
 
@@ -79,7 +80,7 @@ namespace FirstLab.viewModels
             {
                 if (value == _pmTenPercent) return;
                 _pmTenPercent = value;
-                OnPropertyChanged(PmTenPercentBindName);
+                NotifyPropertyChanged();
             }
         }
 
@@ -90,7 +91,7 @@ namespace FirstLab.viewModels
             {
                 if (value == _pmTenValue) return;
                 _pmTenValue = value;
-                OnPropertyChanged(PmTenValueBindName);
+                NotifyPropertyChanged();
             }
         }
 
@@ -101,7 +102,7 @@ namespace FirstLab.viewModels
             {
                 if (value == _qualityDescription) return;
                 _qualityDescription = value;
-                OnPropertyChanged(QualityDescriptionBindName);
+                NotifyPropertyChanged();
             }
         }
 
@@ -112,7 +113,7 @@ namespace FirstLab.viewModels
             {
                 if (value == _caqiValue) return;
                 _caqiValue = value;
-                OnPropertyChanged(CaqiValueBindName);
+                NotifyPropertyChanged();
             }
         }
 
@@ -123,7 +124,7 @@ namespace FirstLab.viewModels
             {
                 if (value == _humidity) return;
                 _humidity = value;
-                OnPropertyChanged(HumidityBindName);
+                NotifyPropertyChanged();
             }
         }
 
@@ -134,7 +135,7 @@ namespace FirstLab.viewModels
             {
                 if (value == _pressure) return;
                 _pressure = value;
-                OnPropertyChanged(PressureBindName);
+                NotifyPropertyChanged();
             }
         }
 
@@ -145,7 +146,7 @@ namespace FirstLab.viewModels
             {
                 if (value == _qualityText) return;
                 _qualityText = value;
-                OnPropertyChanged(QualityTextBindName);
+                NotifyPropertyChanged();
             }
         }
 
@@ -153,16 +154,7 @@ namespace FirstLab.viewModels
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        protected virtual void OnPropertyChanged(string propertyName)
-        {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-            }
-            else
-            {
-                Console.WriteLine("Property changed is null!");
-            }
-        }
+        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "") =>
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }
