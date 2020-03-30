@@ -1,5 +1,5 @@
-using FirstLab.styles;
 using FirstLab.styles.circle;
+using FirstLab.viewModels;
 using Xamarin.Forms;
 
 namespace FirstLab.controls.circle
@@ -24,7 +24,7 @@ namespace FirstLab.controls.circle
                     }
                 }
             };
-
+            circle.SetBinding(BackgroundColorProperty, new Binding(DetailsViewModel.CaqiColorBindName));
             return circle;
         }
     }

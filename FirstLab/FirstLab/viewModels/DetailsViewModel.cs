@@ -27,6 +27,7 @@ namespace FirstLab.viewModels
                     PmTenValue = now;
                     PmTwoPointFivePercent = now;
                     PmTenPercent = now;
+                    CaqiColor = now % 2 == 0 ? Color.MediumAquamarine : Color.Chartreuse;
                 }
             });
             thread.Start();
@@ -34,6 +35,8 @@ namespace FirstLab.viewModels
 
         public const string CaqiValueBindName = nameof(CaqiValue);
         private int _caqiValue;
+        public const string CaqiColorBindName = nameof(CaqiColor);
+        private Color _caqiColor;
         public const string HumidityBindName = nameof(Humidity);
         private int _humidity;
         public const string PressureBindName = nameof(Pressure);
@@ -151,6 +154,17 @@ namespace FirstLab.viewModels
         }
 
         public INavigation Navigation { get; set; }
+
+        public Color CaqiColor
+        {
+            get => _caqiColor;
+            set
+            {
+                if (value == _caqiColor) return;
+                _caqiColor = value;
+                NotifyPropertyChanged();
+            }
+        }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
