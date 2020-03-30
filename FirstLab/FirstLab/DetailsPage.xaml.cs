@@ -65,10 +65,10 @@ namespace FirstLab
             };
 
             PMValuesGrid.Children.Add(
-                GridItem.CreateGridItem("PM 2.5", 34, "mg/m3", 137, DetailsViewModel.PmTwoPointFiveValueBindName,
+                GridItem.CreateGridItem("PM 2.5", "mg/m3", DetailsViewModel.PmTwoPointFiveValueBindName,
                     DetailsViewModel.PmTwoPointFivePercentBindName), 0, 0);
             PMValuesGrid.Children.Add(
-                GridItem.CreateGridItem("PM 10", 67, "mg/m3", 135, DetailsViewModel.PmTenValueBindName,
+                GridItem.CreateGridItem("PM 10", "mg/m3", DetailsViewModel.PmTenValueBindName,
                     DetailsViewModel.PmTenPercentBindName), 1, 0);
 
             HumiditySlider = SliderItem.CreateSlider("Humidity", 0, 100, "%", DetailsViewModel.HumidityBindName);

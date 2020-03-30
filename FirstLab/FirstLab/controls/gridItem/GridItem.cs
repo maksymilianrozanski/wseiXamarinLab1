@@ -5,7 +5,7 @@ namespace FirstLab.controls.gridItem
 {
     public static class GridItem
     {
-        public static StackLayout CreateGridItem(string name, int value, string unit, int percentValue,
+        public static StackLayout CreateGridItem(string name, string unit,
             string bindingNameMgM3, string bindingNamePercent)
         {
             var absoluteValueSpan = new Span {FontSize = 20};
