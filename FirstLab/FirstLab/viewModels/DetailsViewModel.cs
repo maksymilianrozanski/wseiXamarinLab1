@@ -31,15 +31,15 @@ namespace FirstLab.viewModels
             thread.Start();
         }
 
-        public const string CaqiValueBindName = "CaqiValue";
+        public const string CaqiValueBindName = nameof(CaqiValue);
         private int _caqiValue;
-        public const string HumidityBindName = "Humidity";
+        public const string HumidityBindName = nameof(Humidity);
         private int _humidity;
-        public const string PressureBindName = "Pressure";
+        public const string PressureBindName = nameof(Pressure);
         private int _pressure;
-        public const string QualityTextBindName = "QualityText";
+        public const string QualityTextBindName = nameof(QualityText);
         private string _qualityText;
-        public const string QualityDescriptionBindName = "QualityDescription";
+        public const string QualityDescriptionBindName = nameof(QualityDescription);
         private string _qualityDescription;
         public const string PmTwoPointFiveValueBindName = nameof(PmTwoPointFiveValue);
         private int _pmTwoPointFiveValue;
@@ -47,7 +47,7 @@ namespace FirstLab.viewModels
         private int _pmTwoPointFivePercent;
         public const string PmTenValueBindName = nameof(PmTenValue);
         private int _pmTenValue;
-        public const string PmTenPercentBindName =nameof(PmTenPercent);
+        public const string PmTenPercentBindName = nameof(PmTenPercent);
         private int _pmTenPercent;
 
         public int PmTwoPointFivePercent
