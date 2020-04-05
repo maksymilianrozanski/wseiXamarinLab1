@@ -1,3 +1,4 @@
+using FirstLab.location;
 using FirstLab.viewModels;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
@@ -21,6 +22,7 @@ namespace FirstLab
             HomePageButton = new Button {Text = "This is home page button", Command = vm.MyCommand,};
 
             HomePageStackLayout.Children.Add(HomePageButton);
+            LocationProvider.GetLocation();
         }
     }
 }

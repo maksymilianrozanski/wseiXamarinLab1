@@ -7,9 +7,10 @@
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
         <DebugType>pdbonly</DebugType>
         <DebugSymbols>true</DebugSymbols>
+        <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     </PropertyGroup>
-
     <ItemGroup>
-        <PackageReference Include="Xamarin.Forms" Version="3.3.0.912540" />
+        <PackageReference Include="Xamarin.Essentials" Version="1.5.2"/>
+        <PackageReference Include="Xamarin.Forms" Version="4.6.0.529-pre3"/>
     </ItemGroup>
 </Project>
