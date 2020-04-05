@@ -1,11 +1,12 @@
 using System;
+using System.Threading.Tasks;
 using Xamarin.Essentials;
 
 namespace FirstLab.location
 {
     public class LocationProvider
     {
-        public static async void GetLocation()
+        public static async Task<Location> GetLocation()
         {
             try
             {
@@ -13,11 +14,17 @@ namespace FirstLab.location
                 var location = await Geolocation.GetLocationAsync(request);
 
                 Console.WriteLine("Will print location!");
-                
+
                 if (location != null)
                 {
                     Console.WriteLine(
                         $"Latitude: {location.Latitude}, Longitude: {location.Longitude}, Altitude: {location.Altitude}");
+                    return location;
+                }
+                else
+                {
+                    Console.WriteLine("Null location!");
+                    throw new Exception("Null location");
                 }
             }
             catch (FeatureNotSupportedException fnsEx)

@@ -1,3 +1,5 @@
+using System;
+using System.Threading.Tasks;
 using FirstLab.location;
 using FirstLab.viewModels;
 using Xamarin.Forms;
@@ -22,7 +24,15 @@ namespace FirstLab
             HomePageButton = new Button {Text = "This is home page button", Command = vm.MyCommand,};
 
             HomePageStackLayout.Children.Add(HomePageButton);
-            LocationProvider.GetLocation();
+
+            Console.WriteLine("HomePage will print location");
+            ReadLocation();
+        }
+
+        private static async Task ReadLocation()
+        {
+            var location = await LocationProvider.GetLocation();
+            Console.WriteLine("Printing location from HomePage: " + location);
         }
     }
 }
