@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
@@ -101,6 +102,27 @@ namespace FirstLabUnitTests.network
                     {"maxDistanceKM", "-1"},
                     {"maxResults", "1"},
                 })
+                .Respond("application/json", ExampleContent);
+
+            var client = mockHttp.ToHttpClient();
+            client.DefaultRequestHeaders.Add("Accept", "application/json");
+            client.DefaultRequestHeaders.Add("apikey", "ExpectedApiKey");
+            client.BaseAddress = new Uri(baseUrl);
+
+            var networkUnderTest = new Network(client);
+            var result = networkUnderTest.GetNearestInstallations(location).Result.Result;
+            mockHttp.VerifyNoOutstandingExpectation();
+        }
+
+        [Test]
+        public void GetNearestInstallationsShouldRequestCorrectApiEndpoint()
+        {
+            var baseUrl = "http://example.com";
+
+            var location = new Location(50.062006, 19.940984);
+
+            var mockHttp = new MockHttpMessageHandler();
+            mockHttp.When(baseUrl + "/v2/installations/nearest/")
                 .Respond("application/json", ExampleContent);
 
             var client = mockHttp.ToHttpClient();
