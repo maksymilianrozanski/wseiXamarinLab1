@@ -62,5 +62,24 @@ namespace FirstLabUnitTests.network
             var result = networkUnderTest.GetNearestInstallations(new Location(50.062006, 19.940984)).Result.Result;
             mockHttp.VerifyNoOutstandingExpectation();
         }
+
+        [Test]
+        public void ShouldRequestCorrectBaseUrl()
+        {
+            var expectedBase = "http://example.com";
+            
+            var mockHttp = new MockHttpMessageHandler();
+            mockHttp.When(expectedBase + "*")
+                .Respond("application/json", ExampleContent);
+
+            var client = mockHttp.ToHttpClient();
+            client.DefaultRequestHeaders.Add("Accept", "application/json");
+            client.DefaultRequestHeaders.Add("apikey", "ExpectedApiKey");
+            client.BaseAddress = new Uri(expectedBase);
+            
+            var networkUnderTest = new Network(client);
+            var result = networkUnderTest.GetNearestInstallations(new Location(50.062006, 19.940984)).Result.Result;
+            mockHttp.VerifyNoOutstandingExpectation();
+        }
     }
 }

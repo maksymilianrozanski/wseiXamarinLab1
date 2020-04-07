@@ -20,7 +20,7 @@ namespace FirstLab.network
 
         public async Task<Task<string>> GetNearestInstallations(Location location)
         {
-            var response = await _client.GetAsync("https://airapi.airly.eu/v2/installations/nearest/1");
+            var response = await _client.GetAsync("/v2/installations/nearest/1");
             return response.Content.ReadAsStringAsync();
         }
     }
