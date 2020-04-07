@@ -6,6 +6,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FirstLab.Android", "FirstLa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FirstLab.iOS", "FirstLab\FirstLab.iOS\FirstLab.iOS.csproj", "{94AAE170-C49E-4A85-8795-15C451AB22F4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FirstLabUnitTests", "FirstLabUnitTests\FirstLabUnitTests.csproj", "{48B6A25D-01C1-46CE-BF36-10AC15C4B2CE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Ad-Hoc|iPhone = Ad-Hoc|iPhone
@@ -82,5 +84,21 @@ Global
 		{94AAE170-C49E-4A85-8795-15C451AB22F4}.Release|iPhoneSimulator.ActiveCfg = Release|iPhoneSimulator
 		{94AAE170-C49E-4A85-8795-15C451AB22F4}.Release|iPhoneSimulator.Build.0 = Release|iPhoneSimulator
 		{94AAE170-C49E-4A85-8795-15C451AB22F4}.Release|iPhoneSimulator.Deploy.0 = Release|iPhoneSimulator
+		{48B6A25D-01C1-46CE-BF36-10AC15C4B2CE}.Ad-Hoc|iPhone.ActiveCfg = Debug|Any CPU
+		{48B6A25D-01C1-46CE-BF36-10AC15C4B2CE}.Ad-Hoc|iPhone.Build.0 = Debug|Any CPU
+		{48B6A25D-01C1-46CE-BF36-10AC15C4B2CE}.AppStore|iPhone.ActiveCfg = Debug|Any CPU
+		{48B6A25D-01C1-46CE-BF36-10AC15C4B2CE}.AppStore|iPhone.Build.0 = Debug|Any CPU
+		{48B6A25D-01C1-46CE-BF36-10AC15C4B2CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{48B6A25D-01C1-46CE-BF36-10AC15C4B2CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{48B6A25D-01C1-46CE-BF36-10AC15C4B2CE}.Debug|iPhone.ActiveCfg = Debug|Any CPU
+		{48B6A25D-01C1-46CE-BF36-10AC15C4B2CE}.Debug|iPhone.Build.0 = Debug|Any CPU
+		{48B6A25D-01C1-46CE-BF36-10AC15C4B2CE}.Debug|iPhoneSimulator.ActiveCfg = Debug|Any CPU
+		{48B6A25D-01C1-46CE-BF36-10AC15C4B2CE}.Debug|iPhoneSimulator.Build.0 = Debug|Any CPU
+		{48B6A25D-01C1-46CE-BF36-10AC15C4B2CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{48B6A25D-01C1-46CE-BF36-10AC15C4B2CE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{48B6A25D-01C1-46CE-BF36-10AC15C4B2CE}.Release|iPhone.ActiveCfg = Release|Any CPU
+		{48B6A25D-01C1-46CE-BF36-10AC15C4B2CE}.Release|iPhone.Build.0 = Release|Any CPU
+		{48B6A25D-01C1-46CE-BF36-10AC15C4B2CE}.Release|iPhoneSimulator.ActiveCfg = Release|Any CPU
+		{48B6A25D-01C1-46CE-BF36-10AC15C4B2CE}.Release|iPhoneSimulator.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
