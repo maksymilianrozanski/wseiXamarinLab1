@@ -7,11 +7,13 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using FirstLab.network;
+using FirstLab.network.models;
 using Moq;
 using Moq.Protected;
 using NUnit.Framework;
 using RichardSzalay.MockHttp;
 using Xamarin.Essentials;
+
 
 namespace FirstLabUnitTests.network
 {
@@ -63,7 +65,8 @@ namespace FirstLabUnitTests.network
             client.BaseAddress = new Uri(baseUri);
 
             var networkUnderTest = new Network(client);
-            var result = networkUnderTest.GetNearestInstallations(new Location(50.062006, 19.940984)).Result.Result;
+            var result = networkUnderTest.GetNearestInstallationsRequest(new Location(50.062006, 19.940984)).Result
+                .Result;
             mockHttp.VerifyNoOutstandingExpectation();
         }
 
@@ -82,7 +85,8 @@ namespace FirstLabUnitTests.network
             client.BaseAddress = new Uri(expectedBase);
 
             var networkUnderTest = new Network(client);
-            var result = networkUnderTest.GetNearestInstallations(new Location(50.062006, 19.940984)).Result.Result;
+            var result = networkUnderTest.GetNearestInstallationsRequest(new Location(50.062006, 19.940984)).Result
+                .Result;
             mockHttp.VerifyNoOutstandingExpectation();
         }
 
@@ -110,7 +114,7 @@ namespace FirstLabUnitTests.network
             client.BaseAddress = new Uri(baseUrl);
 
             var networkUnderTest = new Network(client);
-            var result = networkUnderTest.GetNearestInstallations(location).Result.Result;
+            var result = networkUnderTest.GetNearestInstallationsRequest(location).Result.Result;
             mockHttp.VerifyNoOutstandingExpectation();
         }
 
@@ -131,8 +135,21 @@ namespace FirstLabUnitTests.network
             client.BaseAddress = new Uri(baseUrl);
 
             var networkUnderTest = new Network(client);
-            var result = networkUnderTest.GetNearestInstallations(location).Result.Result;
+            var result = networkUnderTest.GetNearestInstallationsRequest(location).Result.Result;
             mockHttp.VerifyNoOutstandingExpectation();
+        }
+
+        [Test]
+        public void ShouldReturnFirstInstallationOfJson()
+        {
+            var json = ExampleContent;
+            var result = Network.GetNearestInstallation(json);
+            var expected = new Installation(8077, new Location(50.062006, 19.940984),
+                new Address("Poland", "Krak├│w", "Miko┼éajska"));
+            Assert.AreEqual(expected.id, result.id);
+            Assert.AreEqual(expected.location.Latitude, result.location.Latitude);
+            Assert.AreEqual(expected.location.Longitude, result.location.Longitude);
+            Assert.AreEqual(expected.address, result.address);
         }
     }
 }
