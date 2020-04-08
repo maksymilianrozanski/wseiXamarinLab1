@@ -188,7 +188,7 @@ namespace FirstLab.network.models
         }
     }
 
-    public readonly struct Standard 
+    public readonly struct Standard
     {
         public readonly string name;
         public readonly string pollutant;
@@ -205,7 +205,8 @@ namespace FirstLab.network.models
 
         public bool Equals(Standard other)
         {
-            return name == other.name && pollutant == other.pollutant && limit.Equals(other.limit) && percent.Equals(other.percent);
+            return name == other.name && pollutant == other.pollutant && limit.Equals(other.limit) &&
+                   percent.Equals(other.percent);
         }
 
         public override bool Equals(object obj)
