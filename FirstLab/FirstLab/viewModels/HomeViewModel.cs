@@ -28,14 +28,9 @@ namespace FirstLab.viewModels
             },
             new List<Standard> {new Standard("WHO", "PM25", 25.0, 79.05)}));
 
-        public const string MeasurementsBindName = nameof(Measurements);
-        public const string HomeViewModelItemBindName = nameof(Items);
-        
         private List<(Measurements, int)> _measurements;
 
         public ICommand MyCommand { get; set; }
-
-        private List<HomeViewModelItem> _items;
 
         public List<(Measurements, int)> Measurements
         {
@@ -45,33 +40,11 @@ namespace FirstLab.viewModels
 
         public List<MeasurementViewModelItem> MeasurementViewModelItems
         {
-            get
-            {
-                IEnumerable<(Current, int)> currentAndInt = _measurements.Select(it =>
-                    (it.Item1.current, it.Item2));
-
-                var valueAndInt =
-                    currentAndInt.Select(it => (it.Item1.values, it.Item2))
-                        .SelectMany(tuple => tuple.values, (tuple, i) => (tuple, i))
-                        .Select(it => new MeasurementViewModelItem()
-                        {
-                            Name = it.i.name, Value = it.i.value
-                        });
-
-                return valueAndInt.ToList();
-            }
+            get => _measurements.Select(it =>
+                    (it.Item1.current, it.Item2)).Select(it => (it.Item1.values, it.Item2))
+                .SelectMany(tuple => tuple.values, (tuple, i) => (tuple, i))
+                .Select(it => new MeasurementViewModelItem {Name = it.i.name, Value = it.i.value}).ToList();
         }
-
-        public List<HomeViewModelItem> Items
-        {
-            get => _items;
-            set => SetProperty(ref _items, value);
-        }
-    }
-
-    public class HomeViewModelItem
-    {
-        public string Name { get; set; }
     }
 
     public class MeasurementViewModelItem

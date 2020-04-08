@@ -15,10 +15,7 @@ namespace FirstLab
 
         public Button HomePageButton;
 
-        public ObservableCollection<HomeViewModelItem> Items;
-
-        public ObservableCollection<MeasurementViewModelItem> MeasurementViewModelItems;
-        
+        public ObservableCollection<MeasurementViewModelItem> MeasurementItems;
 
         public HomePage()
         {
@@ -32,9 +29,10 @@ namespace FirstLab
             HomePageStackLayout.Children.Add(HomePageButton);
 
             var listView = new ListView();
-            listView.ItemsSource = MeasurementViewModelItems;
+            listView.ItemsSource = MeasurementItems;
             listView.ItemTemplate = new DataTemplate(typeof(MeasurementItemCellTemplate));
-            listView.SetBinding(ListView.ItemsSourceProperty, new Binding(nameof(MeasurementViewModelItems)));
+            listView.SetBinding(ListView.ItemsSourceProperty,
+                new Binding(nameof(HomeViewModel.MeasurementViewModelItems)));
             HomePageStackLayout.Children.Add(listView);
 
             Console.WriteLine("HomePage will print location");
@@ -47,5 +45,4 @@ namespace FirstLab
             Console.WriteLine("Printing location from HomePage: " + location);
         }
     }
-    
 }
