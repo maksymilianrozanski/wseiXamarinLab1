@@ -122,13 +122,13 @@ namespace FirstLab.viewModels
 
         private bool SetProperty<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
         {
+            void NotifyPropertyChanged() =>
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
             if (EqualityComparer<T>.Default.Equals(field, value)) return false;
             field = value;
-            NotifyPropertyChanged(propertyName);
+            NotifyPropertyChanged();
             return true;
         }
-
-        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "") =>
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }
