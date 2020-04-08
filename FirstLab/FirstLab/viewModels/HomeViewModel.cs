@@ -3,17 +3,14 @@ using Xamarin.Forms;
 
 namespace FirstLab.viewModels
 {
-    public class HomeViewModel
+    public class HomeViewModel : BaseViewModel
     {
-        public HomeViewModel(INavigation navigation)
+        public HomeViewModel(INavigation navigation): base(navigation)
         {
-            this.Navigation = navigation;
             this.MyCommand = new Command(
                 execute: () => { navigation.PushAsync(new DetailsPage()); }
             );
         }
-
-        public INavigation Navigation { get; set; }
 
         public ICommand MyCommand { get; set; }
     }
