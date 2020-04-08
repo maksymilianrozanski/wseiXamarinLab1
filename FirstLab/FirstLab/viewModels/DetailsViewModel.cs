@@ -8,12 +8,32 @@ using Xamarin.Forms;
 
 namespace FirstLab.viewModels
 {
-    public class DetailsViewModel : INotifyPropertyChanged
+    public abstract class BaseViewModel : INotifyPropertyChanged
     {
-        public DetailsViewModel(INavigation navigation)
+        public INavigation Navigation { get; set; }
+        public virtual event PropertyChangedEventHandler PropertyChanged;
+
+        protected BaseViewModel(INavigation navigation)
         {
             Navigation = navigation;
+        }
 
+        protected bool SetProperty<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
+        {
+            void NotifyPropertyChanged() =>
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
+            if (EqualityComparer<T>.Default.Equals(field, value)) return false;
+            field = value;
+            NotifyPropertyChanged();
+            return true;
+        }
+    }
+
+    public class DetailsViewModel : BaseViewModel
+    {
+        public DetailsViewModel(INavigation navigation) : base(navigation)
+        {
             var thread = new Thread(() =>
             {
                 Thread.Sleep(1000);
@@ -110,25 +130,10 @@ namespace FirstLab.viewModels
             set => SetProperty(ref _qualityText, value);
         }
 
-        public INavigation Navigation { get; set; }
-
         public Color CaqiColor
         {
             get => _caqiColor;
             set => SetProperty(ref _caqiColor, value);
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        private bool SetProperty<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
-        {
-            void NotifyPropertyChanged() =>
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-
-            if (EqualityComparer<T>.Default.Equals(field, value)) return false;
-            field = value;
-            NotifyPropertyChanged();
-            return true;
         }
     }
 }
