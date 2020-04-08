@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Windows.Input;
 using FirstLab.network.models;
@@ -15,24 +16,6 @@ namespace FirstLab.viewModels
                 execute: () => { navigation.PushAsync(new DetailsPage()); }
             );
             Measurements = new List<(Measurements, int)> {(_measurementStub, 8077)};
-            Items = new List<HomeViewModelItem>
-            {
-            };
-
-            var thread = new Thread(() =>
-            {
-                Thread.Sleep(1000);
-                while (true)
-                {
-                    var now = DateTime.Now.Second;
-                    Items = new List<HomeViewModelItem>
-                    {
-                        new HomeViewModelItem {Name = "someText" + now},
-                        new HomeViewModelItem {Name = "someText" + now + 2}
-                    };
-                }
-            });
-            thread.Start();
         }
 
         private readonly Measurements _measurementStub = new Measurements(new Current(
@@ -47,6 +30,7 @@ namespace FirstLab.viewModels
 
         public const string MeasurementsBindName = nameof(Measurements);
         public const string HomeViewModelItemBindName = nameof(Items);
+        
         private List<(Measurements, int)> _measurements;
 
         public ICommand MyCommand { get; set; }
@@ -57,6 +41,25 @@ namespace FirstLab.viewModels
         {
             get => _measurements;
             set => SetProperty(ref _measurements, value);
+        }
+
+        public List<MeasurementViewModelItem> MeasurementViewModelItems
+        {
+            get
+            {
+                IEnumerable<(Current, int)> currentAndInt = _measurements.Select(it =>
+                    (it.Item1.current, it.Item2));
+
+                var valueAndInt =
+                    currentAndInt.Select(it => (it.Item1.values, it.Item2))
+                        .SelectMany(tuple => tuple.values, (tuple, i) => (tuple, i))
+                        .Select(it => new MeasurementViewModelItem()
+                        {
+                            Name = it.i.name, Value = it.i.value
+                        });
+
+                return valueAndInt.ToList();
+            }
         }
 
         public List<HomeViewModelItem> Items
@@ -71,13 +74,24 @@ namespace FirstLab.viewModels
         public string Name { get; set; }
     }
 
-    public class HomeItemTemplate : ViewCell
+    public class MeasurementViewModelItem
     {
-        public HomeItemTemplate()
+        public string Name { get; set; }
+        public double Value { get; set; }
+    }
+
+    public class MeasurementItemCellTemplate : ViewCell
+    {
+        public MeasurementItemCellTemplate()
         {
-            var typeLabel = new Label();
-            typeLabel.SetBinding(Label.TextProperty, new Binding("Name"));
-            View = typeLabel;
+            var stackLayout = new StackLayout();
+            var addressLabel = new Label();
+            addressLabel.SetBinding(Label.TextProperty, nameof(MeasurementViewModelItem.Name));
+            var valueLabel = new Label();
+            valueLabel.SetBinding(Label.TextProperty, nameof(MeasurementViewModelItem.Value));
+            stackLayout.Children.Add(addressLabel);
+            stackLayout.Children.Add(valueLabel);
+            View = stackLayout;
         }
     }
 }
