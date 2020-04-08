@@ -57,5 +57,8 @@ namespace FirstLab.network
             var response = await _client.GetAsync(uriBuilder.Uri.ToString());
             return response.Content.ReadAsStringAsync();
         }
+
+        public static Measurements GetMeasurements(string json)
+            => JsonConvert.DeserializeObject<Measurements>(json);
     }
 }
