@@ -1,4 +1,5 @@
 using System;
+using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using FirstLab.location;
 using FirstLab.viewModels;
@@ -14,6 +15,8 @@ namespace FirstLab
 
         public Button HomePageButton;
 
+        public ObservableCollection<HomeViewModelItem> Items;
+
         public HomePage()
         {
             InitializeComponent();
@@ -25,6 +28,12 @@ namespace FirstLab
 
             HomePageStackLayout.Children.Add(HomePageButton);
 
+            var listView = new ListView();
+            listView.ItemsSource = Items;
+            listView.ItemTemplate = new DataTemplate(typeof(HomeItemTemplate));
+            listView.SetBinding(ListView.ItemsSourceProperty, new Binding(HomeViewModel.HomeViewModelItemBindName));
+            HomePageStackLayout.Children.Add(listView);
+
             Console.WriteLine("HomePage will print location");
             ReadLocation();
         }
@@ -35,4 +44,5 @@ namespace FirstLab
             Console.WriteLine("Printing location from HomePage: " + location);
         }
     }
+    
 }

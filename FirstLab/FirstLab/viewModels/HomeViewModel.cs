@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Windows.Input;
 using FirstLab.network.models;
 using Xamarin.Forms;
@@ -13,6 +15,24 @@ namespace FirstLab.viewModels
                 execute: () => { navigation.PushAsync(new DetailsPage()); }
             );
             Measurements = new List<(Measurements, int)> {(_measurementStub, 8077)};
+            Items = new List<HomeViewModelItem>
+            {
+            };
+
+            var thread = new Thread(() =>
+            {
+                Thread.Sleep(1000);
+                while (true)
+                {
+                    var now = DateTime.Now.Second;
+                    Items = new List<HomeViewModelItem>
+                    {
+                        new HomeViewModelItem {Name = "someText" + now},
+                        new HomeViewModelItem {Name = "someText" + now + 2}
+                    };
+                }
+            });
+            thread.Start();
         }
 
         private readonly Measurements _measurementStub = new Measurements(new Current(
@@ -26,14 +46,38 @@ namespace FirstLab.viewModels
             new List<Standard> {new Standard("WHO", "PM25", 25.0, 79.05)}));
 
         public const string MeasurementsBindName = nameof(Measurements);
+        public const string HomeViewModelItemBindName = nameof(Items);
         private List<(Measurements, int)> _measurements;
 
         public ICommand MyCommand { get; set; }
+
+        private List<HomeViewModelItem> _items;
 
         public List<(Measurements, int)> Measurements
         {
             get => _measurements;
             set => SetProperty(ref _measurements, value);
+        }
+
+        public List<HomeViewModelItem> Items
+        {
+            get => _items;
+            set => SetProperty(ref _items, value);
+        }
+    }
+
+    public class HomeViewModelItem
+    {
+        public string Name { get; set; }
+    }
+
+    public class HomeItemTemplate : ViewCell
+    {
+        public HomeItemTemplate()
+        {
+            var typeLabel = new Label();
+            typeLabel.SetBinding(Label.TextProperty, new Binding("Name"));
+            View = typeLabel;
         }
     }
 }
