@@ -1,18 +1,13 @@
 using System;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using System.Threading;
-using FirstLab.location;
 using Xamarin.Forms;
 
 namespace FirstLab.viewModels
 {
-    public class DetailsViewModel : INotifyPropertyChanged
+    public class DetailsViewModel : BaseViewModel
     {
-        public DetailsViewModel(INavigation navigation)
+        public DetailsViewModel(INavigation navigation) : base(navigation)
         {
-            Navigation = navigation;
-
             var thread = new Thread(() =>
             {
                 Thread.Sleep(1000);
@@ -58,118 +53,61 @@ namespace FirstLab.viewModels
         public int PmTwoPointFivePercent
         {
             get => _pmTwoPointFivePercent;
-            set
-            {
-                if (value == _pmTwoPointFivePercent) return;
-                _pmTwoPointFivePercent = value;
-                NotifyPropertyChanged();
-            }
+            set => SetProperty(ref _pmTwoPointFivePercent, value);
         }
 
         public int PmTwoPointFiveValue
         {
             get => _pmTwoPointFiveValue;
-            set
-            {
-                if (value == _pmTwoPointFiveValue) return;
-                _pmTwoPointFiveValue = value;
-                NotifyPropertyChanged();
-            }
+            set => SetProperty(ref _pmTwoPointFiveValue, value);
         }
 
         public int PmTenPercent
         {
             get => _pmTenPercent;
-            set
-            {
-                if (value == _pmTenPercent) return;
-                _pmTenPercent = value;
-                NotifyPropertyChanged();
-            }
+            set => SetProperty(ref _pmTenPercent, value);
         }
 
         public int PmTenValue
         {
             get => _pmTenValue;
-            set
-            {
-                if (value == _pmTenValue) return;
-                _pmTenValue = value;
-                NotifyPropertyChanged();
-            }
+            set => SetProperty(ref _pmTenValue, value);
         }
 
         public string QualityDescription
         {
             get => _qualityDescription;
-            set
-            {
-                if (value == _qualityDescription) return;
-                _qualityDescription = value;
-                NotifyPropertyChanged();
-            }
+            set => SetProperty(ref _qualityDescription, value);
         }
 
         public int CaqiValue
         {
             get => _caqiValue;
-            set
-            {
-                if (value == _caqiValue) return;
-                _caqiValue = value;
-                NotifyPropertyChanged();
-            }
+            set => SetProperty(ref _caqiValue, value);
         }
 
         public int Humidity
         {
             get => _humidity;
-            set
-            {
-                if (value == _humidity) return;
-                _humidity = value;
-                NotifyPropertyChanged();
-            }
+            set => SetProperty(ref _humidity, value);
         }
 
         public int Pressure
         {
             get => _pressure;
-            set
-            {
-                if (value == _pressure) return;
-                _pressure = value;
-                NotifyPropertyChanged();
-            }
+            set => SetProperty(ref _pressure, value);
         }
 
         public string QualityText
         {
             get => _qualityText;
-            set
-            {
-                if (value == _qualityText) return;
-                _qualityText = value;
-                NotifyPropertyChanged();
-            }
+            set => SetProperty(ref _qualityText, value);
         }
-
-        public INavigation Navigation { get; set; }
 
         public Color CaqiColor
         {
             get => _caqiColor;
-            set
-            {
-                if (value == _caqiColor) return;
-                _caqiColor = value;
-                NotifyPropertyChanged();
-            }
+            set => SetProperty(ref _caqiColor, value);
         }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "") =>
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }
