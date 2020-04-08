@@ -42,5 +42,20 @@ namespace FirstLab.network
 
         public static Installation GetNearestInstallation(string json) =>
             JsonConvert.DeserializeObject<List<Installation>>(json)[0];
+
+        public async Task<Task<string>> GetMeasurementsRequest(int id)
+        {
+            var query = HttpUtility.ParseQueryString(string.Empty);
+            query["id"] = id.ToString();
+
+            var uriBuilder =
+                new UriBuilder(Path.Combine(_client.BaseAddress.ToString(), "v2/measurements/installation/"))
+                {
+                    Query = query.ToString(),
+                };
+
+            var response = await _client.GetAsync(uriBuilder.Uri.ToString());
+            return response.Content.ReadAsStringAsync();
+        }
     }
 }
