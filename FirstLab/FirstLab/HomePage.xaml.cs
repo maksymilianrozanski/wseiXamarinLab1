@@ -1,6 +1,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
+using FirstLab.controls.homePage;
 using FirstLab.location;
 using FirstLab.viewModels;
 using Xamarin.Forms;
