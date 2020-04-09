@@ -1,8 +1,25 @@
+using System.Collections.ObjectModel;
 using FirstLab.viewModels;
 using Xamarin.Forms;
 
 namespace FirstLab.controls.homePage
 {
+    public static class MeasurementsList
+    {
+        public static ListView CreateMeasurementsListView(ObservableCollection<MeasurementVmItem> listViewItemsSource)
+        {
+            var listView = new ListView
+            {
+                ItemsSource = listViewItemsSource,
+                HasUnevenRows = true,
+                ItemTemplate = new DataTemplate(typeof(MeasurementCell))
+            };
+            listView.SetBinding(ListView.ItemsSourceProperty,
+                new Binding(nameof(HomeViewModel.MeasurementInstallationVmItems)));
+            return listView;
+        }
+    }
+
     public class MeasurementCell : ViewCell
     {
         public MeasurementCell()

@@ -5,7 +5,6 @@ using FirstLab.controls.homePage;
 using FirstLab.location;
 using FirstLab.viewModels;
 using Xamarin.Forms;
-using Xamarin.Forms.Markup;
 using Xamarin.Forms.Xaml;
 
 namespace FirstLab
@@ -27,15 +26,9 @@ namespace FirstLab
             BindingContext = vm;
 
             HomePageButton = new Button {Text = "This is home page button", Command = vm.MyCommand,};
-
             HomePageStackLayout.Children.Add(HomePageButton);
 
-            var listView = new ListView();
-            listView.ItemsSource = MeasurementItems;
-            listView.HasUnevenRows = true;
-            listView.ItemTemplate = new DataTemplate(typeof(MeasurementCell));
-            listView.SetBinding(ListView.ItemsSourceProperty,
-                new Binding(nameof(HomeViewModel.MeasurementInstallationVmItems)));
+            var listView = MeasurementsList.CreateMeasurementsListView(MeasurementItems);
             HomePageStackLayout.Children.Add(listView);
 
             Console.WriteLine("HomePage will print location");
