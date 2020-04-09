@@ -55,24 +55,24 @@ namespace FirstLabUnitTests.viewModels
 
             var result = HomeViewModel.MeasurementsInstallationToVmItem(input);
 
-            var expected = new List<MeasurementInstallationVmItem>
+            var expected = new List<MeasurementVmItem>
             {
-                new MeasurementInstallationVmItem
+                new MeasurementVmItem
                 {
                     City = address1.city, Country = address1.country, Street = address1.street, Name = value1.name,
                     Value = value1.value
                 },
-                new MeasurementInstallationVmItem
+                new MeasurementVmItem
                 {
                     City = address1.city, Country = address1.country, Street = address1.street, Name = value2.name,
                     Value = value2.value
                 },
-                new MeasurementInstallationVmItem
+                new MeasurementVmItem
                 {
                     City = address2.city, Country = address2.country, Street = address2.street, Name = value3.name,
                     Value = value3.value
                 },
-                new MeasurementInstallationVmItem
+                new MeasurementVmItem
                 {
                     City = address2.city, Country = address2.country, Street = address2.street, Name = value4.name,
                     Value = value4.value
