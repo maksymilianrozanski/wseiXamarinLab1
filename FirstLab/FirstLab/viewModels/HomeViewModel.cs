@@ -1,7 +1,5 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Windows.Input;
 using FirstLab.network.models;
 using Xamarin.Forms;
@@ -32,6 +30,14 @@ namespace FirstLab.viewModels
 
         public ICommand MyCommand { get; set; }
 
+        private List<(Measurements, Installation)> _measurementsInstallation;
+
+        public List<(Measurements, Installation)> MeasurementsInstallation
+        {
+            get => _measurementsInstallation;
+            set => SetProperty(ref _measurementsInstallation, value);
+        }
+
         public List<(Measurements, int)> Measurements
         {
             get => _measurements;
@@ -45,6 +51,44 @@ namespace FirstLab.viewModels
                 .SelectMany(tuple => tuple.values, (tuple, i) => (tuple, i))
                 .Select(it => new MeasurementViewModelItem {Name = it.i.name, Value = it.i.value}).ToList();
         }
+
+        public List<MeasurementInstallationVmItem> MeasurementInstallationVmItems
+        {
+            get => _measurementsInstallation.Select(it =>
+                    (it.Item1.current, it.Item2)).Select(it => (it.Item1.values, it.Item2))
+                .SelectMany(valuesInst => valuesInst.values, (tuple, value) => (tuple, value))
+                .Select(it => (it.tuple.Item2, it.value))
+                .Select(it => new MeasurementInstallationVmItem
+                {
+                    Country = it.Item1.address.country,
+                    City = it.Item1.address.city,
+                    Street = it.Item1.address.street,
+                    Name = it.value.name,
+                    Value = it.value.value
+                }).ToList();
+        }
+
+        public static List<MeasurementInstallationVmItem> MeasurementsInstallationToVmItem(
+            IEnumerable<(Measurements, Installation)> items) =>
+            items.Select(it => (it.Item1.current.values, it.Item2))
+                .SelectMany(valuesInst => valuesInst.values, (tuple, value) => (value, tuple.Item2))
+                .Select(it => new MeasurementInstallationVmItem
+                {
+                    Country = it.Item2.address.country,
+                    City = it.Item2.address.city,
+                    Street = it.Item2.address.street,
+                    Name = it.value.name,
+                    Value = it.value.value
+                }).ToList();
+    }
+
+    public struct MeasurementInstallationVmItem
+    {
+        public string Country { get; set; }
+        public string City { get; set; }
+        public string Street { get; set; }
+        public string Name { get; set; }
+        public double Value { get; set; }
     }
 
     public class MeasurementViewModelItem
