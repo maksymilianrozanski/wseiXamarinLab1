@@ -16,7 +16,7 @@ namespace FirstLab
 
         public Button HomePageButton;
 
-        public ObservableCollection<MeasurementInstallationVmItem> MeasurementItems;
+        public ObservableCollection<MeasurementVmItem> MeasurementItems;
 
         public HomePage()
         {
@@ -32,7 +32,7 @@ namespace FirstLab
             var listView = new ListView();
             listView.ItemsSource = MeasurementItems;
             listView.HasUnevenRows = true;
-            listView.ItemTemplate = new DataTemplate(typeof(MeasurementItemCellTemplate2));
+            listView.ItemTemplate = new DataTemplate(typeof(MeasurementCell));
             listView.SetBinding(ListView.ItemsSourceProperty,
                 new Binding(nameof(HomeViewModel.MeasurementInstallationVmItems)));
             HomePageStackLayout.Children.Add(listView);

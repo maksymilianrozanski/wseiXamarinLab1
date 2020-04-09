@@ -15,7 +15,7 @@ namespace FirstLab.viewModels
                 execute: () => { navigation.PushAsync(new DetailsPage()); }
             );
             
-            _measurementInstallationVmItems = MeasurementsInstallationToVmItem(new List<(Measurements, Installation)>
+            _measurementVmItems = MeasurementsInstallationToVmItem(new List<(Measurements, Installation)>
                 {(_measurementStub, _installationStub)});
         }
 
@@ -34,19 +34,19 @@ namespace FirstLab.viewModels
 
         public ICommand MyCommand { get; set; }
 
-        private List<MeasurementInstallationVmItem> _measurementInstallationVmItems;
+        private List<MeasurementVmItem> _measurementVmItems;
 
-        public List<MeasurementInstallationVmItem> MeasurementInstallationVmItems
+        public List<MeasurementVmItem> MeasurementInstallationVmItems
         {
-            get => _measurementInstallationVmItems;
-            set => SetProperty(ref _measurementInstallationVmItems, value);
+            get => _measurementVmItems;
+            set => SetProperty(ref _measurementVmItems, value);
         }
 
-        public static List<MeasurementInstallationVmItem> MeasurementsInstallationToVmItem(
+        public static List<MeasurementVmItem> MeasurementsInstallationToVmItem(
             IEnumerable<(Measurements, Installation)> items) =>
             items.Select(it => (it.Item1.current.values, it.Item2))
                 .SelectMany(valuesInst => valuesInst.values, (tuple, value) => (value, tuple.Item2))
-                .Select(it => new MeasurementInstallationVmItem
+                .Select(it => new MeasurementVmItem
                 {
                     Country = it.Item2.address.country,
                     City = it.Item2.address.city,
@@ -56,7 +56,7 @@ namespace FirstLab.viewModels
                 }).ToList();
     }
 
-    public struct MeasurementInstallationVmItem
+    public struct MeasurementVmItem
     {
         public string Country { get; set; }
         public string City { get; set; }
@@ -65,21 +65,21 @@ namespace FirstLab.viewModels
         public double Value { get; set; }
     }
 
-    public class MeasurementItemCellTemplate2 : ViewCell
+    public class MeasurementCell : ViewCell
     {
-        public MeasurementItemCellTemplate2()
+        public MeasurementCell()
         {
             var stackLayout = new StackLayout();
             var countryLabel = new Label();
-            countryLabel.SetBinding(Label.TextProperty, nameof(MeasurementInstallationVmItem.Country));
+            countryLabel.SetBinding(Label.TextProperty, nameof(MeasurementVmItem.Country));
             var cityLabel = new Label();
-            cityLabel.SetBinding(Label.TextProperty, nameof(MeasurementInstallationVmItem.City));
+            cityLabel.SetBinding(Label.TextProperty, nameof(MeasurementVmItem.City));
             var streetLabel = new Label();
-            streetLabel.SetBinding(Label.TextProperty, nameof(MeasurementInstallationVmItem.Street));
+            streetLabel.SetBinding(Label.TextProperty, nameof(MeasurementVmItem.Street));
             var nameLabel = new Label();
-            nameLabel.SetBinding(Label.TextProperty, nameof(MeasurementInstallationVmItem.Name));
+            nameLabel.SetBinding(Label.TextProperty, nameof(MeasurementVmItem.Name));
             var valueLabel = new Label();
-            valueLabel.SetBinding(Label.TextProperty, nameof(MeasurementInstallationVmItem.Value));
+            valueLabel.SetBinding(Label.TextProperty, nameof(MeasurementVmItem.Value));
 
             stackLayout.Children.Add(countryLabel);
             stackLayout.Children.Add(cityLabel);
