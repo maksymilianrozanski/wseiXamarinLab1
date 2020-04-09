@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using FirstLab.location;
 using FirstLab.viewModels;
 using Xamarin.Forms;
+using Xamarin.Forms.Markup;
 using Xamarin.Forms.Xaml;
 
 namespace FirstLab
@@ -15,7 +16,7 @@ namespace FirstLab
 
         public Button HomePageButton;
 
-        public ObservableCollection<MeasurementViewModelItem> MeasurementItems;
+        public ObservableCollection<MeasurementInstallationVmItem> MeasurementItems;
 
         public HomePage()
         {
@@ -30,9 +31,10 @@ namespace FirstLab
 
             var listView = new ListView();
             listView.ItemsSource = MeasurementItems;
-            listView.ItemTemplate = new DataTemplate(typeof(MeasurementItemCellTemplate));
+            listView.HasUnevenRows = true;
+            listView.ItemTemplate = new DataTemplate(typeof(MeasurementItemCellTemplate2));
             listView.SetBinding(ListView.ItemsSourceProperty,
-                new Binding(nameof(HomeViewModel.MeasurementViewModelItems)));
+                new Binding(nameof(HomeViewModel.MeasurementInstallationVmItems)));
             HomePageStackLayout.Children.Add(listView);
 
             Console.WriteLine("HomePage will print location");
