@@ -1,4 +1,5 @@
-﻿using FirstLab.controls.circle;
+﻿using System;
+using FirstLab.controls.circle;
 using FirstLab.controls.gridItem;
 using FirstLab.controls.qualityText;
 using FirstLab.controls.slider;
@@ -21,7 +22,7 @@ namespace FirstLab
 
         public StackLayout PressureSlider;
 
-        public DetailsPage()
+        public DetailsPage(MeasurementVmItem vmItem)
         {
             InitializeComponent();
             var vm = new DetailsViewModel(Navigation);

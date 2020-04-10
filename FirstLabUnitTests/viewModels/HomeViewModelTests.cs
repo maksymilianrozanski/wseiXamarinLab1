@@ -59,24 +59,14 @@ namespace FirstLabUnitTests.viewModels
             {
                 new MeasurementVmItem
                 {
-                    City = address1.city, Country = address1.country, Street = address1.street, Name = value1.name,
-                    Value = value1.value
+                    City = address1.city, Country = address1.country, Street = address1.street,
+                    Measurements = measurements1, Installation = installation1
                 },
                 new MeasurementVmItem
                 {
-                    City = address1.city, Country = address1.country, Street = address1.street, Name = value2.name,
-                    Value = value2.value
+                    City = address2.city, Country = address2.country, Street = address2.street,
+                    Measurements = measurements2, Installation = installation2
                 },
-                new MeasurementVmItem
-                {
-                    City = address2.city, Country = address2.country, Street = address2.street, Name = value3.name,
-                    Value = value3.value
-                },
-                new MeasurementVmItem
-                {
-                    City = address2.city, Country = address2.country, Street = address2.street, Name = value4.name,
-                    Value = value4.value
-                }
             };
 
             Assert.AreEqual(expected,result);

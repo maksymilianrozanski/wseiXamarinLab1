@@ -11,12 +11,12 @@ namespace FirstLab.viewModels
     {
         public HomeViewModel(INavigation navigation) : base(navigation)
         {
-            this.MyCommand = new Command(
-                execute: () => { navigation.PushAsync(new DetailsPage()); }
+            this.MyCommand = new Command<MeasurementVmItem>(
+                execute: vmListItem => { navigation.PushAsync(new DetailsPage(vmListItem)); }
             );
-            
+
             _measurementVmItems = MeasurementsInstallationToVmItem(new List<(Measurements, Installation)>
-                {(_measurementStub, _installationStub)});
+                {(_measurementStub, _installationStub), (_measurementStub, _installationStub)});
         }
 
         private readonly Measurements _measurementStub = new Measurements(new Current(
@@ -44,24 +44,23 @@ namespace FirstLab.viewModels
 
         public static List<MeasurementVmItem> MeasurementsInstallationToVmItem(
             IEnumerable<(Measurements, Installation)> items) =>
-            items.Select(it => (it.Item1.current.values, it.Item2))
-                .SelectMany(valuesInst => valuesInst.values, (tuple, value) => (value, tuple.Item2))
+            items.Select(it => (it.Item1, it.Item2))
                 .Select(it => new MeasurementVmItem
                 {
-                    Country = it.Item2.address.country,
+                    Measurements = it.Item1,
+                    Installation = it.Item2,
                     City = it.Item2.address.city,
+                    Country = it.Item2.address.country,
                     Street = it.Item2.address.street,
-                    Name = it.value.name,
-                    Value = it.value.value
                 }).ToList();
     }
 
     public struct MeasurementVmItem
     {
+        public Measurements Measurements { get; set; }
+        public Installation Installation { get; set; }
         public string Country { get; set; }
         public string City { get; set; }
         public string Street { get; set; }
-        public string Name { get; set; }
-        public double Value { get; set; }
     }
 }
