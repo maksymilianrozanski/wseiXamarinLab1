@@ -14,8 +14,6 @@ namespace FirstLab
     {
         private StackLayout HomePageStackLayout => homePageStackLayout;
 
-        public Button HomePageButton;
-
         public ObservableCollection<MeasurementVmItem> MeasurementItems;
 
         public HomePage()
@@ -25,10 +23,7 @@ namespace FirstLab
             var vm = new HomeViewModel(Navigation);
             BindingContext = vm;
 
-            HomePageButton = new Button {Text = "This is home page button", Command = vm.MyCommand,};
-            HomePageStackLayout.Children.Add(HomePageButton);
-
-            var listView = MeasurementsList.CreateMeasurementsListView(MeasurementItems);
+            var listView = MeasurementsList.CreateMeasurementsListView(MeasurementItems, vm.MyCommand);
             HomePageStackLayout.Children.Add(listView);
 
             Console.WriteLine("HomePage will print location");

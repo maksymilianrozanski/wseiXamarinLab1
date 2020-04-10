@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Windows.Input;
 using FirstLab.viewModels;
 using Xamarin.Forms;
 
@@ -6,14 +7,16 @@ namespace FirstLab.controls.homePage
 {
     public static class MeasurementsList
     {
-        public static ListView CreateMeasurementsListView(ObservableCollection<MeasurementVmItem> listViewItemsSource)
+        public static ListView CreateMeasurementsListView(ObservableCollection<MeasurementVmItem> listViewItemsSource,
+            ICommand vm)
         {
             var listView = new ListView
             {
                 ItemsSource = listViewItemsSource,
                 HasUnevenRows = true,
-                ItemTemplate = new DataTemplate(typeof(MeasurementCell))
+                ItemTemplate = new DataTemplate(typeof(MeasurementCell)),
             };
+            listView.ItemTapped += (sender, args) => vm.Execute(args.Item);
             listView.SetBinding(ListView.ItemsSourceProperty,
                 new Binding(nameof(HomeViewModel.MeasurementInstallationVmItems)));
             return listView;

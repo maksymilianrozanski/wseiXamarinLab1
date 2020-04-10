@@ -11,8 +11,8 @@ namespace FirstLab.viewModels
     {
         public HomeViewModel(INavigation navigation) : base(navigation)
         {
-            this.MyCommand = new Command(
-                execute: () => { navigation.PushAsync(new DetailsPage()); }
+            this.MyCommand = new Command<MeasurementVmItem>(
+                execute: vmListItem => { navigation.PushAsync(new DetailsPage(vmListItem)); }
             );
             
             _measurementVmItems = MeasurementsInstallationToVmItem(new List<(Measurements, Installation)>
