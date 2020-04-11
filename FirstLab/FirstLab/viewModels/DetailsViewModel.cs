@@ -8,13 +8,14 @@ namespace FirstLab.viewModels
     {
         public DetailsViewModel(INavigation navigation, MeasurementVmItem homePageViewModelItem) : base(navigation)
         {
+            CaqiValue = ExtractCaqiValue(homePageViewModelItem);
+
             var thread = new Thread(() =>
             {
                 Thread.Sleep(1000);
                 while (true)
                 {
                     var now = DateTime.Now.Second;
-                    CaqiValue = now;
                     Humidity = now;
                     Pressure = now + 1000;
                     QualityText = now % 2 == 0 ? "Good" : "Bad";
@@ -85,6 +86,11 @@ namespace FirstLab.viewModels
             get => _caqiValue;
             set => SetProperty(ref _caqiValue, value);
         }
+
+        private static int ExtractCaqiValue(MeasurementVmItem vmItem) =>
+            vmItem.Measurements.current.indexes.Count >= 0
+                ? Convert.ToInt32(vmItem.Measurements.current.indexes[0].value)
+                : 0;
 
         public int Humidity
         {
