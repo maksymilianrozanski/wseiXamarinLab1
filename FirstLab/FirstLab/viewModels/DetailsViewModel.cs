@@ -1,5 +1,6 @@
 using System;
 using System.Threading;
+using Xamarin.Essentials;
 using Xamarin.Forms;
 
 namespace FirstLab.viewModels
@@ -9,6 +10,7 @@ namespace FirstLab.viewModels
         public DetailsViewModel(INavigation navigation, MeasurementVmItem homePageViewModelItem) : base(navigation)
         {
             CaqiValue = ExtractCaqiValue(homePageViewModelItem);
+            CaqiColor = ExtractColor(homePageViewModelItem);
 
             var thread = new Thread(() =>
             {
@@ -24,7 +26,6 @@ namespace FirstLab.viewModels
                     PmTenValue = now;
                     PmTwoPointFivePercent = now;
                     PmTenPercent = now;
-                    CaqiColor = now % 2 == 0 ? Color.MediumAquamarine : Color.Chartreuse;
                 }
             });
             thread.Start();
@@ -114,6 +115,12 @@ namespace FirstLab.viewModels
         {
             get => _caqiColor;
             set => SetProperty(ref _caqiColor, value);
+        }
+
+        private static Color ExtractColor(MeasurementVmItem vmItem)
+        {
+            if (vmItem.Measurements.current.indexes.Count < 0) return Color.Fuchsia;
+            return ColorConverters.FromHex(vmItem.Measurements.current.indexes[0].color);
         }
     }
 }

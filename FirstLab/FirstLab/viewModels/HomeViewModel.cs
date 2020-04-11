@@ -21,7 +21,12 @@ namespace FirstLab.viewModels
 
         private readonly Measurements _measurementStub = new Measurements(new Current(
             "2020-04-08T07:31:50.230Z", "2020-04-08T08:31:50.230Z",
-            new List<Value> {new Value("PM1", 13.61), new Value("PM25", 19.76)},
+            new List<Value>
+            {
+                new Value("PM10", 13.61), new Value("PM25", 19.76),
+                new Value("PRESSURE", 1031.43), new Value("HUMIDITY", 33.51),
+                new Value("TEMPERATURE", 14.07)
+            },
             new List<Index>
             {
                 new Index("AIRLY_CAQI", 37.52, "LOW", "Air is quite good.",
