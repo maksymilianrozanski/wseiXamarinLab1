@@ -25,7 +25,7 @@ namespace FirstLab
         public DetailsPage(MeasurementVmItem vmItem)
         {
             InitializeComponent();
-            var vm = new DetailsViewModel(Navigation);
+            var vm = new DetailsViewModel(Navigation, vmItem);
             this.BindingContext = vm;
 
             Circle = CircleFrame.CreateCircleFrame();
