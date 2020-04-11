@@ -6,7 +6,7 @@ namespace FirstLab.viewModels
 {
     public class DetailsViewModel : BaseViewModel
     {
-        public DetailsViewModel(INavigation navigation) : base(navigation)
+        public DetailsViewModel(INavigation navigation, MeasurementVmItem homePageViewModelItem) : base(navigation)
         {
             var thread = new Thread(() =>
             {
