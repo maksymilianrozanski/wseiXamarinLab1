@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Threading;
+using FirstLab.network.models;
 using Xamarin.Essentials;
 using Xamarin.Forms;
 
@@ -12,8 +13,8 @@ namespace FirstLab.viewModels
         public const string CaqiColorBindName = nameof(CaqiColor);
         public const string HumidityBindName = nameof(Humidity);
         public const string PressureBindName = nameof(Pressure);
-        public const string QualityTextBindName = nameof(QualityText);
-        public const string QualityDescriptionBindName = nameof(QualityDescription);
+        public const string QualityTextBindName = nameof(QualityDescription);
+        public const string QualityDescriptionBindName = nameof(QualityAdvice);
         public const string PmTwoPointFiveValueBindName = nameof(PmTwoPointFiveValue);
         public const string PmTwoPointFivePercentBindName = nameof(PmTwoPointFivePercent);
         public const string PmTenValueBindName = nameof(PmTenValue);
@@ -36,8 +37,8 @@ namespace FirstLab.viewModels
         private int _pmTwoPointFivePercent;
         private int _pmTwoPointFiveValue;
         private int _pressure;
+        private string _qualityAdvice;
         private string _qualityDescription;
-        private string _qualityText;
 
         public DetailsViewModel(INavigation navigation, MeasurementVmItem homePageViewModelItem) : base(navigation)
         {
@@ -45,6 +46,8 @@ namespace FirstLab.viewModels
             CaqiColor = ExtractColor(homePageViewModelItem);
             Humidity = ExtractIntValue("HUMIDITY")(homePageViewModelItem);
             Pressure = ExtractIntValue("PRESSURE")(homePageViewModelItem);
+            QualityDescription = FirstIndex(homePageViewModelItem).description;
+            QualityAdvice = FirstIndex(homePageViewModelItem).advice;
 
             var thread = new Thread(() =>
             {
@@ -52,8 +55,6 @@ namespace FirstLab.viewModels
                 while (true)
                 {
                     var now = DateTime.Now.Second;
-                    QualityText = now % 2 == 0 ? "Good" : "Bad";
-                    QualityDescription = now % 2 == 0 ? "Hello World!" : "Hi World!";
                     PmTwoPointFiveValue = now;
                     PmTenValue = now;
                     PmTwoPointFivePercent = now;
@@ -87,10 +88,10 @@ namespace FirstLab.viewModels
             set => SetProperty(ref _pmTenValue, value);
         }
 
-        public string QualityDescription
+        public string QualityAdvice
         {
-            get => _qualityDescription;
-            set => SetProperty(ref _qualityDescription, value);
+            get => _qualityAdvice;
+            set => SetProperty(ref _qualityAdvice, value);
         }
 
         public int CaqiValue
@@ -111,10 +112,10 @@ namespace FirstLab.viewModels
             set => SetProperty(ref _pressure, value);
         }
 
-        public string QualityText
+        public string QualityDescription
         {
-            get => _qualityText;
-            set => SetProperty(ref _qualityText, value);
+            get => _qualityDescription;
+            set => SetProperty(ref _qualityDescription, value);
         }
 
         public Color CaqiColor
@@ -128,6 +129,11 @@ namespace FirstLab.viewModels
             return vmItem.Measurements.current.indexes.Count >= 0
                 ? Convert.ToInt32(vmItem.Measurements.current.indexes[0].value)
                 : 0;
+        }
+
+        public static Index FirstIndex(MeasurementVmItem vmItem)
+        {
+            return vmItem.Measurements.current.indexes?.ElementAtOrDefault(0) ?? new Index();
         }
 
         private static Color ExtractColor(MeasurementVmItem vmItem)
