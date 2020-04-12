@@ -12,8 +12,8 @@ namespace FirstLab.viewModels
         {
             CaqiValue = ExtractCaqiValue(homePageViewModelItem);
             CaqiColor = ExtractColor(homePageViewModelItem);
-            Humidity = ExtractHumidity(homePageViewModelItem);
-            
+            Humidity = ExtractIntValue("HUMIDITY")(homePageViewModelItem);
+
             var thread = new Thread(() =>
             {
                 Thread.Sleep(1000);
@@ -100,15 +100,14 @@ namespace FirstLab.viewModels
             set => SetProperty(ref _humidity, value);
         }
 
-        public static int ExtractHumidity(MeasurementVmItem vmItem)
-        {
-            if (vmItem.Measurements.current.values.Exists(it => it.name == "HUMIDITY"))
-            {
-                var h = vmItem.Measurements.current.values.First(it => it.name == "HUMIDITY");
-                return Convert.ToInt32(h.value);
-            }
-            else return 0;
-        }
+        public static readonly Func<string, Func<MeasurementVmItem, int>> ExtractIntValue =
+            (string key) =>
+                (MeasurementVmItem vmItem) =>
+                {
+                    if (vmItem.Measurements.current.values.Exists(it => it.name == key))
+                        return Convert.ToInt32(vmItem.Measurements.current.values.First(it => it.name == key).value);
+                    else return -1;
+                };
 
         public int Pressure
         {

@@ -41,12 +41,12 @@ namespace FirstLabUnitTests.viewModels
         }
 
         [Test]
-        public void ShouldRoundHumidityToNearestInt_roundDown()
+        public void ShouldRoundValueToNearestInt_roundDown()
         {
             var input = 33.33;
             var expected = 33;
             var vmItem = CreateVmItem(humidity: input);
-            var result = DetailsViewModel.ExtractHumidity(vmItem);
+            var result = DetailsViewModel.ExtractIntValue("HUMIDITY")(vmItem);
             Assert.AreEqual(expected, result, "Should round value to nearest int");
         }
 
@@ -56,25 +56,17 @@ namespace FirstLabUnitTests.viewModels
             var input = 33.51;
             var expected = 34;
             var vmItem = CreateVmItem(humidity: input);
-            var result = DetailsViewModel.ExtractHumidity(vmItem);
+            var result = DetailsViewModel.ExtractIntValue("HUMIDITY")(vmItem);
             Assert.AreEqual(expected, result, "Should round value to nearest int");
         }
 
         [Test]
-        public void ShouldReturnZeroIfThereIsNoHumidityInVmItem()
+        public void ShouldReturnZeroIfThereIsNoValueInVmItem()
         {
-            var vmItem = new MeasurementVmItem
-            {
-                Measurements = new Measurements(new Current(
-                    "2020-04-08T07:31:50.230Z", "2020-04-08T08:31:50.230Z",
-                    new List<Value> {new Value("PM10", 10.2),},
-                    new List<Index>(),
-                    new List<Standard>()))
-            };
-
-            var expected = 0;
-            var result = DetailsViewModel.ExtractHumidity(vmItem);
-            Assert.AreEqual(expected, result, "Should return 0 if there is no humidity value in view model item");
+            var vmItem = CreateVmItem();
+            var expected = -1;
+            var result = DetailsViewModel.ExtractIntValue("NotPresent")(vmItem);
+            Assert.AreEqual(expected, result, "Should return -1 if there is value with specified name in view model item");
         }
     }
 }
