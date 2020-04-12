@@ -1,6 +1,6 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using FirstLab.network.models;
 using Xamarin.Essentials;
 using Xamarin.Forms;
@@ -40,6 +40,8 @@ namespace FirstLab.viewModels
         private string _qualityAdvice;
         private string _qualityDescription;
 
+        private List<(Value, Standard)> _valuesWithStandards;
+
         public DetailsViewModel(INavigation navigation, MeasurementVmItem homePageViewModelItem) : base(navigation)
         {
             CaqiValue = ExtractCaqiValue(homePageViewModelItem);
@@ -48,20 +50,7 @@ namespace FirstLab.viewModels
             Pressure = ExtractIntValue("PRESSURE")(homePageViewModelItem);
             QualityDescription = FirstIndex(homePageViewModelItem).description;
             QualityAdvice = FirstIndex(homePageViewModelItem).advice;
-
-            var thread = new Thread(() =>
-            {
-                Thread.Sleep(1000);
-                while (true)
-                {
-                    var now = DateTime.Now.Second;
-                    PmTwoPointFiveValue = now;
-                    PmTenValue = now;
-                    PmTwoPointFivePercent = now;
-                    PmTenPercent = now;
-                }
-            });
-            thread.Start();
+            ValuesWithStandards = ExtractValuesWithStandards(homePageViewModelItem);
         }
 
         public int PmTwoPointFivePercent
@@ -122,6 +111,32 @@ namespace FirstLab.viewModels
         {
             get => _caqiColor;
             set => SetProperty(ref _caqiColor, value);
+        }
+
+        public List<(Value, Standard)> ValuesWithStandards
+        {
+            get => _valuesWithStandards;
+            set
+            {
+                SetProperty(ref _valuesWithStandards, value);
+                PmTenValue = Convert.ToInt32(GetValueByName(ValuesWithStandards, "PM10").Item1.value);
+                PmTenPercent = Convert.ToInt32(GetValueByName(_valuesWithStandards, "PM10").Item2.percent);
+                PmTwoPointFiveValue = Convert.ToInt32(GetValueByName(_valuesWithStandards, "PM25").Item1.value);
+                PmTwoPointFivePercent = Convert.ToInt32(GetValueByName(_valuesWithStandards, "PM25").Item2.percent);
+            }
+        }
+
+        public static List<(Value, Standard)> ExtractValuesWithStandards(MeasurementVmItem vmItem)
+        {
+            var values = vmItem.Measurements.current.values;
+            var standards = vmItem.Measurements.current.standards;
+            return values.Join(standards, value => value.name, standard => standard.pollutant,
+                (value, standard) => (value, standard)).ToList();
+        }
+
+        public static (Value, Standard) GetValueByName(List<(Value, Standard)> list, string name)
+        {
+            return list.FirstOrDefault(it => it.Item1.name == name);
         }
 
         private static int ExtractCaqiValue(MeasurementVmItem vmItem)
