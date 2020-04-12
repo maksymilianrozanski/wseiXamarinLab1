@@ -8,11 +8,43 @@ namespace FirstLab.viewModels
 {
     public class DetailsViewModel : BaseViewModel
     {
+        public const string CaqiValueBindName = nameof(CaqiValue);
+        public const string CaqiColorBindName = nameof(CaqiColor);
+        public const string HumidityBindName = nameof(Humidity);
+        public const string PressureBindName = nameof(Pressure);
+        public const string QualityTextBindName = nameof(QualityText);
+        public const string QualityDescriptionBindName = nameof(QualityDescription);
+        public const string PmTwoPointFiveValueBindName = nameof(PmTwoPointFiveValue);
+        public const string PmTwoPointFivePercentBindName = nameof(PmTwoPointFivePercent);
+        public const string PmTenValueBindName = nameof(PmTenValue);
+        public const string PmTenPercentBindName = nameof(PmTenPercent);
+
+        public static readonly Func<string, Func<MeasurementVmItem, int>> ExtractIntValue =
+            key =>
+                vmItem =>
+                {
+                    if (vmItem.Measurements.current.values.Exists(it => it.name == key))
+                        return Convert.ToInt32(vmItem.Measurements.current.values.First(it => it.name == key).value);
+                    return -1;
+                };
+
+        private Color _caqiColor;
+        private int _caqiValue;
+        private int _humidity;
+        private int _pmTenPercent;
+        private int _pmTenValue;
+        private int _pmTwoPointFivePercent;
+        private int _pmTwoPointFiveValue;
+        private int _pressure;
+        private string _qualityDescription;
+        private string _qualityText;
+
         public DetailsViewModel(INavigation navigation, MeasurementVmItem homePageViewModelItem) : base(navigation)
         {
             CaqiValue = ExtractCaqiValue(homePageViewModelItem);
             CaqiColor = ExtractColor(homePageViewModelItem);
             Humidity = ExtractIntValue("HUMIDITY")(homePageViewModelItem);
+            Pressure = ExtractIntValue("PRESSURE")(homePageViewModelItem);
 
             var thread = new Thread(() =>
             {
@@ -20,7 +52,6 @@ namespace FirstLab.viewModels
                 while (true)
                 {
                     var now = DateTime.Now.Second;
-                    Pressure = now + 1000;
                     QualityText = now % 2 == 0 ? "Good" : "Bad";
                     QualityDescription = now % 2 == 0 ? "Hello World!" : "Hi World!";
                     PmTwoPointFiveValue = now;
@@ -31,27 +62,6 @@ namespace FirstLab.viewModels
             });
             thread.Start();
         }
-
-        public const string CaqiValueBindName = nameof(CaqiValue);
-        private int _caqiValue;
-        public const string CaqiColorBindName = nameof(CaqiColor);
-        private Color _caqiColor;
-        public const string HumidityBindName = nameof(Humidity);
-        private int _humidity;
-        public const string PressureBindName = nameof(Pressure);
-        private int _pressure;
-        public const string QualityTextBindName = nameof(QualityText);
-        private string _qualityText;
-        public const string QualityDescriptionBindName = nameof(QualityDescription);
-        private string _qualityDescription;
-        public const string PmTwoPointFiveValueBindName = nameof(PmTwoPointFiveValue);
-        private int _pmTwoPointFiveValue;
-        public const string PmTwoPointFivePercentBindName = nameof(PmTwoPointFivePercent);
-        private int _pmTwoPointFivePercent;
-        public const string PmTenValueBindName = nameof(PmTenValue);
-        private int _pmTenValue;
-        public const string PmTenPercentBindName = nameof(PmTenPercent);
-        private int _pmTenPercent;
 
         public int PmTwoPointFivePercent
         {
@@ -89,25 +99,11 @@ namespace FirstLab.viewModels
             set => SetProperty(ref _caqiValue, value);
         }
 
-        private static int ExtractCaqiValue(MeasurementVmItem vmItem) =>
-            vmItem.Measurements.current.indexes.Count >= 0
-                ? Convert.ToInt32(vmItem.Measurements.current.indexes[0].value)
-                : 0;
-
         public int Humidity
         {
             get => _humidity;
             set => SetProperty(ref _humidity, value);
         }
-
-        public static readonly Func<string, Func<MeasurementVmItem, int>> ExtractIntValue =
-            (string key) =>
-                (MeasurementVmItem vmItem) =>
-                {
-                    if (vmItem.Measurements.current.values.Exists(it => it.name == key))
-                        return Convert.ToInt32(vmItem.Measurements.current.values.First(it => it.name == key).value);
-                    else return -1;
-                };
 
         public int Pressure
         {
@@ -125,6 +121,13 @@ namespace FirstLab.viewModels
         {
             get => _caqiColor;
             set => SetProperty(ref _caqiColor, value);
+        }
+
+        private static int ExtractCaqiValue(MeasurementVmItem vmItem)
+        {
+            return vmItem.Measurements.current.indexes.Count >= 0
+                ? Convert.ToInt32(vmItem.Measurements.current.indexes[0].value)
+                : 0;
         }
 
         private static Color ExtractColor(MeasurementVmItem vmItem)
