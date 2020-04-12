@@ -1,5 +1,4 @@
-﻿using System;
-using FirstLab.controls.circle;
+﻿using FirstLab.controls.circle;
 using FirstLab.controls.gridItem;
 using FirstLab.controls.qualityText;
 using FirstLab.controls.slider;
@@ -10,23 +9,21 @@ namespace FirstLab
 {
     public partial class DetailsPage : ContentPage
     {
-        private StackLayout MyStackLayout => myStackLayout;
-
         public Frame Circle;
-
-        public Frame QualityText;
-
-        public Grid PMValuesGrid;
 
         public StackLayout HumiditySlider;
 
+        public Grid PMValuesGrid;
+
         public StackLayout PressureSlider;
+
+        public Frame QualityText;
 
         public DetailsPage(MeasurementVmItem vmItem)
         {
             InitializeComponent();
             var vm = new DetailsViewModel(Navigation, vmItem);
-            this.BindingContext = vm;
+            BindingContext = vm;
 
             Circle = CircleFrame.CreateCircleFrame();
 
@@ -37,7 +34,7 @@ namespace FirstLab
                     Children =
                     {
                         QualityTextLabel.CreateQualityText(),
-                        QualityTextDescription.CreateQualityTextDescription(),
+                        QualityTextDescription.CreateQualityTextDescription()
                     }
                 }
             };
@@ -81,5 +78,7 @@ namespace FirstLab
             MyStackLayout.Children.Add(HumiditySlider);
             MyStackLayout.Children.Add(PressureSlider);
         }
+
+        private StackLayout MyStackLayout => myStackLayout;
     }
 }

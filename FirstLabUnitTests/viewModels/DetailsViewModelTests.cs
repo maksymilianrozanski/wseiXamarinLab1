@@ -36,7 +36,11 @@ namespace FirstLabUnitTests.viewModels
                         new Index("AIRLY_CAQI", indexValue, level, description,
                             advice, color)
                     },
-                    new List<Standard> {new Standard("WHO", "PM25", 25.0, 79.05)}))
+                    new List<Standard>
+                    {
+                        new Standard("WHO", "PM25", 25.0, 79.05),
+                        new Standard("WHO", "PM10", 50.0, 75.3)
+                    }))
             };
         }
 
@@ -86,6 +90,50 @@ namespace FirstLabUnitTests.viewModels
             var expected = new Index();
             var result = DetailsViewModel.FirstIndex(vmItem);
             Assert.AreEqual(expected, result, "Should return empty Index");
+        }
+
+        [Test]
+        public void ShouldExtractValuesWithStandards()
+        {
+            var pm10 = 13.61;
+            var pm25 = 19.76;
+            var vmItem = CreateVmItem(pm10, pm25);
+            var expected = new List<(Value, Standard)>
+            {
+                (new Value("PM10", pm10), new Standard("WHO", "PM10", 50.0, 75.3)),
+                (new Value("PM25", pm25), new Standard("WHO", "PM25", 25.0, 79.05))
+            };
+
+            var result = DetailsViewModel.ExtractValuesWithStandards(vmItem);
+            Assert.AreEqual(expected.ToHashSet(), result.ToHashSet());
+        }
+
+        [Test]
+        public void GetByNameShouldReturnIndexOneItem()
+        {
+            var list = new List<(Value, Standard)>
+            {
+                (new Value("PM10", 13.61), new Standard("WHO", "PM10", 50.0, 75.3)),
+                (new Value("PM25", 19.76), new Standard("WHO", "PM25", 25.0, 79.05))
+            };
+
+            var expected = list[1];
+            var result = DetailsViewModel.GetValueByName(list, "PM25");
+            Assert.AreEqual(expected, result);
+        }
+
+        [Test]
+        public void GetByNameShouldReturnEmptyTuple()
+        {
+            var list = new List<(Value, Standard)>
+            {
+                (new Value("PM10", 13.61), new Standard("WHO", "PM10", 50.0, 75.3)),
+                (new Value("PM25", 19.76), new Standard("WHO", "PM25", 25.0, 79.05))
+            };
+            var expected = (new Value(), new Standard());
+            var result = DetailsViewModel.GetValueByName(list, "NotPresent");
+            Assert.AreEqual(expected, result,
+                "Should return default values when item with requested name not present in the list");
         }
     }
 }
