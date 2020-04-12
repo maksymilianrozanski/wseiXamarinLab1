@@ -66,7 +66,26 @@ namespace FirstLabUnitTests.viewModels
             var vmItem = CreateVmItem();
             var expected = -1;
             var result = DetailsViewModel.ExtractIntValue("NotPresent")(vmItem);
-            Assert.AreEqual(expected, result, "Should return -1 if there is value with specified name in view model item");
+            Assert.AreEqual(expected, result,
+                "Should return -1 if there is value with specified name in view model item");
+        }
+
+        [Test]
+        public void ShouldReturnFirstIndexItem()
+        {
+            var vmItem = CreateVmItem();
+            var expected = vmItem.Measurements.current.indexes.First();
+            var result = DetailsViewModel.FirstIndex(vmItem);
+            Assert.AreEqual(expected, result, "Should return first index item");
+        }
+
+        [Test]
+        public void ShouldReturnEmptyIndexIfThereIfIndexListIsEmpty()
+        {
+            var vmItem = new MeasurementVmItem();
+            var expected = new Index();
+            var result = DetailsViewModel.FirstIndex(vmItem);
+            Assert.AreEqual(expected, result, "Should return empty Index");
         }
     }
 }

@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Threading;
+using FirstLab.network.models;
 using Xamarin.Essentials;
 using Xamarin.Forms;
 
@@ -45,6 +46,7 @@ namespace FirstLab.viewModels
             CaqiColor = ExtractColor(homePageViewModelItem);
             Humidity = ExtractIntValue("HUMIDITY")(homePageViewModelItem);
             Pressure = ExtractIntValue("PRESSURE")(homePageViewModelItem);
+            QualityText = FirstIndex(homePageViewModelItem).description;
 
             var thread = new Thread(() =>
             {
@@ -52,7 +54,6 @@ namespace FirstLab.viewModels
                 while (true)
                 {
                     var now = DateTime.Now.Second;
-                    QualityText = now % 2 == 0 ? "Good" : "Bad";
                     QualityDescription = now % 2 == 0 ? "Hello World!" : "Hi World!";
                     PmTwoPointFiveValue = now;
                     PmTenValue = now;
@@ -128,6 +129,11 @@ namespace FirstLab.viewModels
             return vmItem.Measurements.current.indexes.Count >= 0
                 ? Convert.ToInt32(vmItem.Measurements.current.indexes[0].value)
                 : 0;
+        }
+
+        public static Index FirstIndex(MeasurementVmItem vmItem)
+        {
+            return vmItem.Measurements.current.indexes?.ElementAtOrDefault(0) ?? new Index();
         }
 
         private static Color ExtractColor(MeasurementVmItem vmItem)
