@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading;
 using Xamarin.Essentials;
 using Xamarin.Forms;
@@ -11,14 +12,14 @@ namespace FirstLab.viewModels
         {
             CaqiValue = ExtractCaqiValue(homePageViewModelItem);
             CaqiColor = ExtractColor(homePageViewModelItem);
-
+            Humidity = ExtractHumidity(homePageViewModelItem);
+            
             var thread = new Thread(() =>
             {
                 Thread.Sleep(1000);
                 while (true)
                 {
                     var now = DateTime.Now.Second;
-                    Humidity = now;
                     Pressure = now + 1000;
                     QualityText = now % 2 == 0 ? "Good" : "Bad";
                     QualityDescription = now % 2 == 0 ? "Hello World!" : "Hi World!";
@@ -97,6 +98,16 @@ namespace FirstLab.viewModels
         {
             get => _humidity;
             set => SetProperty(ref _humidity, value);
+        }
+
+        public static int ExtractHumidity(MeasurementVmItem vmItem)
+        {
+            if (vmItem.Measurements.current.values.Exists(it => it.name == "HUMIDITY"))
+            {
+                var h = vmItem.Measurements.current.values.First(it => it.name == "HUMIDITY");
+                return Convert.ToInt32(h.value);
+            }
+            else return 0;
         }
 
         public int Pressure
