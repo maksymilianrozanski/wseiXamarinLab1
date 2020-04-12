@@ -1,4 +1,9 @@
-﻿using Xamarin.Forms;
+﻿using System;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using Newtonsoft.Json.Linq;
+using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
 [assembly: XamlCompilation(XamlCompilationOptions.Compile)]
@@ -7,11 +12,36 @@ namespace FirstLab
 {
     public partial class App : Application
     {
+        public static string ApiKey;
+
         public App()
         {
-            InitializeComponent();
+            var assembly = Assembly.GetExecutingAssembly();
+            ReadApiKey(assembly);
 
+            InitializeComponent();
             MainPage = new NavigationPage(new MainTabbedPage());
+        }
+
+        private void ReadApiKey(Assembly assembly)
+        {
+            var devApiResourceName = assembly.GetManifestResourceNames()
+                .SingleOrDefault(it => it.EndsWith("apiKey.json"));
+            if (devApiResourceName == null)
+                throw new Exception(
+                    "Did you forget to include apiKey.json? apiKey.json placed in project root should contain api key: '{\n  \"key\": \"your api key\"\n}'.");
+            var apiKeyJson = ReadResource(assembly, devApiResourceName);
+            ApiKey = JObject.Parse(apiKeyJson)["key"].Value<string>();
+        }
+
+        private string ReadResource(Assembly assembly, string resourceName)
+        {
+            using (var reader = new StreamReader(
+                assembly.GetManifestResourceStream(resourceName) ??
+                throw new Exception("Resource not found, resource name: " + resourceName)))
+            {
+                return reader.ReadToEnd();
+            }
         }
 
         protected override void OnStart()
