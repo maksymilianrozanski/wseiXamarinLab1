@@ -17,9 +17,10 @@ namespace FirstLab.controls.slider
                 Maximum = max,
                 Minimum = min,
                 Value = min,
-                Style = SliderStyles.SliderStyle()
+                Style = SliderStyles.SliderStyle(),
+                InputTransparent = true
             };
-            slider.SetBinding(Slider.ValueProperty, new Binding(bindingName));
+            slider.SetBinding(Slider.ValueProperty, new Binding(bindingName, BindingMode.OneWay));
 
             slider.ValueChanged += (sender, args) => { sliderValueLabel.Text = args.NewValue + " " + unit; };
 
