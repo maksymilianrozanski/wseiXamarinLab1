@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Collections.Specialized;
+using System.Globalization;
 using FirstLab.network;
 using FirstLab.network.models;
 using NUnit.Framework;
 using RichardSzalay.MockHttp;
-using Xamarin.Forms;
+using Xamarin.Essentials;
 using Index = FirstLab.network.models.Index;
 
 namespace FirstLabUnitTests.network
@@ -32,76 +33,7 @@ namespace FirstLabUnitTests.network
 
             var networkUnderTest = new Network(client);
 
-            var result = networkUnderTest.GetMeasurementsRequest(8077).Result
-                .Result;
-            mockHttp.VerifyNoOutstandingExpectation();
-        }
-
-
-        [Test]
-        public void ShouldRequestCorrectBaseUrl()
-        {
-            var expectedBase = "http://example.com";
-
-            var mockHttp = new MockHttpMessageHandler();
-            mockHttp.When(expectedBase + "*")
-                .Respond("application/json", Responses.MeasurementsResponse);
-
-            var client = mockHttp.ToHttpClient();
-            client.DefaultRequestHeaders.Add("Accept", "application/json");
-            client.DefaultRequestHeaders.Add("apikey", "ExpectedApiKey");
-            client.BaseAddress = new Uri(expectedBase);
-
-            var networkUnderTest = new Network(client);
-            var result = networkUnderTest.GetMeasurementsRequest(8077).Result
-                .Result;
-            mockHttp.VerifyNoOutstandingExpectation();
-        }
-
-
-        [Test]
-        public void GetRequestShouldContainCorrectValues()
-        {
-            var baseUrl = "http://example.com";
-
-            var expectedId = 8077;
-
-            var mockHttp = new MockHttpMessageHandler();
-            mockHttp.When(baseUrl + "*")
-                .WithQueryString(new Dictionary<string, string>
-                {
-                    {"id", expectedId.ToString()},
-                })
-                .Respond("application/json", Responses.MeasurementsResponse);
-
-            var client = mockHttp.ToHttpClient();
-            client.DefaultRequestHeaders.Add("Accept", "application/json");
-            client.DefaultRequestHeaders.Add("apikey", "ExpectedApiKey");
-            client.BaseAddress = new Uri(baseUrl);
-
-            var networkUnderTest = new Network(client);
-            var result = networkUnderTest.GetMeasurementsRequest(expectedId).Result
-                .Result;
-            mockHttp.VerifyNoOutstandingExpectation();
-        }
-
-        [Test]
-        public void GetMeasurementsShouldRequestCorrectApiEndpoint()
-        {
-            var baseUrl = "http://example.com";
-
-            var mockHttp = new MockHttpMessageHandler();
-            mockHttp.When(baseUrl + "/v2/measurements/installation/")
-                .Respond("application/json", Responses.MeasurementsResponse);
-
-            var client = mockHttp.ToHttpClient();
-            client.DefaultRequestHeaders.Add("Accept", "application/json");
-            client.DefaultRequestHeaders.Add("apikey", "ExpectedApiKey");
-            client.BaseAddress = new Uri(baseUrl);
-
-            var networkUnderTest = new Network(client);
-            var result = networkUnderTest.GetMeasurementsRequest(8077).Result
-                .Result;
+            var result = networkUnderTest.GetMeasurementsRequest(8077).Result;
             mockHttp.VerifyNoOutstandingExpectation();
         }
 
@@ -121,6 +53,43 @@ namespace FirstLabUnitTests.network
                 new List<Standard> {new Standard("WHO", "PM25", 25.0, 79.05)}));
 
             Assert.AreEqual(expected, result);
+        }
+
+        [Test]
+        public void NameValueCollectionShouldContainsSpecifiedId()
+        {
+            var id = 1111;
+            var result = Network.ByInstallationId(id);
+            Assert.AreEqual(id.ToString(), result.Get("installationId"));
+        }
+
+        [Test]
+        public void NameValueCollectionShouldContainSpecifiedLocationValues()
+        {
+            var location = new Location(52.2297, 21.0122);
+            var result = Network.InstallationByLocation(location);
+            Assert.AreEqual(location.Latitude.ToString(CultureInfo.InvariantCulture), result.Get("lat"));
+            Assert.AreEqual(location.Longitude.ToString(CultureInfo.InvariantCulture), result.Get("lng"));
+            Assert.AreEqual("-1", result.Get("maxDistanceKM"));
+            Assert.AreEqual("1", result.Get("maxResults"));
+        }
+
+        [Test]
+        public void ShouldReturnUriBuilderContainingCorrectBaseUrl()
+        {
+            var baseAddress = new Uri("https://example.com");
+            var endpoint = "some/endpoint";
+            var result = Network.CreateUriBuilder(baseAddress)(endpoint)(new NameValueCollection());
+            Assert.IsTrue(result.Uri.ToString().StartsWith(baseAddress.ToString()));
+        }
+
+        [Test]
+        public void ShouldReturnUriBuilderContainingCorrectPath()
+        {
+            var baseAddress = new Uri("https://example.com");
+            var endpoint = "some/endpoint";
+            var result = Network.CreateUriBuilder(baseAddress)(endpoint)(new NameValueCollection());
+            Assert.AreEqual("/" + endpoint, result.Path);
         }
     }
 }

@@ -1,19 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
-using System.Net;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 using FirstLab.network;
 using FirstLab.network.models;
-using Moq;
-using Moq.Protected;
 using NUnit.Framework;
 using RichardSzalay.MockHttp;
 using Xamarin.Essentials;
-
 
 namespace FirstLabUnitTests.network
 {
@@ -65,8 +57,7 @@ namespace FirstLabUnitTests.network
             client.BaseAddress = new Uri(baseUri);
 
             var networkUnderTest = new Network(client);
-            var result = networkUnderTest.GetNearestInstallationsRequest(new Location(50.062006, 19.940984)).Result
-                .Result;
+            var result = networkUnderTest.GetNearestInstallationsRequest(new Location(50.062006, 19.940984)).Result;
             mockHttp.VerifyNoOutstandingExpectation();
         }
 
@@ -85,8 +76,7 @@ namespace FirstLabUnitTests.network
             client.BaseAddress = new Uri(expectedBase);
 
             var networkUnderTest = new Network(client);
-            var result = networkUnderTest.GetNearestInstallationsRequest(new Location(50.062006, 19.940984)).Result
-                .Result;
+            var result = networkUnderTest.GetNearestInstallationsRequest(new Location(50.062006, 19.940984)).Result;
             mockHttp.VerifyNoOutstandingExpectation();
         }
 
@@ -104,7 +94,7 @@ namespace FirstLabUnitTests.network
                     {"lat", location.Latitude.ToString(CultureInfo.InvariantCulture)},
                     {"lng", location.Longitude.ToString(CultureInfo.InvariantCulture)},
                     {"maxDistanceKM", "-1"},
-                    {"maxResults", "1"},
+                    {"maxResults", "1"}
                 })
                 .Respond("application/json", ExampleContent);
 
@@ -114,7 +104,7 @@ namespace FirstLabUnitTests.network
             client.BaseAddress = new Uri(baseUrl);
 
             var networkUnderTest = new Network(client);
-            var result = networkUnderTest.GetNearestInstallationsRequest(location).Result.Result;
+            var result = networkUnderTest.GetNearestInstallationsRequest(location).Result;
             mockHttp.VerifyNoOutstandingExpectation();
         }
 
@@ -135,7 +125,7 @@ namespace FirstLabUnitTests.network
             client.BaseAddress = new Uri(baseUrl);
 
             var networkUnderTest = new Network(client);
-            var result = networkUnderTest.GetNearestInstallationsRequest(location).Result.Result;
+            var result = networkUnderTest.GetNearestInstallationsRequest(location).Result;
             mockHttp.VerifyNoOutstandingExpectation();
         }
 
