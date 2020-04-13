@@ -26,7 +26,6 @@ namespace FirstLab.network
 
         public async Task<string> GetNearestInstallationsRequest(Location location)
         {
-            Console.WriteLine("Inside GetNearestInstallationsRequest");
             var query = HttpUtility.ParseQueryString(string.Empty);
             query["lat"] = location.Latitude.ToString(CultureInfo.InvariantCulture);
             query["lng"] = location.Longitude.ToString(CultureInfo.InvariantCulture);
@@ -37,17 +36,8 @@ namespace FirstLab.network
             {
                 Query = query.ToString()
             };
-            Console.WriteLine("asking GetAsync");
             var response = _client.GetAsync(uriBuilder.Uri.ToString()).Result;
-            if (response.IsSuccessStatusCode)
-            {
-                Console.WriteLine("Response code successful");
-                var content = await response.Content.ReadAsStringAsync();
-                Console.WriteLine("Response content:" + content);
-                return content;
-            }
-
-            Console.WriteLine("Response code of GetNearestInstallationsRequest not successful" + response.StatusCode);
+            if (response.IsSuccessStatusCode) return await response.Content.ReadAsStringAsync();
             return null;
         }
 
@@ -68,14 +58,7 @@ namespace FirstLab.network
                 };
 
             var response = _client.GetAsync(uriBuilder.Uri.ToString()).Result;
-            if (response.IsSuccessStatusCode)
-            {
-                var content = await response.Content.ReadAsStringAsync();
-                Console.WriteLine("Response content:" + content);
-                return content;
-            }
-
-            Console.WriteLine("Response code of GetMeasurementsRequest not successful" + response.StatusCode);
+            if (response.IsSuccessStatusCode) return await response.Content.ReadAsStringAsync();
             return null;
         }
 
