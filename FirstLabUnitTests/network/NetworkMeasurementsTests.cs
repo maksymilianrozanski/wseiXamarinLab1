@@ -55,25 +55,6 @@ namespace FirstLabUnitTests.network
         }
 
         [Test]
-        public void GetMeasurementsShouldRequestCorrectApiEndpoint()
-        {
-            var baseUrl = "http://example.com";
-
-            var mockHttp = new MockHttpMessageHandler();
-            mockHttp.When(baseUrl + "/v2/measurements/installation/")
-                .Respond("application/json", Responses.MeasurementsResponse);
-
-            var client = mockHttp.ToHttpClient();
-            client.DefaultRequestHeaders.Add("Accept", "application/json");
-            client.DefaultRequestHeaders.Add("apikey", "ExpectedApiKey");
-            client.BaseAddress = new Uri(baseUrl);
-
-            var networkUnderTest = new Network(client);
-            var result = networkUnderTest.GetMeasurementsRequest(8077).Result;
-            mockHttp.VerifyNoOutstandingExpectation();
-        }
-
-        [Test]
         public void ShouldReturnDeserializedMeasurement()
         {
             var json = Responses.MeasurementsShorter;
@@ -99,6 +80,14 @@ namespace FirstLabUnitTests.network
             var result = Network.GetMeasurementsUri(baseAddress, id);
             var expectedQueryValue = "installationId=" + id;
             Assert.IsTrue(result.Query.Contains(expectedQueryValue));
+        }
+
+        [Test]
+        public void ShouldReturnUriBuilderContainingCorrectPath()
+        {
+            var result = Network.GetMeasurementsUri(new Uri("https://example.com"), 1111);
+            var expectedPath = "/v2/measurements/installation/";
+            Assert.AreEqual(expectedPath, result.Path);
         }
     }
 }
