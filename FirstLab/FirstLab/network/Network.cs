@@ -13,7 +13,7 @@ namespace FirstLab.network
 {
     public class Network
     {
-        private HttpClient _client;
+        private readonly HttpClient _client;
 
         private Network()
         {
@@ -24,41 +24,64 @@ namespace FirstLab.network
             _client = client;
         }
 
-        public async Task<Task<string>> GetNearestInstallationsRequest(Location location)
+        public async Task<string> GetNearestInstallationsRequest(Location location)
         {
+            Console.WriteLine("Inside GetNearestInstallationsRequest");
             var query = HttpUtility.ParseQueryString(string.Empty);
             query["lat"] = location.Latitude.ToString(CultureInfo.InvariantCulture);
             query["lng"] = location.Longitude.ToString(CultureInfo.InvariantCulture);
             query["maxDistanceKM"] = "-1";
             query["maxResults"] = "1";
 
-            var uriBuilder = new UriBuilder(Path.Combine(_client.BaseAddress.ToString(), "v2/installations/nearest/"))
+            var uriBuilder = new UriBuilder(Path.Combine(_client.BaseAddress.ToString(), "v2/installations/nearest"))
             {
-                Query = query.ToString(),
+                Query = query.ToString()
             };
-            var response = await _client.GetAsync(uriBuilder.Uri.ToString());
-            return response.Content.ReadAsStringAsync();
+            Console.WriteLine("asking GetAsync");
+            var response = _client.GetAsync(uriBuilder.Uri.ToString()).Result;
+            if (response.IsSuccessStatusCode)
+            {
+                Console.WriteLine("Response code successful");
+                var content = await response.Content.ReadAsStringAsync();
+                Console.WriteLine("Response content:" + content);
+                return content;
+            }
+
+            Console.WriteLine("Response code of GetNearestInstallationsRequest not successful" + response.StatusCode);
+            return null;
         }
 
-        public static Installation GetNearestInstallation(string json) =>
-            JsonConvert.DeserializeObject<List<Installation>>(json)[0];
+        public static Installation GetNearestInstallation(string json)
+        {
+            return JsonConvert.DeserializeObject<List<Installation>>(json)[0];
+        }
 
-        public async Task<Task<string>> GetMeasurementsRequest(int id)
+        public async Task<string> GetMeasurementsRequest(int id)
         {
             var query = HttpUtility.ParseQueryString(string.Empty);
-            query["id"] = id.ToString();
+            query["installationId"] = id.ToString();
 
             var uriBuilder =
                 new UriBuilder(Path.Combine(_client.BaseAddress.ToString(), "v2/measurements/installation/"))
                 {
-                    Query = query.ToString(),
+                    Query = query.ToString()
                 };
 
-            var response = await _client.GetAsync(uriBuilder.Uri.ToString());
-            return response.Content.ReadAsStringAsync();
+            var response = _client.GetAsync(uriBuilder.Uri.ToString()).Result;
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                Console.WriteLine("Response content:" + content);
+                return content;
+            }
+
+            Console.WriteLine("Response code of GetMeasurementsRequest not successful" + response.StatusCode);
+            return null;
         }
 
         public static Measurements GetMeasurements(string json)
-            => JsonConvert.DeserializeObject<Measurements>(json);
+        {
+            return JsonConvert.DeserializeObject<Measurements>(json);
+        }
     }
 }

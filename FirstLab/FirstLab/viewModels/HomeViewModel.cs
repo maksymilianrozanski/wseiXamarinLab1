@@ -1,6 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Windows.Input;
+using FirstLab.location;
+using FirstLab.network;
 using FirstLab.network.models;
 using Xamarin.Essentials;
 using Xamarin.Forms;
@@ -39,8 +43,10 @@ namespace FirstLab.viewModels
                 vmListItem => { navigation.PushAsync(new DetailsPage(vmListItem)); }
             );
 
-            _measurementVmItems = MeasurementsInstallationToVmItem(new List<(Measurements, Installation)>
-                {(_measurementStub, _installationStub), (_measurementStub, _installationStub)});
+            LoadValues();
+
+            // _measurementVmItems = MeasurementsInstallationToVmItem(new List<(Measurements, Installation)>
+            // {(_measurementStub, _installationStub), (_measurementStub, _installationStub)});
         }
 
         public ICommand MyCommand { get; set; }
@@ -49,6 +55,27 @@ namespace FirstLab.viewModels
         {
             get => _measurementVmItems;
             set => SetProperty(ref _measurementVmItems, value);
+        }
+
+        private async void LoadValues()
+        {
+            var location = await LocationProvider.GetLocation();
+            var httpClient = new HttpClient {BaseAddress = new Uri("https://airapi.airly.eu")};
+            httpClient.DefaultRequestHeaders.Add("Accept", "application/json");
+            httpClient.DefaultRequestHeaders.Add("apiKey", App.ApiKey);
+
+            var network = new Network(httpClient);
+            Console.WriteLine("Before GetNearestInstallationsRequest");
+            var nearestInstallation = network.GetNearestInstallationsRequest(location).Result;
+            var installation = Network.GetNearestInstallation(nearestInstallation);
+            var id = installation.id;
+
+            var measurementsResponse = await network.GetMeasurementsRequest(id);
+            var measurements = Network.GetMeasurements(measurementsResponse);
+            MeasurementInstallationVmItems = MeasurementsInstallationToVmItem(new List<(Measurements, Installation)>
+            {
+                (measurements, installation)
+            });
         }
 
         public static List<MeasurementVmItem> MeasurementsInstallationToVmItem(

@@ -12,8 +12,6 @@ namespace FirstLab
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class HomePage : ContentPage
     {
-        private StackLayout HomePageStackLayout => homePageStackLayout;
-
         public ObservableCollection<MeasurementVmItem> MeasurementItems;
 
         public HomePage()
@@ -29,6 +27,8 @@ namespace FirstLab
             Console.WriteLine("HomePage will print location");
             ReadLocation();
         }
+
+        private StackLayout HomePageStackLayout => homePageStackLayout;
 
         private static async Task ReadLocation()
         {

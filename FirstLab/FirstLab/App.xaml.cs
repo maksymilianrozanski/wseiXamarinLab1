@@ -16,10 +16,10 @@ namespace FirstLab
 
         public App()
         {
+            InitializeComponent();
             var assembly = Assembly.GetExecutingAssembly();
             ReadApiKey(assembly);
 
-            InitializeComponent();
             MainPage = new NavigationPage(new MainTabbedPage());
         }
 
