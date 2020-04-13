@@ -48,18 +48,22 @@ namespace FirstLab.network
 
         public async Task<string> GetMeasurementsRequest(int id)
         {
+            var uriBuilder = GetMeasurementsUri(_client.BaseAddress, id);
+            var response = _client.GetAsync(uriBuilder.Uri).Result;
+            if (response.IsSuccessStatusCode) return await response.Content.ReadAsStringAsync();
+            return null;
+        }
+
+        public static UriBuilder GetMeasurementsUri(Uri baseAddress, int id)
+        {
             var query = HttpUtility.ParseQueryString(string.Empty);
             query["installationId"] = id.ToString();
 
-            var uriBuilder =
-                new UriBuilder(Path.Combine(_client.BaseAddress.ToString(), "v2/measurements/installation/"))
+            return
+                new UriBuilder(Path.Combine(baseAddress.ToString(), "v2/measurements/installation/"))
                 {
                     Query = query.ToString()
                 };
-
-            var response = _client.GetAsync(uriBuilder.Uri.ToString()).Result;
-            if (response.IsSuccessStatusCode) return await response.Content.ReadAsStringAsync();
-            return null;
         }
 
         public static Measurements GetMeasurements(string json)

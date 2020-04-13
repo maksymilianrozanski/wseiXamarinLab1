@@ -54,32 +54,6 @@ namespace FirstLabUnitTests.network
             mockHttp.VerifyNoOutstandingExpectation();
         }
 
-
-        [Test]
-        public void GetRequestShouldContainCorrectValues()
-        {
-            var baseUrl = "http://example.com";
-
-            var expectedId = 8077;
-
-            var mockHttp = new MockHttpMessageHandler();
-            mockHttp.When(baseUrl + "*")
-                .WithQueryString(new Dictionary<string, string>
-                {
-                    {"id", expectedId.ToString()}
-                })
-                .Respond("application/json", Responses.MeasurementsResponse);
-
-            var client = mockHttp.ToHttpClient();
-            client.DefaultRequestHeaders.Add("Accept", "application/json");
-            client.DefaultRequestHeaders.Add("apikey", "ExpectedApiKey");
-            client.BaseAddress = new Uri(baseUrl);
-
-            var networkUnderTest = new Network(client);
-            var result = networkUnderTest.GetMeasurementsRequest(expectedId).Result;
-            mockHttp.VerifyNoOutstandingExpectation();
-        }
-
         [Test]
         public void GetMeasurementsShouldRequestCorrectApiEndpoint()
         {
@@ -115,6 +89,16 @@ namespace FirstLabUnitTests.network
                 new List<Standard> {new Standard("WHO", "PM25", 25.0, 79.05)}));
 
             Assert.AreEqual(expected, result);
+        }
+
+        [Test]
+        public void ShouldReturnUriBuilderContainingCorrectIdPathValue()
+        {
+            var id = 1111;
+            var baseAddress = new Uri("https://example.com");
+            var result = Network.GetMeasurementsUri(baseAddress, id);
+            var expectedQueryValue = "installationId=" + id;
+            Assert.IsTrue(result.Query.Contains(expectedQueryValue));
         }
     }
 }
