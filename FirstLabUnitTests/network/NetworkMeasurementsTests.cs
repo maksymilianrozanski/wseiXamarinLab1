@@ -1,9 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Globalization;
 using FirstLab.network;
 using FirstLab.network.models;
 using NUnit.Framework;
 using RichardSzalay.MockHttp;
+using Xamarin.Essentials;
 using Index = FirstLab.network.models.Index;
 
 namespace FirstLabUnitTests.network
@@ -53,29 +56,40 @@ namespace FirstLabUnitTests.network
         }
 
         [Test]
-        public void ShouldReturnUriBuilderContainingCorrectIdPathValue()
+        public void NameValueCollectionShouldContainsSpecifiedId()
         {
             var id = 1111;
-            var baseAddress = new Uri("https://example.com");
-            var result = Network.GetMeasurementsUri(baseAddress, id);
-            var expectedQueryValue = "installationId=" + id;
-            Assert.IsTrue(result.Query.Contains(expectedQueryValue));
+            var result = Network.ByInstallationId(id);
+            Assert.AreEqual(id.ToString(), result.Get("installationId"));
         }
 
         [Test]
-        public void ShouldReturnUriBuilderContainingCorrectPath()
+        public void NameValueCollectionShouldContainSpecifiedLocationValues()
         {
-            var result = Network.GetMeasurementsUri(new Uri("https://example.com"), 1111);
-            var expectedPath = "/v2/measurements/installation/";
-            Assert.AreEqual(expectedPath, result.Path);
+            var location = new Location(52.2297, 21.0122);
+            var result = Network.InstallationByLocation(location);
+            Assert.AreEqual(location.Latitude.ToString(CultureInfo.InvariantCulture), result.Get("lat"));
+            Assert.AreEqual(location.Longitude.ToString(CultureInfo.InvariantCulture), result.Get("lng"));
+            Assert.AreEqual("-1", result.Get("maxDistanceKM"));
+            Assert.AreEqual("1", result.Get("maxResults"));
         }
 
         [Test]
         public void ShouldReturnUriBuilderContainingCorrectBaseUrl()
         {
             var baseAddress = new Uri("https://example.com");
-            var result = Network.GetMeasurementsUri(baseAddress, 1111);
+            var endpoint = "some/endpoint";
+            var result = Network.CreateUriBuilder(baseAddress)(endpoint)(new NameValueCollection());
             Assert.IsTrue(result.Uri.ToString().StartsWith(baseAddress.ToString()));
+        }
+
+        [Test]
+        public void ShouldReturnUriBuilderContainingCorrectPath()
+        {
+            var baseAddress = new Uri("https://example.com");
+            var endpoint = "some/endpoint";
+            var result = Network.CreateUriBuilder(baseAddress)(endpoint)(new NameValueCollection());
+            Assert.AreEqual("/" + endpoint, result.Path);
         }
     }
 }
