@@ -53,7 +53,7 @@ namespace FirstLab.network
             _client = client;
         }
 
-        public Either<Error, Installation> GetNearestInstallationsRequest2(Location location)
+        public Either<Error, Installation> GetNearestInstallationsRequest(Location location)
         {
             var uriBuilder =
                 CreateUriBuilder(_client.BaseAddress)(NearestInstallationEndpoint)(

@@ -41,7 +41,7 @@ namespace FirstLab.viewModels
 
             var network = new Network(httpClient);
 
-            network.GetNearestInstallationsRequest2(location)
+            network.GetNearestInstallationsRequest(location)
                 .Bind(it => MeasurementInstallationPair(network.GetMeasurementsRequest2(it.id), it))
                 .Bind<Error, (Measurements, Installation), List<(Measurements, Installation)>>(it =>
                     new List<(Measurements, Installation)> {it})
