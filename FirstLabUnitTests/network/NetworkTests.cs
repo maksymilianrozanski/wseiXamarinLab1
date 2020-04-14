@@ -39,29 +39,6 @@ namespace FirstLabUnitTests.network
         }
 
         [Test]
-        public void ShouldRequestWithCorrectHeaders()
-        {
-            var baseUri = "http://example.com";
-            var mockHttp = new MockHttpMessageHandler();
-            mockHttp.When(baseUri + "*")
-                .WithHeaders(new Dictionary<string, string>
-                {
-                    {"Accept", "application/json"},
-                    {"apikey", "ExpectedApiKey"}
-                })
-                .Respond("application/json", ExampleContent);
-
-            var client = mockHttp.ToHttpClient();
-            client.DefaultRequestHeaders.Add("Accept", "application/json");
-            client.DefaultRequestHeaders.Add("apikey", "ExpectedApiKey");
-            client.BaseAddress = new Uri(baseUri);
-
-            var networkUnderTest = new Network(client);
-            var result = networkUnderTest.GetNearestInstallationsRequest(new Location(50.062006, 19.940984)).Result;
-            mockHttp.VerifyNoOutstandingExpectation();
-        }
-
-        [Test]
         public void ShouldRequestCorrectBaseUrl()
         {
             var expectedBase = "http://example.com";
