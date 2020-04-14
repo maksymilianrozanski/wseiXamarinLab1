@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using FirstLab.network;
-using FirstLab.network.models;
 using NUnit.Framework;
 using RichardSzalay.MockHttp;
 using Xamarin.Essentials;
@@ -11,9 +10,6 @@ namespace FirstLabUnitTests.network
 {
     public class NetworkTests
     {
-        private const string ExampleContent =
-            "[{\"id\":8077,\"location\":{\"latitude\":50.062006,\"longitude\":19.940984},\"address\":{\"country\":\"Poland\",\"city\":\"Krak├│w\",\"street\":\"Miko┼éajska\",\"number\":\"4\",\"displayAddress1\":\"Krak├│w\",\"displayAddress2\":\"Miko┼éajska\"},\"elevation\":220.38,\"airly\":true,\"sponsor\":{\"id\":489,\"name\":\"Chatham Financial\",\"description\":\"Airly Sensor's sponsor\",\"logo\":\"https://cdn.airly.eu/logo/ChathamFinancial_1570109001008_473803190.jpg\",\"link\":\"https://crossweb.pl/job/chatham-financial/ \"}}]";
-
         [Test]
         public void ShouldReturnHttpResponse()
         {
@@ -24,7 +20,7 @@ namespace FirstLabUnitTests.network
                     {"Accept", "application/json"},
                     {"apikey", "ExpectedApiKey"}
                 })
-                .Respond("application/json", ExampleContent);
+                .Respond("application/json", Responses.InstallationJsonResponse);
 
             var client = mockHttp.ToHttpClient();
             client.DefaultRequestHeaders.Add("Accept", "application/json");
@@ -45,7 +41,7 @@ namespace FirstLabUnitTests.network
 
             var mockHttp = new MockHttpMessageHandler();
             mockHttp.When(expectedBase + "/*")
-                .Respond("application/json", ExampleContent);
+                .Respond("application/json", Responses.InstallationJsonResponse);
 
             var client = mockHttp.ToHttpClient();
             client.DefaultRequestHeaders.Add("Accept", "application/json");
@@ -75,7 +71,7 @@ namespace FirstLabUnitTests.network
                     {"maxDistanceKM", "-1"},
                     {"maxResults", "1"}
                 })
-                .Respond("application/json", ExampleContent);
+                .Respond("application/json", Responses.InstallationJsonResponse);
 
             var client = mockHttp.ToHttpClient();
             client.DefaultRequestHeaders.Add("Accept", "application/json");
@@ -98,7 +94,7 @@ namespace FirstLabUnitTests.network
 
             var mockHttp = new MockHttpMessageHandler();
             mockHttp.When(baseUrl + "/v2/installations/nearest")
-                .Respond("application/json", ExampleContent);
+                .Respond("application/json", Responses.InstallationJsonResponse);
 
             var client = mockHttp.ToHttpClient();
             client.DefaultRequestHeaders.Add("Accept", "application/json");
@@ -110,19 +106,6 @@ namespace FirstLabUnitTests.network
             var value = NetworkMeasurementsTests.GetValueFromEither(result);
             Assert.NotNull(value);
             mockHttp.VerifyNoOutstandingExpectation();
-        }
-
-        [Test]
-        public void ShouldReturnFirstInstallationOfJson()
-        {
-            var json = ExampleContent;
-            var result = Network.GetNearestInstallation(json);
-            var expected = new Installation(8077, new Location(50.062006, 19.940984),
-                new Address("Poland", "Krak├│w", "Miko┼éajska"));
-            Assert.AreEqual(expected.id, result.id);
-            Assert.AreEqual(expected.location.Latitude, result.location.Latitude);
-            Assert.AreEqual(expected.location.Longitude, result.location.Longitude);
-            Assert.AreEqual(expected.address, result.address);
         }
     }
 }
