@@ -70,7 +70,8 @@ namespace FirstLab.network
                     InstallationByLocation(location));
             var response = _client.GetAsync(uriBuilder.Uri.ToString()).Result;
             return CheckResponseStatus(response)
-                .Bind(it => DeserializeInstallation(it.Content.ReadAsStringAsync().Result));
+                .Bind(ReadMessageContent)
+                .Bind(DeserializeInstallation);
         }
 
         private Either<Error, HttpResponseMessage> CheckResponseStatus(HttpResponseMessage response)
@@ -91,6 +92,11 @@ namespace FirstLab.network
                 return new JsonParsingError("Exception during deserializing json, message: " + e.Message + "json: " +
                                             json + ".");
             }
+        }
+
+        private Either<Error, string> ReadMessageContent(HttpResponseMessage message)
+        {
+            return message.Content.ReadAsStringAsync().Result;
         }
 
         public static Installation GetNearestInstallation(string json)
