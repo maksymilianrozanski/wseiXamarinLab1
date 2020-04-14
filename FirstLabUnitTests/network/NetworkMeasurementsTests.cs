@@ -41,7 +41,7 @@ namespace FirstLabUnitTests.network
             mockHttp.VerifyNoOutstandingExpectation();
         }
 
-        private static T GetValueFromEither<T>(Either<Error, T> either)
+        public static T GetValueFromEither<T>(Either<Error, T> either)
         {
             var option = new Option<T>();
             either.Match(error => Assert.Fail(error.Message), arg => option = arg);

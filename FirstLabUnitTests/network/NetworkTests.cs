@@ -44,7 +44,7 @@ namespace FirstLabUnitTests.network
             var expectedBase = "http://example.com";
 
             var mockHttp = new MockHttpMessageHandler();
-            mockHttp.When(expectedBase + "*")
+            mockHttp.When(expectedBase + "/*")
                 .Respond("application/json", ExampleContent);
 
             var client = mockHttp.ToHttpClient();
@@ -53,7 +53,9 @@ namespace FirstLabUnitTests.network
             client.BaseAddress = new Uri(expectedBase);
 
             var networkUnderTest = new Network(client);
-            var result = networkUnderTest.GetNearestInstallationsRequest(new Location(50.062006, 19.940984)).Result;
+            var result = networkUnderTest.GetNearestInstallationsRequest2(new Location(50.062006, 19.940984));
+            var value = NetworkMeasurementsTests.GetValueFromEither(result);
+            Assert.NotNull(value);
             mockHttp.VerifyNoOutstandingExpectation();
         }
 
