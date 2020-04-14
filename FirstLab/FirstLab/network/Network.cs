@@ -53,16 +53,6 @@ namespace FirstLab.network
             _client = client;
         }
 
-        public async Task<string> GetNearestInstallationsRequest(Location location)
-        {
-            var uriBuilder =
-                CreateUriBuilder(_client.BaseAddress)(NearestInstallationEndpoint)(
-                    InstallationByLocation(location));
-            var response = _client.GetAsync(uriBuilder.Uri.ToString()).Result;
-            if (response.IsSuccessStatusCode) return await response.Content.ReadAsStringAsync();
-            return null;
-        }
-
         public Either<Error, Installation> GetNearestInstallationsRequest2(Location location)
         {
             var uriBuilder =

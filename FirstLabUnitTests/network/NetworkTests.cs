@@ -97,7 +97,7 @@ namespace FirstLabUnitTests.network
             var location = new Location(50.062006, 19.940984);
 
             var mockHttp = new MockHttpMessageHandler();
-            mockHttp.When(baseUrl + "/v2/installations/nearest/")
+            mockHttp.When(baseUrl + "/v2/installations/nearest")
                 .Respond("application/json", ExampleContent);
 
             var client = mockHttp.ToHttpClient();
@@ -106,7 +106,9 @@ namespace FirstLabUnitTests.network
             client.BaseAddress = new Uri(baseUrl);
 
             var networkUnderTest = new Network(client);
-            var result = networkUnderTest.GetNearestInstallationsRequest(location).Result;
+            var result = networkUnderTest.GetNearestInstallationsRequest2(location);
+            var value = NetworkMeasurementsTests.GetValueFromEither(result);
+            Assert.NotNull(value);
             mockHttp.VerifyNoOutstandingExpectation();
         }
 
