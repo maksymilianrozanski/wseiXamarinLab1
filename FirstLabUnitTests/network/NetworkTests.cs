@@ -83,7 +83,9 @@ namespace FirstLabUnitTests.network
             client.BaseAddress = new Uri(baseUrl);
 
             var networkUnderTest = new Network(client);
-            var result = networkUnderTest.GetNearestInstallationsRequest(location).Result;
+            var result = networkUnderTest.GetNearestInstallationsRequest2(location);
+            var value = NetworkMeasurementsTests.GetValueFromEither(result);
+            Assert.NotNull(value);
             mockHttp.VerifyNoOutstandingExpectation();
         }
 
