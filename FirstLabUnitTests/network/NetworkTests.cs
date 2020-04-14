@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using FirstLab.network;
-using FirstLab.network.models;
+using FirstLabUnitTests.utility;
 using NUnit.Framework;
 using RichardSzalay.MockHttp;
 using Xamarin.Essentials;
@@ -11,9 +11,6 @@ namespace FirstLabUnitTests.network
 {
     public class NetworkTests
     {
-        private const string ExampleContent =
-            "[{\"id\":8077,\"location\":{\"latitude\":50.062006,\"longitude\":19.940984},\"address\":{\"country\":\"Poland\",\"city\":\"Krak├│w\",\"street\":\"Miko┼éajska\",\"number\":\"4\",\"displayAddress1\":\"Krak├│w\",\"displayAddress2\":\"Miko┼éajska\"},\"elevation\":220.38,\"airly\":true,\"sponsor\":{\"id\":489,\"name\":\"Chatham Financial\",\"description\":\"Airly Sensor's sponsor\",\"logo\":\"https://cdn.airly.eu/logo/ChathamFinancial_1570109001008_473803190.jpg\",\"link\":\"https://crossweb.pl/job/chatham-financial/ \"}}]";
-
         [Test]
         public void ShouldReturnHttpResponse()
         {
@@ -24,7 +21,7 @@ namespace FirstLabUnitTests.network
                     {"Accept", "application/json"},
                     {"apikey", "ExpectedApiKey"}
                 })
-                .Respond("application/json", ExampleContent);
+                .Respond("application/json", Responses.InstallationJsonResponse);
 
             var client = mockHttp.ToHttpClient();
             client.DefaultRequestHeaders.Add("Accept", "application/json");
@@ -39,36 +36,13 @@ namespace FirstLabUnitTests.network
         }
 
         [Test]
-        public void ShouldRequestWithCorrectHeaders()
-        {
-            var baseUri = "http://example.com";
-            var mockHttp = new MockHttpMessageHandler();
-            mockHttp.When(baseUri + "*")
-                .WithHeaders(new Dictionary<string, string>
-                {
-                    {"Accept", "application/json"},
-                    {"apikey", "ExpectedApiKey"}
-                })
-                .Respond("application/json", ExampleContent);
-
-            var client = mockHttp.ToHttpClient();
-            client.DefaultRequestHeaders.Add("Accept", "application/json");
-            client.DefaultRequestHeaders.Add("apikey", "ExpectedApiKey");
-            client.BaseAddress = new Uri(baseUri);
-
-            var networkUnderTest = new Network(client);
-            var result = networkUnderTest.GetNearestInstallationsRequest(new Location(50.062006, 19.940984)).Result;
-            mockHttp.VerifyNoOutstandingExpectation();
-        }
-
-        [Test]
         public void ShouldRequestCorrectBaseUrl()
         {
             var expectedBase = "http://example.com";
 
             var mockHttp = new MockHttpMessageHandler();
-            mockHttp.When(expectedBase + "*")
-                .Respond("application/json", ExampleContent);
+            mockHttp.When(expectedBase + "/*")
+                .Respond("application/json", Responses.InstallationJsonResponse);
 
             var client = mockHttp.ToHttpClient();
             client.DefaultRequestHeaders.Add("Accept", "application/json");
@@ -76,7 +50,9 @@ namespace FirstLabUnitTests.network
             client.BaseAddress = new Uri(expectedBase);
 
             var networkUnderTest = new Network(client);
-            var result = networkUnderTest.GetNearestInstallationsRequest(new Location(50.062006, 19.940984)).Result;
+            var result = networkUnderTest.GetNearestInstallationsRequest(new Location(50.062006, 19.940984));
+            var value = TestUtility.GetValueFromEither(result);
+            Assert.NotNull(value);
             mockHttp.VerifyNoOutstandingExpectation();
         }
 
@@ -96,7 +72,7 @@ namespace FirstLabUnitTests.network
                     {"maxDistanceKM", "-1"},
                     {"maxResults", "1"}
                 })
-                .Respond("application/json", ExampleContent);
+                .Respond("application/json", Responses.InstallationJsonResponse);
 
             var client = mockHttp.ToHttpClient();
             client.DefaultRequestHeaders.Add("Accept", "application/json");
@@ -104,7 +80,9 @@ namespace FirstLabUnitTests.network
             client.BaseAddress = new Uri(baseUrl);
 
             var networkUnderTest = new Network(client);
-            var result = networkUnderTest.GetNearestInstallationsRequest(location).Result;
+            var result = networkUnderTest.GetNearestInstallationsRequest(location);
+            var value = TestUtility.GetValueFromEither(result);
+            Assert.NotNull(value);
             mockHttp.VerifyNoOutstandingExpectation();
         }
 
@@ -116,8 +94,8 @@ namespace FirstLabUnitTests.network
             var location = new Location(50.062006, 19.940984);
 
             var mockHttp = new MockHttpMessageHandler();
-            mockHttp.When(baseUrl + "/v2/installations/nearest/")
-                .Respond("application/json", ExampleContent);
+            mockHttp.When(baseUrl + "/v2/installations/nearest")
+                .Respond("application/json", Responses.InstallationJsonResponse);
 
             var client = mockHttp.ToHttpClient();
             client.DefaultRequestHeaders.Add("Accept", "application/json");
@@ -125,21 +103,37 @@ namespace FirstLabUnitTests.network
             client.BaseAddress = new Uri(baseUrl);
 
             var networkUnderTest = new Network(client);
-            var result = networkUnderTest.GetNearestInstallationsRequest(location).Result;
+            var result = networkUnderTest.GetNearestInstallationsRequest(location);
+            var value = TestUtility.GetValueFromEither(result);
+            Assert.NotNull(value);
             mockHttp.VerifyNoOutstandingExpectation();
         }
 
         [Test]
-        public void ShouldReturnFirstInstallationOfJson()
+        public void ShouldRequestWithCorrectHeaders()
         {
-            var json = ExampleContent;
-            var result = Network.GetNearestInstallation(json);
-            var expected = new Installation(8077, new Location(50.062006, 19.940984),
-                new Address("Poland", "Krak├│w", "Miko┼éajska"));
-            Assert.AreEqual(expected.id, result.id);
-            Assert.AreEqual(expected.location.Latitude, result.location.Latitude);
-            Assert.AreEqual(expected.location.Longitude, result.location.Longitude);
-            Assert.AreEqual(expected.address, result.address);
+            var baseUri = "http://example.com";
+            var mockHttp = new MockHttpMessageHandler();
+            mockHttp.When(baseUri + "*")
+                .WithHeaders(new Dictionary<string, string>
+                {
+                    {"Accept", "application/json"},
+                    {"apikey", "ExpectedApiKey"}
+                })
+                .Respond("application/json", Responses.MeasurementsJsonResponse);
+
+            var client = mockHttp.ToHttpClient();
+            client.DefaultRequestHeaders.Add("Accept", "application/json");
+            client.DefaultRequestHeaders.Add("apikey", "ExpectedApiKey");
+            client.BaseAddress = new Uri(baseUri);
+
+            var networkUnderTest = new Network(client);
+
+            var result = networkUnderTest.GetMeasurementsRequest2(8077);
+            var value = TestUtility.GetValueFromEither(result);
+
+            Assert.NotNull(value);
+            mockHttp.VerifyNoOutstandingExpectation();
         }
     }
 }
