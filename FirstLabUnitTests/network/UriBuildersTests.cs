@@ -1,51 +1,14 @@
 using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Globalization;
 using FirstLab.network;
-using LaYumba.Functional;
 using NUnit.Framework;
-using RichardSzalay.MockHttp;
 using Xamarin.Essentials;
 
 namespace FirstLabUnitTests.network
 {
-    public class NetworkMeasurementsTests
+    public class UriBuildersTests
     {
-        [Test]
-        public void ShouldRequestWithCorrectHeaders()
-        {
-            var baseUri = "http://example.com";
-            var mockHttp = new MockHttpMessageHandler();
-            mockHttp.When(baseUri + "*")
-                .WithHeaders(new Dictionary<string, string>
-                {
-                    {"Accept", "application/json"},
-                    {"apikey", "ExpectedApiKey"}
-                })
-                .Respond("application/json", Responses.MeasurementsJsonResponse);
-
-            var client = mockHttp.ToHttpClient();
-            client.DefaultRequestHeaders.Add("Accept", "application/json");
-            client.DefaultRequestHeaders.Add("apikey", "ExpectedApiKey");
-            client.BaseAddress = new Uri(baseUri);
-
-            var networkUnderTest = new Network(client);
-
-            var result = networkUnderTest.GetMeasurementsRequest2(8077);
-            var value = GetValueFromEither(result);
-
-            Assert.NotNull(value);
-            mockHttp.VerifyNoOutstandingExpectation();
-        }
-
-        public static T GetValueFromEither<T>(Either<Error, T> either)
-        {
-            var option = new Option<T>();
-            either.Match(error => Assert.Fail(error.Message), arg => option = arg);
-            return option.GetOrElse(() => null).Result;
-        }
-
         [Test]
         public void NameValueCollectionShouldContainsSpecifiedId()
         {
