@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web;
 using FirstLab.network.models;
+using LaYumba.Functional;
 using Newtonsoft.Json;
 using Xamarin.Essentials;
 
@@ -62,6 +63,36 @@ namespace FirstLab.network
             return null;
         }
 
+        public Either<Error, Installation> GetNearestInstallationsRequest2(Location location)
+        {
+            var uriBuilder =
+                CreateUriBuilder(_client.BaseAddress)(NearestInstallationEndpoint)(
+                    InstallationByLocation(location));
+            var response = _client.GetAsync(uriBuilder.Uri.ToString()).Result;
+            return CheckResponseStatus(response)
+                .Bind(it => DeserializeInstallation(it.Content.ReadAsStringAsync().Result));
+        }
+
+        private Either<Error, HttpResponseMessage> CheckResponseStatus(HttpResponseMessage response)
+        {
+            return response.IsSuccessStatusCode
+                ? (Either<Error, HttpResponseMessage>) response
+                : new InvalidResponseCodeError("Not successful response status code: " + response.StatusCode);
+        }
+
+        private Either<Error, Installation> DeserializeInstallation(string json)
+        {
+            try
+            {
+                return JsonConvert.DeserializeObject<List<Installation>>(json)[0];
+            } //TODO: edit to more specific exception type
+            catch (Exception e)
+            {
+                return new JsonParsingError("Exception during deserializing json, message: " + e.Message + "json: " +
+                                            json + ".");
+            }
+        }
+
         public static Installation GetNearestInstallation(string json)
         {
             return JsonConvert.DeserializeObject<List<Installation>>(json)[0];
@@ -79,5 +110,25 @@ namespace FirstLab.network
         {
             return JsonConvert.DeserializeObject<Measurements>(json);
         }
+    }
+
+    public sealed class InvalidResponseCodeError : Error
+    {
+        public InvalidResponseCodeError(string message)
+        {
+            Message = message;
+        }
+
+        public override string Message { get; }
+    }
+
+    public sealed class JsonParsingError : Error
+    {
+        public JsonParsingError(string message)
+        {
+            Message = message;
+        }
+
+        public override string Message { get; }
     }
 }
