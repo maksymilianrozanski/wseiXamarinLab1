@@ -6,6 +6,7 @@ using System.Windows.Input;
 using FirstLab.location;
 using FirstLab.network;
 using FirstLab.network.models;
+using LaYumba.Functional;
 using Xamarin.Forms;
 
 namespace FirstLab.viewModels
@@ -39,16 +40,22 @@ namespace FirstLab.viewModels
             httpClient.DefaultRequestHeaders.Add("apiKey", App.ApiKey);
 
             var network = new Network(httpClient);
-            var nearestInstallation = network.GetNearestInstallationsRequest(location).Result;
-            var installation = Network.GetNearestInstallation(nearestInstallation);
-            var id = installation.id;
 
-            var measurementsResponse = await network.GetMeasurementsRequest(id);
-            var measurements = Network.GetMeasurements(measurementsResponse);
-            MeasurementInstallationVmItems = MeasurementsInstallationToVmItem(new List<(Measurements, Installation)>
-            {
-                (measurements, installation)
-            });
+            network.GetNearestInstallationsRequest2(location)
+                .Bind(it => MeasurementInstallationPair(network.GetMeasurementsRequest2(it.id), it))
+                .Bind<Error, (Measurements, Installation), List<(Measurements, Installation)>>(it =>
+                    new List<(Measurements, Installation)> {it})
+                .Bind<Error, List<(Measurements, Installation)>, List<MeasurementVmItem>>(it =>
+                    MeasurementsInstallationToVmItem(it)).Match(error => { Console.WriteLine(error.Message); },
+                    list => MeasurementInstallationVmItems = list);
+        }
+
+        private static Either<Error, (Measurements, Installation)> MeasurementInstallationPair(
+            Either<Error, Measurements> m,
+            Installation i)
+        {
+            return m.Bind<Error, Measurements, (Measurements, Installation)>(measurement
+                => (measurement, i));
         }
 
         public static List<MeasurementVmItem> MeasurementsInstallationToVmItem(

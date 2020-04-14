@@ -104,12 +104,34 @@ namespace FirstLab.network
             return JsonConvert.DeserializeObject<List<Installation>>(json)[0];
         }
 
+        public Either<Error, Measurements> GetMeasurementsRequest2(int id)
+        {
+            var uriBuilder = CreateUriBuilder(_client.BaseAddress)(MeasurementEndPoint)(ByInstallationId(id));
+            var response = _client.GetAsync(uriBuilder.Uri.ToString()).Result;
+            return CheckResponseStatus(response)
+                .Bind(ReadMessageContent)
+                .Bind(DeserializeMeasurements);
+        }
+
         public async Task<string> GetMeasurementsRequest(int id)
         {
             var uriBuilder = CreateUriBuilder(_client.BaseAddress)(MeasurementEndPoint)(ByInstallationId(id));
             var response = _client.GetAsync(uriBuilder.Uri).Result;
             if (response.IsSuccessStatusCode) return await response.Content.ReadAsStringAsync();
             return null;
+        }
+
+        private Either<Error, Measurements> DeserializeMeasurements(string json)
+        {
+            try
+            {
+                return JsonConvert.DeserializeObject<Measurements>(json);
+            }
+            catch (Exception e)
+            {
+                return new JsonParsingError("Exception during deserializing json, message: " + e.Message + "json: " +
+                                            json + ".");
+            }
         }
 
         public static Measurements GetMeasurements(string json)
