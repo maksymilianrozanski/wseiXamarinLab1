@@ -4,7 +4,6 @@ using System.Collections.Specialized;
 using System.Globalization;
 using System.IO;
 using System.Net.Http;
-using System.Threading.Tasks;
 using System.Web;
 using FirstLab.network.models;
 using LaYumba.Functional;
@@ -101,14 +100,6 @@ namespace FirstLab.network
             return CheckResponseStatus(response)
                 .Bind(ReadMessageContent)
                 .Bind(DeserializeMeasurements);
-        }
-
-        public async Task<string> GetMeasurementsRequest(int id)
-        {
-            var uriBuilder = CreateUriBuilder(_client.BaseAddress)(MeasurementEndPoint)(ByInstallationId(id));
-            var response = _client.GetAsync(uriBuilder.Uri).Result;
-            if (response.IsSuccessStatusCode) return await response.Content.ReadAsStringAsync();
-            return null;
         }
 
         private Either<Error, Measurements> DeserializeMeasurements(string json)
