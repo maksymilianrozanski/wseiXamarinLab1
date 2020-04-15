@@ -19,6 +19,7 @@ namespace FirstLab
             BindingContext = vm;
 
             HomePageStackLayout.Children.Add(CreateStatusIndicator());
+            HomePageStackLayout.Children.Add(CreateErrorLabel());
 
             var listView = MeasurementsList.CreateMeasurementsListView(MeasurementItems, vm.MyCommand);
             HomePageStackLayout.Children.Add(listView);
@@ -34,6 +35,17 @@ namespace FirstLab
             };
             indicator.SetBinding(ActivityIndicator.IsRunningProperty, new Binding(nameof(HomeViewModel.IsLoading)));
             return indicator;
+        }
+
+        private static Label CreateErrorLabel()
+        {
+            var label = new Label
+            {
+                TextColor = Color.Red,
+                FontSize = 20.0
+            };
+            label.SetBinding(Label.TextProperty, new Binding(nameof(HomeViewModel.ErrorMessage)));
+            return label;
         }
     }
 }

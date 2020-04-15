@@ -13,6 +13,7 @@ namespace FirstLab.viewModels
 {
     public class HomeViewModel : BaseViewModel
     {
+        private string _errorMessage;
         private bool _isLoading;
         private List<MeasurementVmItem> _measurementVmItems;
 
@@ -39,6 +40,12 @@ namespace FirstLab.viewModels
             set => SetProperty(ref _measurementVmItems, value);
         }
 
+        public string ErrorMessage
+        {
+            get => _errorMessage;
+            set => SetProperty(ref _errorMessage, value);
+        }
+
         private async void LoadValues()
         {
             IsLoading = true;
@@ -54,8 +61,17 @@ namespace FirstLab.viewModels
                 .Bind<Error, (Measurements, Installation), List<(Measurements, Installation)>>(it =>
                     new List<(Measurements, Installation)> {it})
                 .Bind<Error, List<(Measurements, Installation)>, List<MeasurementVmItem>>(it =>
-                    MeasurementsInstallationToVmItem(it)).Match(error => { Console.WriteLine(error.Message); },
-                    list => { MeasurementInstallationVmItems = list; });
+                    MeasurementsInstallationToVmItem(it))
+                .Match(error =>
+                    {
+                        ErrorMessage = "Something went wrong...";
+                        Console.WriteLine(error.Message);
+                    },
+                    list =>
+                    {
+                        MeasurementInstallationVmItems = list;
+                        ErrorMessage = "";
+                    });
             IsLoading = false;
         }
 
