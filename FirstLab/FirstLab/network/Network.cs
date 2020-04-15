@@ -42,6 +42,14 @@ namespace FirstLab.network
             _client = client;
         }
 
+        public static HttpClient CreateClient()
+        {
+            var httpClient = new HttpClient {BaseAddress = new Uri("https://airapi.airly.eu")};
+            httpClient.DefaultRequestHeaders.Add("Accept", "application/json");
+            httpClient.DefaultRequestHeaders.Add("apiKey", App.ApiKey);
+            return httpClient;
+        }
+
         public static NameValueCollection NearestInstallationsQuery(Location location, int installations)
         {
             var query = HttpUtility.ParseQueryString(string.Empty);
@@ -52,11 +60,7 @@ namespace FirstLab.network
             return query;
         }
 
-        public Either<Error, Installation> GetNearestInstallationsRequest(Location location)
-            => GetNearestInstallationsRequest2(location, 1)
-                .Bind<Error, List<Installation>, Installation>(it => it[0]);
-
-        public Either<Error, List<Installation>> GetNearestInstallationsRequest2(Location location, int installations)
+        public Either<Error, List<Installation>> GetNearestInstallationsRequest(Location location, int installations)
         {
             var uriBuilder =
                 CreateUriBuilder(_client.BaseAddress)(NearestInstallationEndpoint)(

@@ -1,29 +1,33 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using System.Windows.Input;
 using FirstLab.location;
 using FirstLab.network;
 using FirstLab.network.models;
 using LaYumba.Functional;
+using Xamarin.Essentials;
 using Xamarin.Forms;
 
 namespace FirstLab.viewModels
 {
     public class HomeViewModel : BaseViewModel
     {
+        private readonly Network _network;
         private string _errorMessage;
         private bool _isLoading;
         private List<MeasurementVmItem> _measurementVmItems;
 
         public HomeViewModel(INavigation navigation) : base(navigation)
         {
+            var httpClient = Network.CreateClient();
+            _network = new Network(httpClient);
+
             MyCommand = new Command<MeasurementVmItem>(
                 vmListItem => { navigation.PushAsync(new DetailsPage(vmListItem)); }
             );
 
-            LoadValues();
+            LoadMultipleValues();
         }
 
         public ICommand MyCommand { get; set; }
@@ -46,40 +50,62 @@ namespace FirstLab.viewModels
             set => SetProperty(ref _errorMessage, value);
         }
 
-        private async void LoadValues()
+        private async void LoadMultipleValues()
         {
             IsLoading = true;
             var location = await LocationProvider.GetLocation();
-            var httpClient = new HttpClient {BaseAddress = new Uri("https://airapi.airly.eu")};
-            httpClient.DefaultRequestHeaders.Add("Accept", "application/json");
-            httpClient.DefaultRequestHeaders.Add("apiKey", App.ApiKey);
 
-            var network = new Network(httpClient);
-
-            network.GetNearestInstallationsRequest(location)
-                .Bind(it => MeasurementInstallationPair(network.GetMeasurementsRequest(it.id), it))
-                .Bind<Error, (Measurements, Installation), List<(Measurements, Installation)>>(it =>
-                    new List<(Measurements, Installation)> {it})
-                .Bind<Error, List<(Measurements, Installation)>, List<MeasurementVmItem>>(it =>
-                    MeasurementsInstallationToVmItem(it))
+            FetchVmItems(location, _network)
                 .Match(error =>
-                    {
-                        ErrorMessage = "Something went wrong...";
-                        Console.WriteLine(error.Message);
-                    },
-                    list =>
-                    {
-                        MeasurementInstallationVmItems = list;
-                        ErrorMessage = "";
-                    });
+                {
+                    ErrorMessage = "Something went wrong...";
+                    Console.WriteLine(error.Message);
+                }, list =>
+                {
+                    MeasurementInstallationVmItems = list;
+                    ErrorMessage = "";
+                });
             IsLoading = false;
         }
 
-        private static Either<Error, (Measurements, Installation)> MeasurementInstallationPair(
-            Either<Error, Measurements> m,
-            Installation i) =>
-            m.Bind<Error, Measurements, (Measurements, Installation)>(measurement
-                => (measurement, i));
+        private Either<Error, List<MeasurementVmItem>> FetchVmItems(Location location, Network network) =>
+            network.GetNearestInstallationsRequest(location, 2)
+                .Map(it => FetchMeasurementsOfInstallations(it, _network))
+                .Bind(MeasurementsInstallationListToVmItems);
+
+        private static List<Either<Error, (Measurements, Installation)>>
+            FetchMeasurementsOfInstallations(List<Installation> installations, Network network) =>
+            installations.Select(installation => FetchMeasurements(installation, network)).ToList();
+
+        private static Either<Error, (Measurements, Installation)> FetchMeasurements(
+            Installation installation, Network network) =>
+            network.GetMeasurementsRequest(installation.id)
+                .Map(measurement => (measurement, installation));
+
+        private static Either<Error, List<MeasurementVmItem>> MeasurementsInstallationListToVmItems(
+            List<Either<Error, (Measurements, Installation)>> list) =>
+            list.Select(MeasurementsInstallationToVmItem).ToList();
+
+        private static MeasurementVmItem MeasurementsInstallationToVmItem(
+            Either<Error, (Measurements, Installation)> measurementInstallation)
+        {
+            var (measurements, installation) = GetValueFromEither(measurementInstallation);
+            return new MeasurementVmItem
+            {
+                Measurements = measurements,
+                Installation = installation,
+                City = installation.address.city,
+                Country = installation.address.country,
+                Street = installation.address.street
+            };
+        }
+
+        private static T GetValueFromEither<T>(Either<Error, T> either)
+        {
+            var option = new Option<T>();
+            either.Match(error => { }, arg => option = arg);
+            return option.GetOrElse(() => null).Result;
+        }
 
         public static List<MeasurementVmItem> MeasurementsInstallationToVmItem(
             IEnumerable<(Measurements, Installation)> items) =>

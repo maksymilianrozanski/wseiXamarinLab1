@@ -50,7 +50,7 @@ namespace FirstLabUnitTests.network
             client.BaseAddress = new Uri(expectedBase);
 
             var networkUnderTest = new Network(client);
-            var result = networkUnderTest.GetNearestInstallationsRequest(new Location(50.062006, 19.940984));
+            var result = networkUnderTest.GetNearestInstallationsRequest(new Location(50.062006, 19.940984), 1);
             var value = TestUtilities.GetValueFromEither(result);
             Assert.NotNull(value);
             mockHttp.VerifyNoOutstandingExpectation();
@@ -80,7 +80,7 @@ namespace FirstLabUnitTests.network
             client.BaseAddress = new Uri(baseUrl);
 
             var networkUnderTest = new Network(client);
-            var result = networkUnderTest.GetNearestInstallationsRequest(location);
+            var result = networkUnderTest.GetNearestInstallationsRequest(location, 1);
             var value = TestUtilities.GetValueFromEither(result);
             Assert.NotNull(value);
             mockHttp.VerifyNoOutstandingExpectation();
@@ -103,7 +103,7 @@ namespace FirstLabUnitTests.network
             client.BaseAddress = new Uri(baseUrl);
 
             var networkUnderTest = new Network(client);
-            var result = networkUnderTest.GetNearestInstallationsRequest(location);
+            var result = networkUnderTest.GetNearestInstallationsRequest(location, 1);
             var value = TestUtilities.GetValueFromEither(result);
             Assert.NotNull(value);
             mockHttp.VerifyNoOutstandingExpectation();
