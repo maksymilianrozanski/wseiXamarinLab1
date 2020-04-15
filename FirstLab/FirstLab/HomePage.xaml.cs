@@ -31,9 +31,10 @@ namespace FirstLab
         {
             var indicator = new ActivityIndicator
             {
-                IsRunning = false
+                IsRunning = false, IsVisible = false
             };
             indicator.SetBinding(ActivityIndicator.IsRunningProperty, new Binding(nameof(HomeViewModel.IsLoading)));
+            indicator.SetBinding(IsVisibleProperty, new Binding(nameof(HomeViewModel.IsLoading)));
             return indicator;
         }
 
