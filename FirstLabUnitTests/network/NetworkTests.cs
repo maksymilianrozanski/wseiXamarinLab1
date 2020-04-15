@@ -129,7 +129,7 @@ namespace FirstLabUnitTests.network
 
             var networkUnderTest = new Network(client);
 
-            var result = networkUnderTest.GetMeasurementsRequest2(8077);
+            var result = networkUnderTest.GetMeasurementsRequest(8077);
             var value = TestUtilities.GetValueFromEither(result);
 
             Assert.NotNull(value);

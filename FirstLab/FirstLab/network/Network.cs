@@ -63,7 +63,7 @@ namespace FirstLab.network
                 .Bind(DeserializeFirstInstallation);
         }
 
-        public Either<Error, Measurements> GetMeasurementsRequest2(int id)
+        public Either<Error, Measurements> GetMeasurementsRequest(int id)
         {
             var uriBuilder = CreateUriBuilder(_client.BaseAddress)(MeasurementEndPoint)(ByInstallationId(id));
             var response = _client.GetAsync(uriBuilder.Uri.ToString()).Result;

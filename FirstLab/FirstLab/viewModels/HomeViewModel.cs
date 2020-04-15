@@ -57,7 +57,7 @@ namespace FirstLab.viewModels
             var network = new Network(httpClient);
 
             network.GetNearestInstallationsRequest(location)
-                .Bind(it => MeasurementInstallationPair(network.GetMeasurementsRequest2(it.id), it))
+                .Bind(it => MeasurementInstallationPair(network.GetMeasurementsRequest(it.id), it))
                 .Bind<Error, (Measurements, Installation), List<(Measurements, Installation)>>(it =>
                     new List<(Measurements, Installation)> {it})
                 .Bind<Error, List<(Measurements, Installation)>, List<MeasurementVmItem>>(it =>
@@ -77,16 +77,13 @@ namespace FirstLab.viewModels
 
         private static Either<Error, (Measurements, Installation)> MeasurementInstallationPair(
             Either<Error, Measurements> m,
-            Installation i)
-        {
-            return m.Bind<Error, Measurements, (Measurements, Installation)>(measurement
+            Installation i) =>
+            m.Bind<Error, Measurements, (Measurements, Installation)>(measurement
                 => (measurement, i));
-        }
 
         public static List<MeasurementVmItem> MeasurementsInstallationToVmItem(
-            IEnumerable<(Measurements, Installation)> items)
-        {
-            return items.Select(it => (it.Item1, it.Item2))
+            IEnumerable<(Measurements, Installation)> items) =>
+            items.Select(it => (it.Item1, it.Item2))
                 .Select(it => new MeasurementVmItem
                 {
                     Measurements = it.Item1,
@@ -95,7 +92,6 @@ namespace FirstLab.viewModels
                     Country = it.Item2.address.country,
                     Street = it.Item2.address.street
                 }).ToList();
-        }
     }
 
     public struct MeasurementVmItem
