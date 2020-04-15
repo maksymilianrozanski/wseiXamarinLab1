@@ -55,9 +55,7 @@ namespace FirstLab.viewModels
             var location = await LocationProvider.GetLocation();
 
             _network.GetNearestInstallationsRequest2(location, 2)
-                .Bind
-                    <Error, List<Installation>, List<Either<Error, (Measurements, Installation)>>>
-                    (it => FetchMeasurementsOfInstallation(it, _network))
+                .Map(it => FetchMeasurementsOfInstallation(it, _network))
                 .Bind(MeasurementsInstallationListToVmItems)
                 .Match(error =>
                 {
