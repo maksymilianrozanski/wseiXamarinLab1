@@ -102,7 +102,7 @@ namespace FirstLab.network
                 .Bind(DeserializeMeasurements);
         }
 
-        public Either<Error, Measurements> DeserializeMeasurements(string json)
+        public static Either<Error, Measurements> DeserializeMeasurements(string json)
         {
             try
             {
