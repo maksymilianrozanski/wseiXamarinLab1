@@ -11,7 +11,7 @@ namespace FirstLabUnitTests.network
     public class NetworkParsingTests
     {
         [Test]
-        public void ShouldDeserializeMeasurement2()
+        public void ShouldDeserializeMeasurement()
         {
             var json = Responses.MeasurementsJsonResponseShorter;
 
