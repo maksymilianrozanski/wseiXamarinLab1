@@ -42,6 +42,14 @@ namespace FirstLabUnitTests.network
         }
 
         [Test]
+        public void ShouldDeserializeListOfInstallations()
+        {
+            var json = Responses.FourInstallationsJsonResponse;
+            var result = TestUtilities.GetValueFromEither(Network.DeserializeInstallations(json));
+            Assert.AreEqual(4, result.Count);
+        }
+
+        [Test]
         public void ShouldReturnJsonParsingError()
         {
             //given

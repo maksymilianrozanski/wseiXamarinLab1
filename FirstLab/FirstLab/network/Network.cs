@@ -87,6 +87,9 @@ namespace FirstLab.network
             => DeserializeJson<List<Installation>>(json)
                 .Bind<Error, List<Installation>, Installation>(it => it[0]);
 
+        public static Either<Error, List<Installation>> DeserializeInstallations(string json) =>
+            DeserializeJson<List<Installation>>(json);
+
         public static Either<Error, T> DeserializeJson<T>(string json)
         {
             try
