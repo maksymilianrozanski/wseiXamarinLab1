@@ -31,16 +31,6 @@ namespace FirstLab.network
             return query;
         };
 
-        public static Func<Location, NameValueCollection> InstallationByLocation = location =>
-        {
-            var query = HttpUtility.ParseQueryString(string.Empty);
-            query["lat"] = location.Latitude.ToString(CultureInfo.InvariantCulture);
-            query["lng"] = location.Longitude.ToString(CultureInfo.InvariantCulture);
-            query["maxDistanceKM"] = "-1";
-            query["maxResults"] = "1";
-            return query;
-        };
-
         private readonly HttpClient _client;
 
         private Network()
@@ -52,11 +42,21 @@ namespace FirstLab.network
             _client = client;
         }
 
+        public static NameValueCollection NearestInstallationsQuery(Location location, int installations)
+        {
+            var query = HttpUtility.ParseQueryString(string.Empty);
+            query["lat"] = location.Latitude.ToString(CultureInfo.InvariantCulture);
+            query["lng"] = location.Longitude.ToString(CultureInfo.InvariantCulture);
+            query["maxDistanceKM"] = "-1";
+            query["maxResults"] = installations.ToString();
+            return query;
+        }
+
         public Either<Error, Installation> GetNearestInstallationsRequest(Location location)
         {
             var uriBuilder =
                 CreateUriBuilder(_client.BaseAddress)(NearestInstallationEndpoint)(
-                    InstallationByLocation(location));
+                    NearestInstallationsQuery(location, 1));
             var response = _client.GetAsync(uriBuilder.Uri.ToString()).Result;
             return CheckResponseStatus(response)
                 .Bind(ReadMessageContent)
