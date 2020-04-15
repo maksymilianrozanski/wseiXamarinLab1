@@ -57,8 +57,7 @@ namespace FirstLab.viewModels
             _network.GetNearestInstallationsRequest2(location, 2)
                 .Bind
                     <Error, List<Installation>, List<Either<Error, (Measurements, Installation)>>>
-                    (it => it.Select
-                        (it2 => FetchMeasurements2(it2, _network)).ToList())
+                    (it => FetchMeasurementsOfInstallation(it, _network))
                 .Bind(MeasurementsInstallationListToVmItems)
                 .Match(error =>
                 {
@@ -72,6 +71,9 @@ namespace FirstLab.viewModels
             IsLoading = false;
         }
 
+        private static List<Either<Error, (Measurements, Installation)>> FetchMeasurementsOfInstallation(
+            List<Installation> it, Network network)
+            => it.Select(it2 => FetchMeasurements2(it2, network)).ToList();
 
         private static Either<Error, (Measurements, Installation)> FetchMeasurements2(
             Installation installation, Network network
