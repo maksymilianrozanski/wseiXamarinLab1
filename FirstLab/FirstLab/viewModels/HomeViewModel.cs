@@ -84,9 +84,9 @@ namespace FirstLab.viewModels
 
         public static Either<Error, List<MeasurementVmItem>> MeasurementsInstallationListToVmItems(
             List<Either<Error, (Measurements, Installation)>> list) =>
-            list.Select(MeasurementsInstallationToVmItem3).ToList();
+            list.Select(MeasurementsInstallationToVmItem).ToList();
 
-        public static MeasurementVmItem MeasurementsInstallationToVmItem3(
+        public static MeasurementVmItem MeasurementsInstallationToVmItem(
             Either<Error, (Measurements, Installation)> measurementInstallation)
         {
             var (measurements, installation) = GetValueFromEither(measurementInstallation);
