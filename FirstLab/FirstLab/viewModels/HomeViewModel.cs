@@ -6,6 +6,7 @@ using FirstLab.location;
 using FirstLab.network;
 using FirstLab.network.models;
 using LaYumba.Functional;
+using Xamarin.Essentials;
 using Xamarin.Forms;
 
 namespace FirstLab.viewModels
@@ -54,9 +55,7 @@ namespace FirstLab.viewModels
             IsLoading = true;
             var location = await LocationProvider.GetLocation();
 
-            _network.GetNearestInstallationsRequest2(location, 2)
-                .Map(it => FetchMeasurementsOfInstallation(it, _network))
-                .Bind(MeasurementsInstallationListToVmItems)
+            FetchVmItems(location, _network)
                 .Match(error =>
                 {
                     ErrorMessage = "Something went wrong...";
@@ -68,6 +67,11 @@ namespace FirstLab.viewModels
                 });
             IsLoading = false;
         }
+
+        private Either<Error, List<MeasurementVmItem>> FetchVmItems(Location location, Network network) =>
+            network.GetNearestInstallationsRequest2(location, 2)
+                .Map(it => FetchMeasurementsOfInstallation(it, _network))
+                .Bind(MeasurementsInstallationListToVmItems);
 
         private static List<Either<Error, (Measurements, Installation)>> FetchMeasurementsOfInstallation(
             List<Installation> it, Network network)
