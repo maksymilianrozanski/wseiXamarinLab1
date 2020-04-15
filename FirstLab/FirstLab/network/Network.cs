@@ -102,13 +102,26 @@ namespace FirstLab.network
                 .Bind(DeserializeMeasurements);
         }
 
-        private Either<Error, Measurements> DeserializeMeasurements(string json)
+        public Either<Error, Measurements> DeserializeMeasurements(string json)
         {
             try
             {
                 return JsonConvert.DeserializeObject<Measurements>(json);
             }
             catch (Exception e)
+            {
+                return new JsonParsingError("Exception during deserializing json, message: " + e.Message + "json: " +
+                                            json + ".");
+            }
+        }
+
+        public static Either<Error, T> DeserializeJson<T>(string json)
+        {
+            try
+            {
+                return JsonConvert.DeserializeObject<T>(json);
+            }
+            catch (JsonSerializationException e)
             {
                 return new JsonParsingError("Exception during deserializing json, message: " + e.Message + "json: " +
                                             json + ".");

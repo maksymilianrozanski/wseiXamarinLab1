@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using FirstLab.network;
 using FirstLab.network.models;
+using LaYumba.Functional;
 using NUnit.Framework;
 using Xamarin.Essentials;
 
@@ -37,6 +38,21 @@ namespace FirstLabUnitTests.network
             Assert.AreEqual(expected.location.Latitude, result.location.Latitude);
             Assert.AreEqual(expected.location.Longitude, result.location.Longitude);
             Assert.AreEqual(expected.address, result.address);
+        }
+
+        [Test]
+        public void ShouldReturnJsonParsingError()
+        {
+            //given
+            var json = Responses.BrokenSensorJsonResponse;
+            //when
+            var result = Network.DeserializeJson<Measurements>(json);
+            //then
+            var errorOption = new Option<object>();
+            result.Match(error => errorOption = error,
+                measurements => Assert.Fail("Either should contain Left(error)."));
+            var errorResult = errorOption.GetOrElse(() => null).Result;
+            Assert.IsInstanceOf<JsonParsingError>(errorResult);
         }
     }
 }

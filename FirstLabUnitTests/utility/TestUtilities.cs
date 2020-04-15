@@ -3,7 +3,7 @@ using NUnit.Framework;
 
 namespace FirstLabUnitTests.utility
 {
-    public class TestUtility
+    public static class TestUtilities
     {
         public static T GetValueFromEither<T>(Either<Error, T> either)
         {
