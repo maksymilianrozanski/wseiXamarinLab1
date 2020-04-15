@@ -79,14 +79,6 @@ namespace FirstLab.viewModels
             Installation installation, Network network
         ) => MeasurementInstallationPair(network.GetMeasurementsRequest(installation.id), installation);
 
-
-        private static Either<Error, IEnumerable<Either<Error, (Measurements, Installation)>>> FetchMeasurements(
-            Either<Error, List<Installation>> installations, Network network) =>
-            installations.Select
-            (list =>
-                list.Select(installation =>
-                    MeasurementInstallationPair(network.GetMeasurementsRequest(installation.id), installation)));
-
         private static Either<Error, (Measurements, Installation)> MeasurementInstallationPair(
             Either<Error, Measurements> m,
             Installation i) =>
