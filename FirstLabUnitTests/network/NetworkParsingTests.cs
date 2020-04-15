@@ -29,10 +29,10 @@ namespace FirstLabUnitTests.network
         }
 
         [Test]
-        public void ShouldReturnFirstInstallationOfJson()
+        public void ShouldReturnFirstInstallationOfJson2()
         {
             var json = Responses.InstallationJsonResponse;
-            var result = Network.GetNearestInstallation(json);
+            var result = TestUtilities.GetValueFromEither(Network.DeserializeFirstInstallation(json));
             var expected = new Installation(8077, new Location(50.062006, 19.940984),
                 new Address("Poland", "Krak├│w", "Miko┼éajska"));
             Assert.AreEqual(expected.id, result.id);

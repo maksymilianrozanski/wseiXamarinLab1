@@ -60,32 +60,8 @@ namespace FirstLab.network
             var response = _client.GetAsync(uriBuilder.Uri.ToString()).Result;
             return CheckResponseStatus(response)
                 .Bind(ReadMessageContent)
-                .Bind(DeserializeInstallation);
+                .Bind(DeserializeFirstInstallation);
         }
-
-        private Either<Error, HttpResponseMessage> CheckResponseStatus(HttpResponseMessage response) =>
-            response.IsSuccessStatusCode
-                ? (Either<Error, HttpResponseMessage>) response
-                : new InvalidResponseCodeError("Not successful response status code: " + response.StatusCode);
-
-        private Either<Error, Installation> DeserializeInstallation(string json)
-        {
-            try
-            {
-                return JsonConvert.DeserializeObject<List<Installation>>(json)[0];
-            } //TODO: edit to more specific exception type
-            catch (Exception e)
-            {
-                return new JsonParsingError("Exception during deserializing json, message: " + e.Message + "json: " +
-                                            json + ".");
-            }
-        }
-
-        private Either<Error, string> ReadMessageContent(HttpResponseMessage message) =>
-            message.Content.ReadAsStringAsync().Result;
-
-        public static Installation GetNearestInstallation(string json) =>
-            JsonConvert.DeserializeObject<List<Installation>>(json)[0];
 
         public Either<Error, Measurements> GetMeasurementsRequest2(int id)
         {
@@ -96,8 +72,20 @@ namespace FirstLab.network
                 .Bind(DeserializeMeasurements);
         }
 
+        private Either<Error, HttpResponseMessage> CheckResponseStatus(HttpResponseMessage response) =>
+            response.IsSuccessStatusCode
+                ? (Either<Error, HttpResponseMessage>) response
+                : new InvalidResponseCodeError("Not successful response status code: " + response.StatusCode);
+
+        private Either<Error, string> ReadMessageContent(HttpResponseMessage message) =>
+            message.Content.ReadAsStringAsync().Result;
+
         public static Either<Error, Measurements> DeserializeMeasurements(string json) =>
             DeserializeJson<Measurements>(json);
+
+        public static Either<Error, Installation> DeserializeFirstInstallation(string json)
+            => DeserializeJson<List<Installation>>(json)
+                .Bind<Error, List<Installation>, Installation>(it => it[0]);
 
         public static Either<Error, T> DeserializeJson<T>(string json)
         {
