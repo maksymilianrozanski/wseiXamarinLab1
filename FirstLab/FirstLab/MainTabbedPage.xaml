@@ -5,11 +5,7 @@
             x:Class="FirstLab.MainTabbedPage">
 
     <ContentPage>
-        <StackLayout x:Name="tabbedPageStackLayout">
-            <Label Text="Hello, world!"
-                   VerticalOptions="CenterAndExpand"
-                   HorizontalOptions="CenterAndExpand" />
-        </StackLayout>
+        <StackLayout x:Name="TabbedPageStackLayout" />
 
     </ContentPage>
 </TabbedPage>
