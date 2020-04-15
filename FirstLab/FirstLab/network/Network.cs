@@ -42,6 +42,14 @@ namespace FirstLab.network
             _client = client;
         }
 
+        public static HttpClient CreateClient()
+        {
+            var httpClient = new HttpClient {BaseAddress = new Uri("https://airapi.airly.eu")};
+            httpClient.DefaultRequestHeaders.Add("Accept", "application/json");
+            httpClient.DefaultRequestHeaders.Add("apiKey", App.ApiKey);
+            return httpClient;
+        }
+
         public static NameValueCollection NearestInstallationsQuery(Location location, int installations)
         {
             var query = HttpUtility.ParseQueryString(string.Empty);

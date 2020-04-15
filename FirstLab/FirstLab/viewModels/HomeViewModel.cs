@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using System.Windows.Input;
 using FirstLab.location;
 using FirstLab.network;
@@ -13,12 +12,16 @@ namespace FirstLab.viewModels
 {
     public class HomeViewModel : BaseViewModel
     {
+        private readonly Network _network;
         private string _errorMessage;
         private bool _isLoading;
         private List<MeasurementVmItem> _measurementVmItems;
 
         public HomeViewModel(INavigation navigation) : base(navigation)
         {
+            var httpClient = Network.CreateClient();
+            _network = new Network(httpClient);
+
             MyCommand = new Command<MeasurementVmItem>(
                 vmListItem => { navigation.PushAsync(new DetailsPage(vmListItem)); }
             );
@@ -50,17 +53,12 @@ namespace FirstLab.viewModels
         {
             IsLoading = true;
             var location = await LocationProvider.GetLocation();
-            var httpClient = new HttpClient {BaseAddress = new Uri("https://airapi.airly.eu")};
-            httpClient.DefaultRequestHeaders.Add("Accept", "application/json");
-            httpClient.DefaultRequestHeaders.Add("apiKey", App.ApiKey);
 
-            var network = new Network(httpClient);
-
-            network.GetNearestInstallationsRequest2(location, 2)
+            _network.GetNearestInstallationsRequest2(location, 2)
                 .Bind
                     <Error, List<Installation>, List<Either<Error, (Measurements, Installation)>>>
                     (it => it.Select
-                        (it2 => FetchMeasurements2(it2, network)).ToList())
+                        (it2 => FetchMeasurements2(it2, _network)).ToList())
                 .Bind
                     <Error, List<Either<Error, (Measurements, Installation)>>, List<MeasurementVmItem>>
                     (it => it.Select
