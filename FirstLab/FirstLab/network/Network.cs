@@ -127,11 +127,6 @@ namespace FirstLab.network
                                             json + ".");
             }
         }
-
-        public static Measurements GetMeasurements(string json)
-        {
-            return JsonConvert.DeserializeObject<Measurements>(json);
-        }
     }
 
     public sealed class InvalidResponseCodeError : Error
