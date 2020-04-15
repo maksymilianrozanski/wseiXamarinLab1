@@ -74,8 +74,8 @@ namespace FirstLab.viewModels
                 .Bind(MeasurementsInstallationListToVmItems);
 
         private static List<Either<Error, (Measurements, Installation)>>
-            FetchMeasurementsOfInstallations(List<Installation> it, Network network) =>
-            it.Select(it2 => FetchMeasurements(it2, network)).ToList();
+            FetchMeasurementsOfInstallations(List<Installation> installations, Network network) =>
+            installations.Select(installation => FetchMeasurements(installation, network)).ToList();
 
         private static Either<Error, (Measurements, Installation)> FetchMeasurements(
             Installation installation, Network network) =>
