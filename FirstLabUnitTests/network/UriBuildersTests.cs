@@ -21,7 +21,7 @@ namespace FirstLabUnitTests.network
         public void NameValueCollectionShouldContainSpecifiedLocationValues()
         {
             var location = new Location(52.2297, 21.0122);
-            var result = Network.InstallationByLocation(location);
+            var result = Network.NearestInstallationsQuery(location, 1);
             Assert.AreEqual(location.Latitude.ToString(CultureInfo.InvariantCulture), result.Get("lat"));
             Assert.AreEqual(location.Longitude.ToString(CultureInfo.InvariantCulture), result.Get("lng"));
             Assert.AreEqual("-1", result.Get("maxDistanceKM"));
