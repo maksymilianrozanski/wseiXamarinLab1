@@ -18,15 +18,22 @@ namespace FirstLab
             var vm = new HomeViewModel(Navigation);
             BindingContext = vm;
 
-            HomePageStackLayout.Children.Add(new ActivityIndicator
-            {
-                IsRunning = false
-            });
+            HomePageStackLayout.Children.Add(CreateStatusIndicator());
 
             var listView = MeasurementsList.CreateMeasurementsListView(MeasurementItems, vm.MyCommand);
             HomePageStackLayout.Children.Add(listView);
         }
 
         private StackLayout HomePageStackLayout => homePageStackLayout;
+
+        private static ActivityIndicator CreateStatusIndicator()
+        {
+            var indicator = new ActivityIndicator
+            {
+                IsRunning = false
+            };
+            indicator.SetBinding(ActivityIndicator.IsRunningProperty, new Binding(nameof(HomeViewModel.IsLoading)));
+            return indicator;
+        }
     }
 }

@@ -13,9 +13,8 @@ namespace FirstLab.viewModels
 {
     public class HomeViewModel : BaseViewModel
     {
+        private bool _isLoading;
         private List<MeasurementVmItem> _measurementVmItems;
-
-        private Status _networkStatus;
 
         public HomeViewModel(INavigation navigation) : base(navigation)
         {
@@ -28,10 +27,10 @@ namespace FirstLab.viewModels
 
         public ICommand MyCommand { get; set; }
 
-        public Status NetworkStatus
+        public bool IsLoading
         {
-            get => _networkStatus;
-            set => SetProperty(ref _networkStatus, value);
+            get => _isLoading;
+            set => SetProperty(ref _isLoading, value);
         }
 
         public List<MeasurementVmItem> MeasurementInstallationVmItems
@@ -42,7 +41,7 @@ namespace FirstLab.viewModels
 
         private async void LoadValues()
         {
-            NetworkStatus = Status.Loading;
+            IsLoading = true;
             var location = await LocationProvider.GetLocation();
             var httpClient = new HttpClient {BaseAddress = new Uri("https://airapi.airly.eu")};
             httpClient.DefaultRequestHeaders.Add("Accept", "application/json");
@@ -55,16 +54,9 @@ namespace FirstLab.viewModels
                 .Bind<Error, (Measurements, Installation), List<(Measurements, Installation)>>(it =>
                     new List<(Measurements, Installation)> {it})
                 .Bind<Error, List<(Measurements, Installation)>, List<MeasurementVmItem>>(it =>
-                    MeasurementsInstallationToVmItem(it)).Match(error =>
-                    {
-                        NetworkStatus = Status.Error;
-                        Console.WriteLine(error.Message);
-                    },
-                    list =>
-                    {
-                        MeasurementInstallationVmItems = list;
-                        NetworkStatus = Status.Complete;
-                    });
+                    MeasurementsInstallationToVmItem(it)).Match(error => { Console.WriteLine(error.Message); },
+                    list => { MeasurementInstallationVmItems = list; });
+            IsLoading = false;
         }
 
         private static Either<Error, (Measurements, Installation)> MeasurementInstallationPair(
@@ -88,13 +80,6 @@ namespace FirstLab.viewModels
                     Street = it.Item2.address.street
                 }).ToList();
         }
-    }
-
-    public enum Status
-    {
-        Complete,
-        Loading,
-        Error
     }
 
     public struct MeasurementVmItem
