@@ -60,11 +60,7 @@ namespace FirstLab.network
             return query;
         }
 
-        public Either<Error, Installation> GetNearestInstallationsRequest(Location location)
-            => GetNearestInstallationsRequest2(location, 1)
-                .Bind<Error, List<Installation>, Installation>(it => it[0]);
-
-        public Either<Error, List<Installation>> GetNearestInstallationsRequest2(Location location, int installations)
+        public Either<Error, List<Installation>> GetNearestInstallationsRequest(Location location, int installations)
         {
             var uriBuilder =
                 CreateUriBuilder(_client.BaseAddress)(NearestInstallationEndpoint)(

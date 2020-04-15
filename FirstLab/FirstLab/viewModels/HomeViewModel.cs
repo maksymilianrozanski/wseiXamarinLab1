@@ -69,23 +69,18 @@ namespace FirstLab.viewModels
         }
 
         private Either<Error, List<MeasurementVmItem>> FetchVmItems(Location location, Network network) =>
-            network.GetNearestInstallationsRequest2(location, 2)
-                .Map(it => FetchMeasurementsOfInstallation(it, _network))
+            network.GetNearestInstallationsRequest(location, 2)
+                .Map(it => FetchMeasurementsOfInstallations(it, _network))
                 .Bind(MeasurementsInstallationListToVmItems);
 
-        private static List<Either<Error, (Measurements, Installation)>> FetchMeasurementsOfInstallation(
-            List<Installation> it, Network network)
-            => it.Select(it2 => FetchMeasurements2(it2, network)).ToList();
+        private static List<Either<Error, (Measurements, Installation)>>
+            FetchMeasurementsOfInstallations(List<Installation> it, Network network) =>
+            it.Select(it2 => FetchMeasurements(it2, network)).ToList();
 
-        private static Either<Error, (Measurements, Installation)> FetchMeasurements2(
-            Installation installation, Network network
-        ) => MeasurementInstallationPair(network.GetMeasurementsRequest(installation.id), installation);
-
-        private static Either<Error, (Measurements, Installation)> MeasurementInstallationPair(
-            Either<Error, Measurements> m,
-            Installation i) =>
-            m.Bind<Error, Measurements, (Measurements, Installation)>(measurement
-                => (measurement, i));
+        private static Either<Error, (Measurements, Installation)> FetchMeasurements(
+            Installation installation, Network network) =>
+            network.GetMeasurementsRequest(installation.id)
+                .Map(measurement => (measurement, installation));
 
         public static Either<Error, List<MeasurementVmItem>> MeasurementsInstallationListToVmItems(
             List<Either<Error, (Measurements, Installation)>> list) =>
