@@ -18,6 +18,11 @@ namespace FirstLab
             var vm = new HomeViewModel(Navigation);
             BindingContext = vm;
 
+            HomePageStackLayout.Children.Add(new ActivityIndicator
+            {
+                IsRunning = false
+            });
+
             var listView = MeasurementsList.CreateMeasurementsListView(MeasurementItems, vm.MyCommand);
             HomePageStackLayout.Children.Add(listView);
         }
