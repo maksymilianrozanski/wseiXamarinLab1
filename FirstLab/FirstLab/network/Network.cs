@@ -63,12 +63,10 @@ namespace FirstLab.network
                 .Bind(DeserializeInstallation);
         }
 
-        private Either<Error, HttpResponseMessage> CheckResponseStatus(HttpResponseMessage response)
-        {
-            return response.IsSuccessStatusCode
+        private Either<Error, HttpResponseMessage> CheckResponseStatus(HttpResponseMessage response) =>
+            response.IsSuccessStatusCode
                 ? (Either<Error, HttpResponseMessage>) response
                 : new InvalidResponseCodeError("Not successful response status code: " + response.StatusCode);
-        }
 
         private Either<Error, Installation> DeserializeInstallation(string json)
         {
@@ -83,15 +81,11 @@ namespace FirstLab.network
             }
         }
 
-        private Either<Error, string> ReadMessageContent(HttpResponseMessage message)
-        {
-            return message.Content.ReadAsStringAsync().Result;
-        }
+        private Either<Error, string> ReadMessageContent(HttpResponseMessage message) =>
+            message.Content.ReadAsStringAsync().Result;
 
-        public static Installation GetNearestInstallation(string json)
-        {
-            return JsonConvert.DeserializeObject<List<Installation>>(json)[0];
-        }
+        public static Installation GetNearestInstallation(string json) =>
+            JsonConvert.DeserializeObject<List<Installation>>(json)[0];
 
         public Either<Error, Measurements> GetMeasurementsRequest2(int id)
         {
@@ -102,18 +96,8 @@ namespace FirstLab.network
                 .Bind(DeserializeMeasurements);
         }
 
-        public static Either<Error, Measurements> DeserializeMeasurements(string json)
-        {
-            try
-            {
-                return JsonConvert.DeserializeObject<Measurements>(json);
-            }
-            catch (Exception e)
-            {
-                return new JsonParsingError("Exception during deserializing json, message: " + e.Message + "json: " +
-                                            json + ".");
-            }
-        }
+        public static Either<Error, Measurements> DeserializeMeasurements(string json) =>
+            DeserializeJson<Measurements>(json);
 
         public static Either<Error, T> DeserializeJson<T>(string json)
         {
