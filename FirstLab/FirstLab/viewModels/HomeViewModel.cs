@@ -23,7 +23,7 @@ namespace FirstLab.viewModels
                 vmListItem => { navigation.PushAsync(new DetailsPage(vmListItem)); }
             );
 
-            LoadValues();
+            LoadMultipleValues();
         }
 
         public ICommand MyCommand { get; set; }
@@ -46,7 +46,7 @@ namespace FirstLab.viewModels
             set => SetProperty(ref _errorMessage, value);
         }
 
-        private async void LoadValues()
+        private async void LoadMultipleValues()
         {
             IsLoading = true;
             var location = await LocationProvider.GetLocation();
@@ -56,30 +56,65 @@ namespace FirstLab.viewModels
 
             var network = new Network(httpClient);
 
-            network.GetNearestInstallationsRequest(location)
-                .Bind(it => MeasurementInstallationPair(network.GetMeasurementsRequest(it.id), it))
-                .Bind<Error, (Measurements, Installation), List<(Measurements, Installation)>>(it =>
-                    new List<(Measurements, Installation)> {it})
-                .Bind<Error, List<(Measurements, Installation)>, List<MeasurementVmItem>>(it =>
-                    MeasurementsInstallationToVmItem(it))
+            network.GetNearestInstallationsRequest2(location, 2)
+                .Bind
+                    <Error, List<Installation>, List<Either<Error, (Measurements, Installation)>>>
+                    (it => it.Select
+                        (it2 => FetchMeasurements2(it2, network)).ToList())
+                .Bind
+                    <Error, List<Either<Error, (Measurements, Installation)>>, List<MeasurementVmItem>>
+                    (it => it.Select
+                        (MeasurementsInstallationToVmItem3).ToList())
                 .Match(error =>
-                    {
-                        ErrorMessage = "Something went wrong...";
-                        Console.WriteLine(error.Message);
-                    },
-                    list =>
-                    {
-                        MeasurementInstallationVmItems = list;
-                        ErrorMessage = "";
-                    });
+                {
+                    ErrorMessage = "Something went wrong...";
+                    Console.WriteLine(error.Message);
+                }, list =>
+                {
+                    MeasurementInstallationVmItems = list;
+                    ErrorMessage = "";
+                });
             IsLoading = false;
         }
+
+        private static Either<Error, (Measurements, Installation)> FetchMeasurements2(
+            Installation installation, Network network
+        ) => MeasurementInstallationPair(network.GetMeasurementsRequest(installation.id), installation);
+
+
+        private static Either<Error, IEnumerable<Either<Error, (Measurements, Installation)>>> FetchMeasurements(
+            Either<Error, List<Installation>> installations, Network network) =>
+            installations.Select
+            (list =>
+                list.Select(installation =>
+                    MeasurementInstallationPair(network.GetMeasurementsRequest(installation.id), installation)));
 
         private static Either<Error, (Measurements, Installation)> MeasurementInstallationPair(
             Either<Error, Measurements> m,
             Installation i) =>
             m.Bind<Error, Measurements, (Measurements, Installation)>(measurement
                 => (measurement, i));
+
+        public static MeasurementVmItem MeasurementsInstallationToVmItem3(
+            Either<Error, (Measurements, Installation)> measurementInstallation)
+        {
+            var (measurements, installation) = GetValueFromEither(measurementInstallation);
+            return new MeasurementVmItem
+            {
+                Measurements = measurements,
+                Installation = installation,
+                City = installation.address.city,
+                Country = installation.address.country,
+                Street = installation.address.street
+            };
+        }
+
+        private static T GetValueFromEither<T>(Either<Error, T> either)
+        {
+            var option = new Option<T>();
+            either.Match(error => { }, arg => option = arg);
+            return option.GetOrElse(() => null).Result;
+        }
 
         public static List<MeasurementVmItem> MeasurementsInstallationToVmItem(
             IEnumerable<(Measurements, Installation)> items) =>
