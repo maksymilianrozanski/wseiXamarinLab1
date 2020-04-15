@@ -82,11 +82,11 @@ namespace FirstLab.viewModels
             network.GetMeasurementsRequest(installation.id)
                 .Map(measurement => (measurement, installation));
 
-        public static Either<Error, List<MeasurementVmItem>> MeasurementsInstallationListToVmItems(
+        private static Either<Error, List<MeasurementVmItem>> MeasurementsInstallationListToVmItems(
             List<Either<Error, (Measurements, Installation)>> list) =>
             list.Select(MeasurementsInstallationToVmItem).ToList();
 
-        public static MeasurementVmItem MeasurementsInstallationToVmItem(
+        private static MeasurementVmItem MeasurementsInstallationToVmItem(
             Either<Error, (Measurements, Installation)> measurementInstallation)
         {
             var (measurements, installation) = GetValueFromEither(measurementInstallation);
