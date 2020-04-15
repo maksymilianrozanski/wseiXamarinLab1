@@ -59,10 +59,7 @@ namespace FirstLab.viewModels
                     <Error, List<Installation>, List<Either<Error, (Measurements, Installation)>>>
                     (it => it.Select
                         (it2 => FetchMeasurements2(it2, _network)).ToList())
-                .Bind
-                    <Error, List<Either<Error, (Measurements, Installation)>>, List<MeasurementVmItem>>
-                    (it => it.Select
-                        (MeasurementsInstallationToVmItem3).ToList())
+                .Bind(MeasurementsInstallationListToVmItems)
                 .Match(error =>
                 {
                     ErrorMessage = "Something went wrong...";
@@ -75,6 +72,7 @@ namespace FirstLab.viewModels
             IsLoading = false;
         }
 
+
         private static Either<Error, (Measurements, Installation)> FetchMeasurements2(
             Installation installation, Network network
         ) => MeasurementInstallationPair(network.GetMeasurementsRequest(installation.id), installation);
@@ -84,6 +82,10 @@ namespace FirstLab.viewModels
             Installation i) =>
             m.Bind<Error, Measurements, (Measurements, Installation)>(measurement
                 => (measurement, i));
+
+        public static Either<Error, List<MeasurementVmItem>> MeasurementsInstallationListToVmItems(
+            List<Either<Error, (Measurements, Installation)>> list) =>
+            list.Select(MeasurementsInstallationToVmItem3).ToList();
 
         public static MeasurementVmItem MeasurementsInstallationToVmItem3(
             Either<Error, (Measurements, Installation)> measurementInstallation)
