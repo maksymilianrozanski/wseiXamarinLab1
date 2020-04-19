@@ -7,13 +7,13 @@ namespace FirstLab.viewModels
 {
     public abstract class BaseViewModel : INotifyPropertyChanged
     {
-        public INavigation Navigation { get; set; }
-        public virtual event PropertyChangedEventHandler PropertyChanged;
-
         protected BaseViewModel(INavigation navigation)
         {
             Navigation = navigation;
         }
+
+        public INavigation Navigation { get; set; }
+        public virtual event PropertyChangedEventHandler PropertyChanged;
 
         protected bool SetProperty<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
         {

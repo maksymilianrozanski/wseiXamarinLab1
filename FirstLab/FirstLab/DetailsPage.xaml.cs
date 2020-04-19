@@ -13,7 +13,7 @@ namespace FirstLab
 
         public StackLayout HumiditySlider;
 
-        public Grid PMValuesGrid;
+        public Grid PmValuesGrid;
 
         public StackLayout PressureSlider;
 
@@ -39,7 +39,7 @@ namespace FirstLab
                 }
             };
 
-            PMValuesGrid = new Grid
+            PmValuesGrid = new Grid
             {
                 ColumnDefinitions = new ColumnDefinitionCollection
                 {
@@ -62,10 +62,10 @@ namespace FirstLab
                 }
             };
 
-            PMValuesGrid.Children.Add(
+            PmValuesGrid.Children.Add(
                 GridItem.CreateGridItem("PM 2.5", "mg/m3", DetailsViewModel.PmTwoPointFiveValueBindName,
                     DetailsViewModel.PmTwoPointFivePercentBindName), 0, 0);
-            PMValuesGrid.Children.Add(
+            PmValuesGrid.Children.Add(
                 GridItem.CreateGridItem("PM 10", "mg/m3", DetailsViewModel.PmTenValueBindName,
                     DetailsViewModel.PmTenPercentBindName), 1, 0);
 
@@ -74,7 +74,7 @@ namespace FirstLab
 
             MyStackLayout.Children.Add(Circle);
             MyStackLayout.Children.Add(QualityText);
-            MyStackLayout.Children.Add(PMValuesGrid);
+            MyStackLayout.Children.Add(PmValuesGrid);
             MyStackLayout.Children.Add(HumiditySlider);
             MyStackLayout.Children.Add(PressureSlider);
         }

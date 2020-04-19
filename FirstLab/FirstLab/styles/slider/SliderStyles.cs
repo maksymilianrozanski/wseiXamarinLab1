@@ -4,21 +4,18 @@ namespace FirstLab.styles.slider
 {
     public class SliderStyles
     {
-        public static Style SliderLabelStyle()
-        {
-            return new Style(typeof(Label))
+        public static Style SliderLabelStyle() =>
+            new Style(typeof(Label))
             {
                 Setters =
                 {
                     new Setter {Property = Label.FontSizeProperty, Value = 20},
-                    new Setter {Property = Label.TextColorProperty, Value = Colors.TextColorMain},
+                    new Setter {Property = Label.TextColorProperty, Value = Colors.TextColorMain}
                 }
             };
-        }
 
-        public static Style SliderStyle()
-        {
-            return new Style(typeof(Label))
+        public static Style SliderStyle() =>
+            new Style(typeof(Label))
             {
                 Setters =
                 {
@@ -27,6 +24,5 @@ namespace FirstLab.styles.slider
                     new Setter {Property = Slider.MaximumTrackColorProperty, Value = Colors.AccentColorSecondary}
                 }
             };
-        }
     }
 }

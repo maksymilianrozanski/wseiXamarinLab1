@@ -134,22 +134,16 @@ namespace FirstLab.viewModels
                 (value, standard) => (value, standard)).ToList();
         }
 
-        public static (Value, Standard) GetValueByName(List<(Value, Standard)> list, string name)
-        {
-            return list.FirstOrDefault(it => it.Item1.name == name);
-        }
+        public static (Value, Standard) GetValueByName(List<(Value, Standard)> list, string name) =>
+            list.FirstOrDefault(it => it.Item1.name == name);
 
-        private static int ExtractCaqiValue(MeasurementVmItem vmItem)
-        {
-            return vmItem.Measurements.current.indexes.Count >= 0
+        private static int ExtractCaqiValue(MeasurementVmItem vmItem) =>
+            vmItem.Measurements.current.indexes.Count >= 0
                 ? Convert.ToInt32(vmItem.Measurements.current.indexes[0].value)
                 : 0;
-        }
 
-        public static Index FirstIndex(MeasurementVmItem vmItem)
-        {
-            return vmItem.Measurements.current.indexes?.ElementAtOrDefault(0) ?? new Index();
-        }
+        public static Index FirstIndex(MeasurementVmItem vmItem) =>
+            vmItem.Measurements.current.indexes?.ElementAtOrDefault(0) ?? new Index();
 
         private static Color ExtractColor(MeasurementVmItem vmItem)
         {

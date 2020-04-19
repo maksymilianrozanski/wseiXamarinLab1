@@ -14,9 +14,8 @@ namespace FirstLabUnitTests.viewModels
             double humidity = 33.51, double temperature = 14.07, double indexValue = 37.52, string level = "LOW",
             string description = "Air is quite good.",
             string advice = "Don't miss this day! The clean air calls!", string color = "#D1CF1E"
-        )
-        {
-            return new MeasurementVmItem
+        ) =>
+            new MeasurementVmItem
             {
                 City = "Warsaw",
                 Country = "Poland",
@@ -42,7 +41,6 @@ namespace FirstLabUnitTests.viewModels
                         new Standard("WHO", "PM10", 50.0, 75.3)
                     }))
             };
-        }
 
         [Test]
         public void ShouldRoundValueToNearestInt_roundDown()

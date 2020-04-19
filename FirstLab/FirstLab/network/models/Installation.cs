@@ -1,4 +1,3 @@
-
 using Xamarin.Essentials;
 
 namespace FirstLab.network.models

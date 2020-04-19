@@ -1,10 +1,9 @@
-using System;
 using System.Collections.Generic;
 using FirstLab.network.models;
 using FirstLab.viewModels;
+using LaYumba.Functional;
 using NUnit.Framework;
 using Xamarin.Essentials;
-using Index = FirstLab.network.models.Index;
 
 namespace FirstLabUnitTests.viewModels
 {
@@ -66,10 +65,56 @@ namespace FirstLabUnitTests.viewModels
                 {
                     City = address2.city, Country = address2.country, Street = address2.street,
                     Measurements = measurements2, Installation = installation2
-                },
+                }
             };
 
-            Assert.AreEqual(expected,result);
+            Assert.AreEqual(expected, result);
+        }
+
+        [Test]
+        public void ShouldReturnErrorsListAndResultsList()
+        {
+            var input = new List<Either<Error, string>>
+            {
+                new TestError("test error message1"),
+                "valid value",
+                "valid value2",
+                new TestError("test error message2")
+            };
+
+            var expectedErrors = new List<Error>
+            {
+                new TestError("test error message1"),
+                new TestError("test error message2")
+            };
+
+            var expectedValues = new List<string> {"valid value", "valid value2"};
+
+            var expected = (expectedErrors, expectedValues);
+
+            var result = HomeViewModel.AggregateEithers(input);
+            Assert.AreEqual(expected, result);
+        }
+
+        private sealed class TestError : Error
+        {
+            public TestError(string message)
+            {
+                Message = message;
+            }
+
+            public override string Message { get; }
+
+            private bool Equals(TestError other) => Message == other.Message;
+
+            public override bool Equals(object obj) =>
+                ReferenceEquals(this, obj) || obj is TestError other && Equals(other);
+
+            public override int GetHashCode() => Message != null ? Message.GetHashCode() : 0;
+
+            public static bool operator ==(TestError left, TestError right) => Equals(left, right);
+
+            public static bool operator !=(TestError left, TestError right) => !Equals(left, right);
         }
     }
 }

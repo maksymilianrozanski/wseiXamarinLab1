@@ -62,16 +62,21 @@ namespace FirstLab.viewModels
                     Console.WriteLine(error.Message);
                 }, list =>
                 {
-                    MeasurementInstallationVmItems = list;
-                    ErrorMessage = "";
+                    var (errors, measurementVmItems) = list;
+                    MeasurementInstallationVmItems = measurementVmItems;
+                    var numberOfErrors = errors.Count;
+                    ErrorMessage = numberOfErrors > 0 ? "Number of errors: " + numberOfErrors : "";
                 });
             IsLoading = false;
         }
 
-        private Either<Error, List<MeasurementVmItem>> FetchVmItems(Location location, Network network) =>
-            network.GetNearestInstallationsRequest(location, 2)
+        private Either<Error, (List<Error>, List<MeasurementVmItem>)>
+            FetchVmItems(Location location, Network network) =>
+            network.GetNearestInstallationsRequest(location, 3)
                 .Map(it => FetchMeasurementsOfInstallations(it, _network))
-                .Bind(MeasurementsInstallationListToVmItems);
+                .Map(AggregateEithers)
+                .Match(error => (new List<Error> {error}, new List<MeasurementVmItem>()), tuple =>
+                    (tuple.Item1, MeasurementsInstallationToVmItem(tuple.Item2)));
 
         private static List<Either<Error, (Measurements, Installation)>>
             FetchMeasurementsOfInstallations(List<Installation> installations, Network network) =>
@@ -82,30 +87,13 @@ namespace FirstLab.viewModels
             network.GetMeasurementsRequest(installation.id)
                 .Map(measurement => (measurement, installation));
 
-        private static Either<Error, List<MeasurementVmItem>> MeasurementsInstallationListToVmItems(
-            List<Either<Error, (Measurements, Installation)>> list) =>
-            list.Select(MeasurementsInstallationToVmItem).ToList();
-
-        private static MeasurementVmItem MeasurementsInstallationToVmItem(
-            Either<Error, (Measurements, Installation)> measurementInstallation)
-        {
-            var (measurements, installation) = GetValueFromEither(measurementInstallation);
-            return new MeasurementVmItem
+        public static (List<Error>, List<TR> ) AggregateEithers<TR>(IEnumerable<Either<Error, TR>> list) =>
+            list.Aggregate((new List<Error>(), new List<TR>()), (acc, either) =>
             {
-                Measurements = measurements,
-                Installation = installation,
-                City = installation.address.city,
-                Country = installation.address.country,
-                Street = installation.address.street
-            };
-        }
-
-        private static T GetValueFromEither<T>(Either<Error, T> either)
-        {
-            var option = new Option<T>();
-            either.Match(error => { }, arg => option = arg);
-            return option.GetOrElse(() => null).Result;
-        }
+                either.Match(error => acc.Item1.Add(error),
+                    value => acc.Item2.Add(value));
+                return acc;
+            });
 
         public static List<MeasurementVmItem> MeasurementsInstallationToVmItem(
             IEnumerable<(Measurements, Installation)> items) =>

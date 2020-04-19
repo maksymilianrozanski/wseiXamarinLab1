@@ -4,9 +4,8 @@ namespace FirstLab.styles.circle
 {
     public static class CaqiCircleStyles
     {
-        public static Style CaqiValueStyle()
-        {
-            return new Style(typeof(Label))
+        public static Style CaqiValueStyle() =>
+            new Style(typeof(Label))
             {
                 Setters =
                 {
@@ -16,11 +15,9 @@ namespace FirstLab.styles.circle
                     new Setter {Property = Label.VerticalTextAlignmentProperty, Value = TextAlignment.Start}
                 }
             };
-        }
 
-        public static Style CaqiTextStyle()
-        {
-            return new Style(typeof(Label))
+        public static Style CaqiTextStyle() =>
+            new Style(typeof(Label))
             {
                 Setters =
                 {
@@ -30,11 +27,9 @@ namespace FirstLab.styles.circle
                     new Setter {Property = Label.VerticalTextAlignmentProperty, Value = TextAlignment.Start}
                 }
             };
-        }
 
-        public static Style CircleFrameStyle()
-        {
-            return new Style(typeof(Label))
+        public static Style CircleFrameStyle() =>
+            new Style(typeof(Label))
             {
                 Setters =
                 {
@@ -47,6 +42,5 @@ namespace FirstLab.styles.circle
                     new Setter {Property = View.HorizontalOptionsProperty, Value = LayoutOptions.Center}
                 }
             };
-        }
     }
 }

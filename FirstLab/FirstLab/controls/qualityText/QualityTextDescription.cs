@@ -1,4 +1,3 @@
-using FirstLab.styles;
 using FirstLab.styles.qualityText;
 using FirstLab.viewModels;
 using Xamarin.Forms;

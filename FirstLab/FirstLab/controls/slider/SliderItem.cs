@@ -1,4 +1,3 @@
-using FirstLab.styles;
 using FirstLab.styles.slider;
 using Xamarin.Forms;
 

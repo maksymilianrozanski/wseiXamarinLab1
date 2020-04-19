@@ -14,7 +14,7 @@ namespace FirstLab.controls.homePage
             {
                 ItemsSource = listViewItemsSource,
                 HasUnevenRows = true,
-                ItemTemplate = new DataTemplate(typeof(MeasurementCell)),
+                ItemTemplate = new DataTemplate(typeof(MeasurementCell))
             };
             listView.ItemTapped += (sender, args) => vm.Execute(args.Item);
             listView.SetBinding(ListView.ItemsSourceProperty,
