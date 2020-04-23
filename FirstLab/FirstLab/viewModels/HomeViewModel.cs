@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using FirstLab.location;
 using FirstLab.network;
@@ -13,6 +14,8 @@ using MeasurementById =
 using InstallationsByLocation =
     System.Func<Xamarin.Essentials.Location, LaYumba.Functional.Either<LaYumba.Functional.Error,
         System.Collections.Generic.List<FirstLab.network.models.Installation>>>;
+
+[assembly: InternalsVisibleTo("FirstLabUnitTests")]
 
 namespace FirstLab.viewModels
 {
@@ -59,7 +62,7 @@ namespace FirstLab.viewModels
             FetchMeasurements => networkGet => installation =>
             networkGet(installation.id).Map(measurement => (measurement, installation));
 
-        private static Func<MeasurementById, Func<InstallationsByLocation,
+        internal static Func<MeasurementById, Func<InstallationsByLocation,
             Func<Location, Either<Error, (List<Error>, List<MeasurementVmItem>)>>>> FetchVmItems =>
             measurementById => installationByLocation => currentLocation =>
                 installationByLocation(currentLocation)

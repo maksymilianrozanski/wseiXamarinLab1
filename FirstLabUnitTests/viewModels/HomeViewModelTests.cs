@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using FirstLab.network.models;
 using FirstLab.viewModels;
 using LaYumba.Functional;
@@ -94,6 +95,42 @@ namespace FirstLabUnitTests.viewModels
 
             var result = HomeViewModel.AggregateEithers(input);
             Assert.AreEqual(expected, result);
+        }
+
+        [Test]
+        public void ShouldReturnVmItems()
+        {
+            var value1 = new Value("PM1", 13.61);
+            var value2 = new Value("PM25", 19.76);
+
+            var measurements1 = new Measurements(new Current(
+                "2020-04-08T07:31:50.230Z", "2020-04-08T08:31:50.230Z",
+                new List<Value> {value1, value2},
+                new List<Index>
+                {
+                    new Index("AIRLY_CAQI", 37.52, "LOW", "Air is quite good.",
+                        "Don't miss this day! The clean air calls!", "#D1CF1E")
+                },
+                new List<Standard> {new Standard("WHO", "PM25", 25.0, 79.05)}));
+            var address1 = new Address("Poland", "Krak├│w", "Miko┼éajska");
+
+            var installation1 = new Installation(8077, new Location(50.062006, 19.940984),
+                address1);
+
+            HomeViewModel.FetchVmItems(i => measurements1)(location => new List<Installation> {installation1})(
+                    new Location(50.062006, 19.940984))
+                .Match(error => Assert.Fail("Should not return error"), tuple =>
+                {
+                    var (errors, measurementVmItems) = tuple;
+                    //then
+                    Assert.IsEmpty(errors);
+                    Assert.AreEqual(1, measurementVmItems.Count);
+                    Assert.AreEqual(installation1, measurementVmItems.First().Installation);
+                    Assert.AreEqual(measurements1, measurementVmItems.First().Measurements);
+                    Assert.AreEqual(address1.city, measurementVmItems.First().City);
+                    Assert.AreEqual(address1.country, measurementVmItems.First().Country);
+                    Assert.AreEqual(address1.street, measurementVmItems.First().Street);
+                });
         }
 
         private sealed class TestError : Error
