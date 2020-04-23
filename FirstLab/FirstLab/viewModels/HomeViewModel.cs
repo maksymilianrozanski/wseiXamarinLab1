@@ -94,7 +94,7 @@ namespace FirstLab.viewModels
             IsLoading = false;
         }
 
-        public static (List<Error>, List<TR> ) AggregateEithers<TR>(IEnumerable<Either<Error, TR>> list) =>
+        internal static (List<Error>, List<TR> ) AggregateEithers<TR>(IEnumerable<Either<Error, TR>> list) =>
             list.Aggregate((new List<Error>(), new List<TR>()), (acc, either) =>
             {
                 either.Match(error => acc.Item1.Add(error),
@@ -102,7 +102,7 @@ namespace FirstLab.viewModels
                 return acc;
             });
 
-        public static List<MeasurementVmItem> MeasurementsInstallationToVmItem(
+        internal static List<MeasurementVmItem> MeasurementsInstallationToVmItem(
             IEnumerable<(Measurements, Installation)> items) =>
             items.Select(it => (it.Item1, it.Item2))
                 .Select(it => new MeasurementVmItem
