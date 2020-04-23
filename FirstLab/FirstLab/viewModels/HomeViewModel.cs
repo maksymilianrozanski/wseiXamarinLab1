@@ -50,6 +50,15 @@ namespace FirstLab.viewModels
             set => SetProperty(ref _errorMessage, value);
         }
 
+        private static Func<Network, Func<List<Installation>, List<Either<Error, (Measurements, Installation)>>>>
+            FetchMeasurementsOfInstallations =>
+            network => installations => installations.Select(FetchMeasurements(network)).ToList();
+
+        private static Func<Network, Func<Installation, Either<Error, (Measurements, Installation)>>>
+            FetchMeasurements =>
+            network => installation => network.GetMeasurementsRequest(installation.id)
+                .Map(measurement => (measurement, installation));
+
         private async void LoadMultipleValues()
         {
             IsLoading = true;
@@ -73,19 +82,10 @@ namespace FirstLab.viewModels
         private Either<Error, (List<Error>, List<MeasurementVmItem>)>
             FetchVmItems(Location location, Network network) =>
             network.GetNearestInstallationsRequest(location, 3)
-                .Map(it => FetchMeasurementsOfInstallations(it, _network))
+                .Map(FetchMeasurementsOfInstallations(_network))
                 .Map(AggregateEithers)
                 .Match(error => (new List<Error> {error}, new List<MeasurementVmItem>()), tuple =>
                     (tuple.Item1, MeasurementsInstallationToVmItem(tuple.Item2)));
-
-        private static List<Either<Error, (Measurements, Installation)>>
-            FetchMeasurementsOfInstallations(List<Installation> installations, Network network) =>
-            installations.Select(installation => FetchMeasurements(installation, network)).ToList();
-
-        private static Either<Error, (Measurements, Installation)> FetchMeasurements(
-            Installation installation, Network network) =>
-            network.GetMeasurementsRequest(installation.id)
-                .Map(measurement => (measurement, installation));
 
         public static (List<Error>, List<TR> ) AggregateEithers<TR>(IEnumerable<Either<Error, TR>> list) =>
             list.Aggregate((new List<Error>(), new List<TR>()), (acc, either) =>
