@@ -1,9 +1,12 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using FirstLab.network.models;
 using FirstLab.viewModels;
 using LaYumba.Functional;
 using NUnit.Framework;
 using Xamarin.Essentials;
+using Index = FirstLab.network.models.Index;
 
 namespace FirstLabUnitTests.viewModels
 {
@@ -12,40 +15,8 @@ namespace FirstLabUnitTests.viewModels
         [Test]
         public void ShouldConvertListToViewModelItems()
         {
-            var value1 = new Value("PM1", 13.61);
-            var value2 = new Value("PM25", 19.76);
-            var value3 = new Value("PM10", 29.29);
-            var value4 = new Value("PM25", 30.30);
-            var address1 = new Address("Poland", "Krak├│w", "Miko┼éajska");
-            var address2 = new Address("Poland", "Warszawa", "Some random street");
-
-            var measurements1 = new Measurements(new Current(
-                "2020-04-08T07:31:50.230Z", "2020-04-08T08:31:50.230Z",
-                new List<Value> {value1, value2},
-                new List<Index>
-                {
-                    new Index("AIRLY_CAQI", 37.52, "LOW", "Air is quite good.",
-                        "Don't miss this day! The clean air calls!", "#D1CF1E")
-                },
-                new List<Standard> {new Standard("WHO", "PM25", 25.0, 79.05)}));
-
-            var measurements2 = new Measurements(new Current(
-                "2020-04-08T07:31:50.230Z", "2020-04-08T08:31:50.230Z",
-                new List<Value> {value3, value4},
-                new List<Index>
-                {
-                    new Index("AIRLY_CAQI", 37.52, "LOW", "Air is quite good.",
-                        "Don't miss this day! The clean air calls!", "#D1CF1E")
-                },
-                new List<Standard> {new Standard("WHO", "PM25", 25.0, 79.05)}));
-
-
-            var installation1 = new Installation(8077, new Location(50.062006, 19.940984),
-                address1);
-
-
-            var installation2 = new Installation(8077, new Location(59.062006, 29.940984),
-                address2);
+            TestItems(out var installation1, out var installation2, out var measurements1, out var measurements2,
+                out var address1, out var address2);
 
             var input = new List<(Measurements, Installation)>
             {
@@ -95,6 +66,133 @@ namespace FirstLabUnitTests.viewModels
             var result = HomeViewModel.AggregateEithers(input);
             Assert.AreEqual(expected, result);
         }
+
+        [Test]
+        public void ShouldReturnVmItems()
+        {
+            var value1 = new Value("PM1", 13.61);
+            var value2 = new Value("PM25", 19.76);
+
+            var measurements1 = new Measurements(new Current(
+                "2020-04-08T07:31:50.230Z", "2020-04-08T08:31:50.230Z",
+                new List<Value> {value1, value2},
+                new List<Index>
+                {
+                    new Index("AIRLY_CAQI", 37.52, "LOW", "Air is quite good.",
+                        "Don't miss this day! The clean air calls!", "#D1CF1E")
+                },
+                new List<Standard> {new Standard("WHO", "PM25", 25.0, 79.05)}));
+            var address1 = new Address("Poland", "Krak├│w", "Miko┼éajska");
+
+            var installation1 = new Installation(8077, new Location(50.062006, 19.940984),
+                address1);
+
+            HomeViewModel.FetchVmItems(i => measurements1)(location => new List<Installation> {installation1})(
+                    new Location(50.062006, 19.940984))
+                .Match(error => Assert.Fail("Should not return error"), tuple =>
+                {
+                    var (errors, measurementVmItems) = tuple;
+                    //then
+                    Assert.IsEmpty(errors);
+                    Assert.AreEqual(1, measurementVmItems.Count);
+                    Assert.AreEqual(installation1, measurementVmItems.First().Installation);
+                    Assert.AreEqual(measurements1, measurementVmItems.First().Measurements);
+                    Assert.AreEqual(address1.city, measurementVmItems.First().City);
+                    Assert.AreEqual(address1.country, measurementVmItems.First().Country);
+                    Assert.AreEqual(address1.street, measurementVmItems.First().Street);
+                });
+        }
+
+        [Test]
+        public void ErrorWhenFetchingInstallations()
+        {
+            var testError = new TestError("Error when fetching installations");
+
+            HomeViewModel.FetchVmItems(i => throw new Exception("Should not call this function"))
+                (location => testError)(
+                    new Location(50.062006, 19.940984)).Match(
+                    error => Assert.Fail("Should match Right"),
+                    tuple =>
+                    {
+                        var (errors, measurementVmItems) = tuple;
+                        Assert.AreEqual(testError, errors.First());
+                        Assert.AreEqual(1, errors.Count);
+                        Assert.IsEmpty(measurementVmItems);
+                    }
+                );
+        }
+
+        [Test]
+        public void ErrorWhenFetchingOneOfMeasurements()
+        {
+            TestItems(out var installation1, out var installation2, out var measurements1, out _,
+                out _, out _);
+
+            var testError = new TestError("Fetching not successful...");
+
+            Either<Error, Measurements> ErrorIfSecond(int id)
+            {
+                if (id == installation2.id) return testError;
+                else return measurements1;
+            }
+
+            var installations = new List<Installation> {installation1, installation2};
+
+            HomeViewModel.FetchVmItems(ErrorIfSecond)(location => installations)(new Location(59.062006, 29.940984))
+                .Match(
+                    error => Assert.Fail("Should match Right"),
+                    tuple =>
+                    {
+                        var (errors, measurementVmItems) = tuple;
+                        Assert.AreEqual(1, errors.Count);
+                        Assert.AreEqual(testError, errors.First());
+                        Assert.AreEqual(1, measurementVmItems.Count,
+                            "Should not return installation if it's measurements are not fetched.");
+                        Assert.AreEqual(installation1, measurementVmItems.First().Installation,
+                            "Should return installation whose measurements were fetched successfully");
+                        Assert.AreEqual(measurements1, measurementVmItems.First().Measurements,
+                            "Should contain measurements returned by measurementById function");
+                    });
+        }
+
+        private static void TestItems(out Installation installation1, out Installation installation2,
+            out Measurements measurements1, out Measurements measurements2, out Address address1,
+            out Address address2)
+        {
+            var value1 = new Value("PM1", 13.61);
+            var value2 = new Value("PM25", 19.76);
+            var value3 = new Value("PM10", 29.29);
+            var value4 = new Value("PM25", 30.30);
+            address1 = new Address("Poland", "Krak├│w", "Miko┼éajska");
+            address2 = new Address("Poland", "Warszawa", "Some random street");
+
+            measurements1 = new Measurements(new Current(
+                "2020-04-08T07:31:50.230Z", "2020-04-08T08:31:50.230Z",
+                new List<Value> {value1, value2},
+                new List<Index>
+                {
+                    new Index("AIRLY_CAQI", 37.52, "LOW", "Air is quite good.",
+                        "Don't miss this day! The clean air calls!", "#D1CF1E")
+                },
+                new List<Standard> {new Standard("WHO", "PM25", 25.0, 79.05)}));
+
+            measurements2 = new Measurements(new Current(
+                "2020-04-08T07:31:50.230Z", "2020-04-08T08:31:50.230Z",
+                new List<Value> {value3, value4},
+                new List<Index>
+                {
+                    new Index("AIRLY_CAQI", 37.52, "LOW", "Air is quite good.",
+                        "Don't miss this day! The clean air calls!", "#D1CF1E")
+                },
+                new List<Standard> {new Standard("WHO", "PM25", 25.0, 79.05)}));
+
+            installation1 = new Installation(8077, new Location(50.062006, 19.940984),
+                address1);
+
+            installation2 = new Installation(8078, new Location(59.062006, 29.940984),
+                address2);
+        }
+
 
         private sealed class TestError : Error
         {

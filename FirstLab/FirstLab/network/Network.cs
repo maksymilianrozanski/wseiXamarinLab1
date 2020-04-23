@@ -42,6 +42,18 @@ namespace FirstLab.network
             _client = client;
         }
 
+        public Func<int, Func<Location, Either<Error, List<Installation>>>> GetNearestInstallationsRequest2 =>
+            installations => location =>
+            {
+                var uriBuilder =
+                    CreateUriBuilder(_client.BaseAddress)(NearestInstallationEndpoint)(
+                        NearestInstallationsQuery(location, installations));
+                var response = _client.GetAsync(uriBuilder.Uri.ToString()).Result;
+                return CheckResponseStatus(response)
+                    .Bind(ReadMessageContent)
+                    .Bind(DeserializeInstallations);
+            };
+
         public static HttpClient CreateClient()
         {
             var httpClient = new HttpClient {BaseAddress = new Uri("https://airapi.airly.eu")};
@@ -61,15 +73,7 @@ namespace FirstLab.network
         }
 
         public Either<Error, List<Installation>> GetNearestInstallationsRequest(Location location, int installations)
-        {
-            var uriBuilder =
-                CreateUriBuilder(_client.BaseAddress)(NearestInstallationEndpoint)(
-                    NearestInstallationsQuery(location, installations));
-            var response = _client.GetAsync(uriBuilder.Uri.ToString()).Result;
-            return CheckResponseStatus(response)
-                .Bind(ReadMessageContent)
-                .Bind(DeserializeInstallations);
-        }
+            => GetNearestInstallationsRequest2(installations)(location);
 
         public Either<Error, Measurements> GetMeasurementsRequest(int id)
         {

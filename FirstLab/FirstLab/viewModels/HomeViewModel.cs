@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using FirstLab.location;
 using FirstLab.network;
@@ -8,6 +9,13 @@ using FirstLab.network.models;
 using LaYumba.Functional;
 using Xamarin.Essentials;
 using Xamarin.Forms;
+using MeasurementById =
+    System.Func<int, LaYumba.Functional.Either<LaYumba.Functional.Error, FirstLab.network.models.Measurements>>;
+using InstallationsByLocation =
+    System.Func<Xamarin.Essentials.Location, LaYumba.Functional.Either<LaYumba.Functional.Error,
+        System.Collections.Generic.List<FirstLab.network.models.Installation>>>;
+
+[assembly: InternalsVisibleTo("FirstLabUnitTests")]
 
 namespace FirstLab.viewModels
 {
@@ -50,21 +58,28 @@ namespace FirstLab.viewModels
             set => SetProperty(ref _errorMessage, value);
         }
 
-        private static Func<Network, Func<List<Installation>, List<Either<Error, (Measurements, Installation)>>>>
-            FetchMeasurementsOfInstallations =>
-            network => installations => installations.Select(FetchMeasurements(network)).ToList();
+        private static Func<MeasurementById, Func<Installation, Either<Error, (Measurements, Installation)>>>
+            FetchMeasurements => networkGet => installation =>
+            networkGet(installation.id).Map(measurement => (measurement, installation));
 
-        private static Func<Network, Func<Installation, Either<Error, (Measurements, Installation)>>>
-            FetchMeasurements =>
-            network => installation => network.GetMeasurementsRequest(installation.id)
-                .Map(measurement => (measurement, installation));
+        internal static Func<MeasurementById, Func<InstallationsByLocation,
+            Func<Location, Either<Error, (List<Error>, List<MeasurementVmItem>)>>>> FetchVmItems =>
+            measurementById => installationByLocation => currentLocation =>
+                installationByLocation(currentLocation)
+                    .Map(it => it.Map(FetchMeasurements(measurementById)))
+                    .Map(AggregateEithers)
+                    .Match(error => (new List<Error> {error}, new List<MeasurementVmItem>()), tuple =>
+                        (tuple.Item1, MeasurementsInstallationToVmItem(tuple.Item2)));
+
+        private InstallationsByLocation FetchInstallations =>
+            location => _network.GetNearestInstallationsRequest2(2)(location);
 
         private async void LoadMultipleValues()
         {
             IsLoading = true;
             var location = await LocationProvider.GetLocation();
 
-            FetchVmItems(location, _network)
+            FetchVmItems(_network.GetMeasurementsRequest)(FetchInstallations)(location)
                 .Match(error =>
                 {
                     ErrorMessage = "Something went wrong...";
@@ -79,15 +94,7 @@ namespace FirstLab.viewModels
             IsLoading = false;
         }
 
-        private Either<Error, (List<Error>, List<MeasurementVmItem>)>
-            FetchVmItems(Location location, Network network) =>
-            network.GetNearestInstallationsRequest(location, 3)
-                .Map(FetchMeasurementsOfInstallations(_network))
-                .Map(AggregateEithers)
-                .Match(error => (new List<Error> {error}, new List<MeasurementVmItem>()), tuple =>
-                    (tuple.Item1, MeasurementsInstallationToVmItem(tuple.Item2)));
-
-        public static (List<Error>, List<TR> ) AggregateEithers<TR>(IEnumerable<Either<Error, TR>> list) =>
+        internal static (List<Error>, List<TR> ) AggregateEithers<TR>(IEnumerable<Either<Error, TR>> list) =>
             list.Aggregate((new List<Error>(), new List<TR>()), (acc, either) =>
             {
                 either.Match(error => acc.Item1.Add(error),
@@ -95,7 +102,7 @@ namespace FirstLab.viewModels
                 return acc;
             });
 
-        public static List<MeasurementVmItem> MeasurementsInstallationToVmItem(
+        internal static List<MeasurementVmItem> MeasurementsInstallationToVmItem(
             IEnumerable<(Measurements, Installation)> items) =>
             items.Select(it => (it.Item1, it.Item2))
                 .Select(it => new MeasurementVmItem
