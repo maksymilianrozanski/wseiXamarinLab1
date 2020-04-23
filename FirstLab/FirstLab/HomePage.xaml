@@ -5,7 +5,7 @@
              x:Class="FirstLab.HomePage">
     <ContentPage.Content>
         <StackLayout x:Name="homePageStackLayout">
-            <Label Text="Hello, world!"
+            <Label Text="Nearest installations will be displayed below"
                    VerticalOptions="CenterAndExpand"
                    HorizontalOptions="CenterAndExpand" />
         </StackLayout>
