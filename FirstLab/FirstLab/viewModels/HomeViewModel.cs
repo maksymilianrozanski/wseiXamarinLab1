@@ -8,6 +8,8 @@ using FirstLab.network.models;
 using LaYumba.Functional;
 using Xamarin.Essentials;
 using Xamarin.Forms;
+using MeasurementById =
+    System.Func<int, LaYumba.Functional.Either<LaYumba.Functional.Error, FirstLab.network.models.Measurements>>;
 
 namespace FirstLab.viewModels
 {
@@ -50,14 +52,15 @@ namespace FirstLab.viewModels
             set => SetProperty(ref _errorMessage, value);
         }
 
-        private static Func<Network, Func<List<Installation>, List<Either<Error, (Measurements, Installation)>>>>
+        private static Func<MeasurementById, Func<List<Installation>,
+                List<Either<Error, (Measurements, Installation)>>>>
             FetchMeasurementsOfInstallations =>
-            network => installations => installations.Select(FetchMeasurements(network)).ToList();
+            networkGet => installations => installations.Select(
+                FetchMeasurements(networkGet)).ToList();
 
-        private static Func<Network, Func<Installation, Either<Error, (Measurements, Installation)>>>
-            FetchMeasurements =>
-            network => installation => network.GetMeasurementsRequest(installation.id)
-                .Map(measurement => (measurement, installation));
+        private static Func<MeasurementById, Func<Installation, Either<Error, (Measurements, Installation)>>>
+            FetchMeasurements => networkGet => installation =>
+            networkGet(installation.id).Map(measurement => (measurement, installation));
 
         private async void LoadMultipleValues()
         {
@@ -82,7 +85,7 @@ namespace FirstLab.viewModels
         private Either<Error, (List<Error>, List<MeasurementVmItem>)>
             FetchVmItems(Location location, Network network) =>
             network.GetNearestInstallationsRequest(location, 3)
-                .Map(FetchMeasurementsOfInstallations(_network))
+                .Map(FetchMeasurementsOfInstallations(_network.GetMeasurementsRequest))
                 .Map(AggregateEithers)
                 .Match(error => (new List<Error> {error}, new List<MeasurementVmItem>()), tuple =>
                     (tuple.Item1, MeasurementsInstallationToVmItem(tuple.Item2)));
