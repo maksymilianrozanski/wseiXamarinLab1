@@ -154,6 +154,54 @@ namespace FirstLabUnitTests.viewModels
                 );
         }
 
+        [Test]
+        public void ErrorWhenFetchingOneOfMeasurements()
+        {
+            var value1 = new Value("PM1", 13.61);
+            var value2 = new Value("PM25", 19.76);
+
+            var measurements1 = new Measurements(new Current(
+                "2020-04-08T07:31:50.230Z", "2020-04-08T08:31:50.230Z",
+                new List<Value> {value1, value2},
+                new List<Index>
+                {
+                    new Index("AIRLY_CAQI", 37.52, "LOW", "Air is quite good.",
+                        "Don't miss this day! The clean air calls!", "#D1CF1E")
+                },
+                new List<Standard> {new Standard("WHO", "PM25", 25.0, 79.05)}));
+            var address1 = new Address("Poland", "Krak├│w", "Miko┼éajska");
+
+            var installation1 = new Installation(8077, new Location(50.062006, 19.940984),
+                address1);
+            var address2 = new Address("Poland", "Warszawa", "Some random street");
+            var installation2 = new Installation(2, new Location(59.062006, 29.940984),
+                address2);
+            var installations = new List<Installation> {installation1, installation2};
+
+            var testError = new TestError("Fetching not successful...");
+
+            Either<Error, Measurements> ErrorIfTwo(int id)
+            {
+                if (id == 2) return testError;
+                else return measurements1;
+            }
+
+            HomeViewModel.FetchVmItems(ErrorIfTwo)(location => installations)(new Location(59.062006, 29.940984)).Match(
+                error => Assert.Fail("Should match Right"),
+                tuple =>
+                {
+                    var (errors, measurementVmItems) = tuple;
+                    Assert.AreEqual(1, errors.Count);
+                    Assert.AreEqual(testError, errors.First());
+                    Assert.AreEqual(1, measurementVmItems.Count,
+                        "Should not return installation if it's measurements are not fetched.");
+                    Assert.AreEqual(installation1, measurementVmItems.First().Installation,
+                        "Should return installation whose measurements were fetched successfully");
+                    Assert.AreEqual(measurements1, measurementVmItems.First().Measurements,
+                        "Should contain measurements returned by measurementById function");
+                });
+        }
+
         private sealed class TestError : Error
         {
             public TestError(string message)
