@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using FirstLab.network.models;
@@ -5,6 +6,7 @@ using FirstLab.viewModels;
 using LaYumba.Functional;
 using NUnit.Framework;
 using Xamarin.Essentials;
+using Index = FirstLab.network.models.Index;
 
 namespace FirstLabUnitTests.viewModels
 {
@@ -131,6 +133,25 @@ namespace FirstLabUnitTests.viewModels
                     Assert.AreEqual(address1.country, measurementVmItems.First().Country);
                     Assert.AreEqual(address1.street, measurementVmItems.First().Street);
                 });
+        }
+
+        [Test]
+        public void ErrorWhenFetchingInstallations()
+        {
+            var testError = new TestError("Error when fetching installations");
+
+            HomeViewModel.FetchVmItems(i => throw new Exception("Should not call this function"))
+                (location => testError)(
+                    new Location(50.062006, 19.940984)).Match(
+                    error => Assert.Fail("Should match Right"),
+                    tuple =>
+                    {
+                        var (errors, measurementVmItems) = tuple;
+                        Assert.AreEqual(testError, errors.First());
+                        Assert.AreEqual(1, errors.Count);
+                        Assert.IsEmpty(measurementVmItems);
+                    }
+                );
         }
 
         private sealed class TestError : Error
