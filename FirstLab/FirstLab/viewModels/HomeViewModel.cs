@@ -55,12 +55,6 @@ namespace FirstLab.viewModels
             set => SetProperty(ref _errorMessage, value);
         }
 
-        private static Func<MeasurementById, Func<List<Installation>,
-                List<Either<Error, (Measurements, Installation)>>>>
-            FetchMeasurementsOfInstallations =>
-            networkGet => installations => installations.Select(
-                FetchMeasurements(networkGet)).ToList();
-
         private static Func<MeasurementById, Func<Installation, Either<Error, (Measurements, Installation)>>>
             FetchMeasurements => networkGet => installation =>
             networkGet(installation.id).Map(measurement => (measurement, installation));
@@ -69,7 +63,7 @@ namespace FirstLab.viewModels
             Func<Location, Either<Error, (List<Error>, List<MeasurementVmItem>)>>>> FetchVmItems =>
             measurementById => installationByLocation => currentLocation =>
                 installationByLocation(currentLocation)
-                    .Map(FetchMeasurementsOfInstallations(measurementById))
+                    .Map(it => it.Map(FetchMeasurements(measurementById)))
                     .Map(AggregateEithers)
                     .Match(error => (new List<Error> {error}, new List<MeasurementVmItem>()), tuple =>
                         (tuple.Item1, MeasurementsInstallationToVmItem(tuple.Item2)));
