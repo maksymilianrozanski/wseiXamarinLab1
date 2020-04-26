@@ -9,5 +9,8 @@ namespace FirstLab.entities
 
         public static StandardEntity ToStandardEntity(this Standard standard) =>
             new StandardEntity(standard.name, standard.pollutant, standard.limit, standard.percent);
+
+        public static ValueEntity ToValueEntity(this Value value) =>
+            new ValueEntity(value.name, value.value);
     }
 }
