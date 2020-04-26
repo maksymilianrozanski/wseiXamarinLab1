@@ -10,13 +10,14 @@
         <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="LaYumba.Functional" Version="0.10.0" />
-        <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-        <PackageReference Include="Xamarin.Essentials" Version="1.5.2" />
-        <PackageReference Include="Xamarin.Forms" Version="4.6.0.529-pre3" />
+        <PackageReference Include="LaYumba.Functional" Version="0.10.0"/>
+        <PackageReference Include="Newtonsoft.Json" Version="12.0.3"/>
+        <PackageReference Include="sqlite-net-pcl" Version="1.7.302-beta"/>
+        <PackageReference Include="Xamarin.Essentials" Version="1.5.2"/>
+        <PackageReference Include="Xamarin.Forms" Version="4.6.0.529-pre3"/>
     </ItemGroup>
     <ItemGroup>
-        <None Remove="apiKey.json" />
-        <EmbeddedResource Include="apiKey.json" />
+        <None Remove="apiKey.json"/>
+        <EmbeddedResource Include="apiKey.json"/>
     </ItemGroup>
 </Project>
