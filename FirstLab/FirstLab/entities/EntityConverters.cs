@@ -1,6 +1,7 @@
 using System.Linq;
 using FirstLab.network.models;
 using LaYumba.Functional;
+using Newtonsoft.Json;
 
 namespace FirstLab.entities
 {
@@ -20,5 +21,14 @@ namespace FirstLab.entities
                 it.values.Select(ToValueEntity).ToList(),
                 it.standards.Select(ToStandardEntity).ToList(),
                 it.indexes.Select(ToIndexEntity).ToList()));
+
+        public static InstallationEntity ToInstallationEntity(this Installation installation) =>
+            installation.Pipe(it =>
+                {
+                    var location = JsonConvert.SerializeObject(it.location);
+                    var address = JsonConvert.SerializeObject(it.address);
+                    return new InstallationEntity(it.id, location, address);
+                }
+            );
     }
 }
