@@ -17,7 +17,13 @@ namespace FirstLab.entities
         public List<StandardEntity> Standards { get; set; }
 
         [OneToMany(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-        public List<IndexEntity> Indexes { get; set; }
+        public List<IndexEntity> IndexEntities { get; set; }
+
+        [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+        public InstallationEntity InstallationEntity { get; set; }
+
+        [ForeignKey(typeof(InstallationEntity))]
+        public int InstallationId { get; set; }
 
         [PrimaryKey, AutoIncrement] public int Id { get; set; }
 
@@ -26,13 +32,13 @@ namespace FirstLab.entities
         }
 
         public CurrentEntity(string fromDateTime, string tillDateTime, List<ValueEntity> values,
-            List<StandardEntity> standards, List<IndexEntity> indexes)
+            List<StandardEntity> standards, List<IndexEntity> indexEntities)
         {
             FromDateTime = fromDateTime;
             TillDateTime = tillDateTime;
             Values = values;
             Standards = standards;
-            Indexes = indexes;
+            IndexEntities = indexEntities;
         }
     }
 }

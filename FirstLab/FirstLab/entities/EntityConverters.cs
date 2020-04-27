@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using FirstLab.network.models;
 using LaYumba.Functional;
@@ -22,12 +23,12 @@ namespace FirstLab.entities
                 it.standards.Select(ToStandardEntity).ToList(),
                 it.indexes.Select(ToIndexEntity).ToList()));
 
-        public static InstallationEntity ToInstallationEntity(this Installation installation) =>
+        public static InstallationEntity ToInstallationEntity(this Installation installation, List<Current> currents) =>
             installation.Pipe(it =>
                 {
                     var location = JsonConvert.SerializeObject(it.location);
                     var address = JsonConvert.SerializeObject(it.address);
-                    return new InstallationEntity(it.id, location, address);
+                    return new InstallationEntity(it.id, location, address, currents.Select(ToCurrentEntity).ToList());
                 }
             );
     }

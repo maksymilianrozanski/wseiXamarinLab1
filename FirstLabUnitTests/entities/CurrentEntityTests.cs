@@ -39,6 +39,7 @@ namespace FirstLabUnitTests.entities
             connection.CreateTable<ValueEntity>();
             connection.CreateTable<StandardEntity>();
             connection.CreateTable<IndexEntity>();
+            connection.CreateTable<InstallationEntity>();
 
             var currentEntity = new Current(
                 "2020-04-08T07:31:50.230Z", "2020-04-08T08:31:50.230Z",
@@ -61,7 +62,7 @@ namespace FirstLabUnitTests.entities
 
         private static bool CompareEntities(CurrentEntity first, CurrentEntity second) =>
             first.Id == second.Id && first.FromDateTime == second.FromDateTime &&
-            ListsEqual(first.Indexes, second.Indexes)
+            ListsEqual(first.IndexEntities, second.IndexEntities)
             && ListsEqual(first.Values, second.Values) && ListsEqual(first.Standards, second.Standards);
 
         private static bool ListsEqual<T>(List<T> first, List<T> second) =>
