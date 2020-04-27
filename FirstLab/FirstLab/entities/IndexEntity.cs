@@ -1,4 +1,5 @@
 using SQLite;
+using SQLiteNetExtensions.Attributes;
 
 namespace FirstLab.entities
 {
@@ -11,6 +12,11 @@ namespace FirstLab.entities
         public string Advice { get; set; }
         public string Color { get; set; }
         [PrimaryKey, AutoIncrement] public int Id { get; set; }
+
+        [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+        public CurrentEntity CurrentEntity { get; set; }
+
+        [ForeignKey(typeof(CurrentEntity))] public int CurrentEntityId { get; set; }
 
         public IndexEntity()
         {

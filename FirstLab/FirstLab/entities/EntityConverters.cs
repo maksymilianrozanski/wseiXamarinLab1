@@ -1,4 +1,6 @@
+using System.Linq;
 using FirstLab.network.models;
+using LaYumba.Functional;
 
 namespace FirstLab.entities
 {
@@ -12,5 +14,11 @@ namespace FirstLab.entities
 
         public static ValueEntity ToValueEntity(this Value value) =>
             new ValueEntity(value.name, value.value);
+
+        public static CurrentEntity ToCurrentEntity(this Current current) =>
+            current.Pipe(it => new CurrentEntity(it.fromDateTime, it.tillDateTime,
+                it.values.Select(ToValueEntity).ToList(),
+                it.standards.Select(ToStandardEntity).ToList(),
+                it.indexes.Select(ToIndexEntity).ToList()));
     }
 }
