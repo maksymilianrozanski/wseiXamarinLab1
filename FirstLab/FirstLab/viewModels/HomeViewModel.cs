@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
+using FirstLab.db;
 using FirstLab.location;
 using FirstLab.network;
 using FirstLab.network.models;
@@ -14,6 +15,9 @@ using MeasurementById =
 using InstallationsByLocation =
     System.Func<Xamarin.Essentials.Location, LaYumba.Functional.Either<LaYumba.Functional.Error,
         System.Collections.Generic.List<FirstLab.network.models.Installation>>>;
+using InstallationsReplacingFunc =
+    System.Func<System.Collections.Generic.List<FirstLab.network.models.Installation>, LaYumba.Functional.Either<
+        LaYumba.Functional.Error, System.Collections.Generic.List<FirstLab.network.models.Installation>>>;
 
 [assembly: InternalsVisibleTo("FirstLabUnitTests")]
 
@@ -74,12 +78,19 @@ namespace FirstLab.viewModels
         private InstallationsByLocation FetchInstallations =>
             location => _network.GetNearestInstallationsRequest2(2)(location);
 
+        private Func<InstallationsReplacingFunc, Func<InstallationsByLocation, InstallationsByLocation>>
+            FetchInstallationsAndReplace => (installationsReplacingFunc) =>
+            installationFetching =>
+                (Location location) =>
+                    installationFetching(location).Bind(installationsReplacingFunc);
+
         private async void LoadMultipleValues()
         {
             IsLoading = true;
             var location = await LocationProvider.GetLocation();
 
-            FetchVmItems(_network.GetMeasurementsRequest)(FetchInstallations)(location)
+            FetchVmItems(_network.GetMeasurementsRequest)(
+                    FetchInstallationsAndReplace(DatabaseHelper.ReplaceInstallations2)(FetchInstallations))(location)
                 .Match(error =>
                 {
                     ErrorMessage = "Something went wrong...";

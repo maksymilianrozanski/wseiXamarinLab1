@@ -6,6 +6,10 @@ using FirstLab.network.models;
 using LaYumba.Functional;
 using SQLite;
 using SQLiteNetExtensions.Extensions;
+using InstallationsReplacingFunc =
+    System.Func<System.Collections.Generic.List<FirstLab.network.models.Installation>, LaYumba.Functional.Either<
+        LaYumba.Functional.Error, System.Collections.Generic.List<FirstLab.network.models.Installation>>>;
+
 
 namespace FirstLab.db
 {
@@ -37,7 +41,7 @@ namespace FirstLab.db
             connection.CreateTable<IndexEntity>();
         }
 
-        public static Func<SQLiteConnection, Func<List<Installation>, Either<Error, List<Installation>>>>
+        public static Func<SQLiteConnection, InstallationsReplacingFunc>
             ReplaceInstallations => connection => list =>
         {
             try
@@ -59,6 +63,9 @@ namespace FirstLab.db
                 return new SqlError(e.Message);
             }
         };
+
+        public static Either<Error, List<Installation>> ReplaceInstallations2(List<Installation> installations) =>
+            ReplaceInstallations(App.Database.Connection)(installations);
     }
 
     public sealed class SqlError : Error
