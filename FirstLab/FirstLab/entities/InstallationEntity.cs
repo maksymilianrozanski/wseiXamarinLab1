@@ -11,7 +11,8 @@ namespace FirstLab.entities
         public string Location { get; set; }
         public string Address { get; set; }
 
-        [OneToMany(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+        [OneToMany(CascadeOperations =
+            CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert | CascadeOperation.CascadeDelete)]
         public List<CurrentEntity> CurrentEntities { get; set; }
 
         public InstallationEntity()
