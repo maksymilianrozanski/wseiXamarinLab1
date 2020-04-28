@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using FirstLab.db;
 using Newtonsoft.Json.Linq;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
@@ -13,6 +14,7 @@ namespace FirstLab
     public partial class App : Application
     {
         public static string ApiKey;
+        private static DatabaseHelper _database;
 
         public App()
         {
@@ -22,6 +24,8 @@ namespace FirstLab
 
             MainPage = new NavigationPage(new MainTabbedPage());
         }
+
+        public static DatabaseHelper Database => _database ?? (_database = new DatabaseHelper());
 
         private void ReadApiKey(Assembly assembly)
         {
