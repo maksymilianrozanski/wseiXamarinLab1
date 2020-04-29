@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Linq;
 using FirstLab.network.models;
 using LaYumba.Functional;
@@ -23,23 +22,32 @@ namespace FirstLab.entities
                 it.standards.Select(ToStandardEntity).ToList(),
                 it.indexes.Select(ToIndexEntity).ToList()));
 
-        public static CurrentEntity ToCurrentEntity2(this Current current, int installationId) =>
+        public static CurrentEntity ToCurrentEntity2(this Current current, InstallationEntity installationEntity) =>
             current.Pipe(it =>
                 new CurrentEntity(it.fromDateTime, it.tillDateTime,
                     it.values.Select(ToValueEntity).ToList(),
                     it.standards.Select(ToStandardEntity).ToList(),
                     it.indexes.Select(ToIndexEntity).ToList())).Pipe(entity =>
             {
-                entity.InstallationId = installationId;
+                entity.InstallationEntity = installationEntity;
                 return entity;
             });
 
-        public static InstallationEntity ToInstallationEntity(this Installation installation, List<Current> currents) =>
+        public static InstallationEntity ToInstallationEntity(this Installation installation, Current current) =>
             installation.Pipe(it =>
                 {
                     var location = JsonConvert.SerializeObject(it.location);
                     var address = JsonConvert.SerializeObject(it.address);
-                    return new InstallationEntity(it.id, location, address, currents.Select(ToCurrentEntity).ToList());
+                    return new InstallationEntity(it.id, location, address, current.ToCurrentEntity());
+                }
+            ).Pipe(it => it.CurrentEntity.InstallationEntity = it);
+
+        public static InstallationEntity ToInstallationEntity(this Installation installation) =>
+            installation.Pipe(it =>
+                {
+                    var location = JsonConvert.SerializeObject(it.location);
+                    var address = JsonConvert.SerializeObject(it.address);
+                    return new InstallationEntity(it.id, location, address, null);
                 }
             );
     }

@@ -14,8 +14,7 @@ namespace FirstLabUnitTests.db
     {
         private readonly InstallationEntity _installationEntity1 =
             new Installation(10, new Location(50.2, 22.2), new Address("PL", "UnknownCity", "Str"))
-                .ToInstallationEntity(new List<Current>()
-                {
+                .ToInstallationEntity(
                     new Current(
                         "2020-04-08T07:31:50.230Z", "2020-04-08T08:31:50.230Z",
                         new List<Value> {new Value("PM1", 13.61), new Value("PM25", 19.76)},
@@ -25,7 +24,7 @@ namespace FirstLabUnitTests.db
                                 "Don't miss this day! The clean air calls!", "#D1CF1E")
                         },
                         new List<Standard> {new Standard("WHO", "PM25", 25.0, 79.05)})
-                });
+                );
 
         private readonly Installation _installationEntity2 =
             new Installation(11, new Location(51.2, 23.2), new Address("PL", "UnknownCity2", "Str"));
@@ -76,9 +75,16 @@ namespace FirstLabUnitTests.db
             var result = DatabaseHelper.ReplaceCurrents(connection)(newMeasurements);
 
             //verify
+            result.Match(error => Assert.Fail("Should return result"), list =>
+            {
+                Assert.AreEqual(newMeasurements.First().Item1, list.First().Item1);
+                Assert.AreEqual(newMeasurements.First().Item2, list.First().Item2);
+                Assert.AreEqual(1, list.Count);
+            });
+
             var updatedEntity = connection.GetWithChildren<InstallationEntity>(10, true);
             var expectedCurrent = newMeasurements.First().Item1.current;
-            var resultCurrentEntity = updatedEntity.CurrentEntities.First();
+            var resultCurrentEntity = updatedEntity.CurrentEntity;
             Assert.AreEqual(expectedCurrent.fromDateTime, resultCurrentEntity.FromDateTime);
             Assert.AreEqual(expectedCurrent.tillDateTime, resultCurrentEntity.TillDateTime);
             Assert.AreEqual(expectedCurrent.values.First().name, resultCurrentEntity.Values.First().Name);
@@ -89,13 +95,6 @@ namespace FirstLabUnitTests.db
             Assert.AreEqual(expectedCurrent.indexes.First().description,
                 resultCurrentEntity.IndexEntities.First().Description);
             Assert.AreEqual(expectedCurrent.standards.First().percent, resultCurrentEntity.Standards.First().Percent);
-
-            result.Match(error => Assert.Fail("Should return result"), list =>
-            {
-                Assert.AreEqual(newMeasurements.First().Item1, list.First().Item1);
-                Assert.AreEqual(newMeasurements.First().Item2, list.First().Item2);
-                Assert.AreEqual(1, list.Count);
-            });
         }
     }
 }

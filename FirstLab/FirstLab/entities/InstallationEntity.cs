@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using SQLite;
 using SQLiteNetExtensions.Attributes;
 
@@ -11,20 +10,24 @@ namespace FirstLab.entities
         public string Location { get; set; }
         public string Address { get; set; }
 
-        [OneToMany(CascadeOperations =
-            CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert | CascadeOperation.CascadeDelete)]
-        public List<CurrentEntity> CurrentEntities { get; set; }
+        [OneToOne(
+            // foreignKey: nameof(entities.CurrentEntity.Id),
+            CascadeOperations = CascadeOperation.All)]
+        public CurrentEntity CurrentEntity { get; set; }
+
+        // [ForeignKey(typeof(CurrentEntity))] public int CurrentEntityId { get; set; }
+
 
         public InstallationEntity()
         {
         }
 
-        public InstallationEntity(int id, string location, string address, List<CurrentEntity> currentEntities)
+        public InstallationEntity(int id, string location, string address, CurrentEntity currentEntity)
         {
             Id = id;
             Location = location;
             Address = address;
-            CurrentEntities = currentEntities;
+            CurrentEntity = currentEntity;
         }
     }
 }

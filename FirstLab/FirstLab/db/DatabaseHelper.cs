@@ -53,7 +53,7 @@ namespace FirstLab.db
                     connection.DeleteAll<IndexEntity>();
                     connection.DeleteAll<ValueEntity>();
                     connection.InsertAllWithChildren(list.Map(
-                        it => it.ToInstallationEntity(new List<Current>())), recursive: true);
+                        it => it.ToInstallationEntity()), recursive: true);
                 });
 
                 return list;
@@ -75,22 +75,16 @@ namespace FirstLab.db
             {
                 connection.RunInTransaction(() =>
                 {
-                    connection.DeleteAll<CurrentEntity>();
-                    connection.DeleteAll<StandardEntity>();
-                    connection.DeleteAll<IndexEntity>();
-                    connection.DeleteAll<ValueEntity>();
-
-                    list.ForEach(it => it.Item1.current.ToCurrentEntity2(it.Item2.id)
+                    list.ForEach(it => it.Item1.current.ToCurrentEntity()
                         .Pipe(currentEntity =>
                         {
                             var installationEntity = connection.Get<InstallationEntity>(it.Item2.id);
 
-                            if (installationEntity.CurrentEntities == null)
-                                installationEntity.CurrentEntities = new List<CurrentEntity> {currentEntity};
-                            else
-                                installationEntity.CurrentEntities.Add(currentEntity);
+                            connection.Execute(
+                                $"DELETE FROM CURRENTENTITY WHERE CURRENTENTITY.InstallationId = ${it.Item2.id};");
 
                             connection.InsertWithChildren(currentEntity, true);
+                            installationEntity.CurrentEntity = currentEntity;
                             connection.UpdateWithChildren(installationEntity);
                         }));
                 });

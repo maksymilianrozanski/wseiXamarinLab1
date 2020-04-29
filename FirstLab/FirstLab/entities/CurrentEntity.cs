@@ -22,7 +22,7 @@ namespace FirstLab.entities
             CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert | CascadeOperation.CascadeDelete)]
         public List<IndexEntity> IndexEntities { get; set; }
 
-        [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+        [OneToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public InstallationEntity InstallationEntity { get; set; }
 
         [ForeignKey(typeof(InstallationEntity))]
