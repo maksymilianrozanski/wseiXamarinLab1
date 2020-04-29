@@ -97,6 +97,34 @@ namespace FirstLab.db
             }
         };
 
+        public static Func<SQLiteConnection,
+            Func<(Measurements, Installation), Either<Error, (Measurements, Installation)>>> ReplaceCurrent =>
+            connection =>
+                pair =>
+                {
+                    try
+                    {
+                        connection.RunInTransaction(() =>
+                        {
+                            var currentEntity = pair.Item1.current.ToCurrentEntity();
+                            var installationEntity = connection.Get<InstallationEntity>(pair.Item2.id);
+
+                            connection.Table<CurrentEntity>()
+                                .Where(entity => entity.InstallationId == pair.Item2.id)
+                                .Delete(entity => true);
+
+                            connection.InsertWithChildren(currentEntity, true);
+                            installationEntity.CurrentEntity = currentEntity;
+                            connection.UpdateWithChildren(installationEntity);
+                        });
+                        return pair;
+                    }
+                    catch (SQLiteException e)
+                    {
+                        return new SqlError(e.Message);
+                    }
+                };
+
         public static Either<Error, List<(Measurements, Installation)>> ReplaceCurrents2(
             List<(Measurements, Installation)> measurementInstallations) =>
             ReplaceCurrents(App.Database.Connection)(measurementInstallations);
