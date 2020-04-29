@@ -62,28 +62,6 @@ namespace FirstLab.viewModels
             set => SetProperty(ref _errorMessage, value);
         }
 
-        private static Func<MeasurementById, Func<Installation, Either<Error, (Measurements, Installation)>>>
-            FetchMeasurements => networkGet => installation =>
-            networkGet(installation.id).Map(measurement => (measurement, installation));
-
-        internal static Func<MeasurementById, Func<InstallationsByLocation,
-            Func<Location, Either<Error, (List<Error>, List<MeasurementVmItem>)>>>> FetchVmItems =>
-            measurementById => installationByLocation => currentLocation =>
-                installationByLocation(currentLocation)
-                    .Map(it => it.Map(FetchMeasurements(measurementById)))
-                    .Map(AggregateEithers)
-                    .Match(error => (new List<Error> {error}, new List<MeasurementVmItem>()), tuple =>
-                        (tuple.Item1, MeasurementsInstallationToVmItem(tuple.Item2)));
-
-        private InstallationsByLocation FetchInstallations =>
-            location => _network.GetNearestInstallationsRequest2(2)(location);
-
-        private Func<InstallationsReplacingFunc, Func<InstallationsByLocation, InstallationsByLocation>>
-            FetchInstallationsAndReplace => (installationsReplacingFunc) =>
-            installationFetching =>
-                (Location location) =>
-                    installationFetching(location).Bind(installationsReplacingFunc);
-
         private async void LoadMultipleValues()
         {
             IsLoading = true;
@@ -104,6 +82,28 @@ namespace FirstLab.viewModels
                 });
             IsLoading = false;
         }
+
+        internal static Func<MeasurementById, Func<InstallationsByLocation,
+            Func<Location, Either<Error, (List<Error>, List<MeasurementVmItem>)>>>> FetchVmItems =>
+            measurementById => installationByLocation => currentLocation =>
+                installationByLocation(currentLocation)
+                    .Map(it => it.Map(FetchMeasurements(measurementById)))
+                    .Map(AggregateEithers)
+                    .Match(error => (new List<Error> {error}, new List<MeasurementVmItem>()), tuple =>
+                        (tuple.Item1, MeasurementsInstallationToVmItem(tuple.Item2)));
+
+        private static Func<MeasurementById, Func<Installation, Either<Error, (Measurements, Installation)>>>
+            FetchMeasurements => networkGet => installation =>
+            networkGet(installation.id).Map(measurement => (measurement, installation));
+
+        private InstallationsByLocation FetchInstallations =>
+            location => _network.GetNearestInstallationsRequest2(2)(location);
+
+        private Func<InstallationsReplacingFunc, Func<InstallationsByLocation, InstallationsByLocation>>
+            FetchInstallationsAndReplace => (installationsReplacingFunc) =>
+            installationFetching =>
+                (Location location) =>
+                    installationFetching(location).Bind(installationsReplacingFunc);
 
         internal static (List<Error>, List<TR> ) AggregateEithers<TR>(IEnumerable<Either<Error, TR>> list) =>
             list.Aggregate((new List<Error>(), new List<TR>()), (acc, either) =>
