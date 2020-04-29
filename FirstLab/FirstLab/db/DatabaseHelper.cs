@@ -66,15 +66,59 @@ namespace FirstLab.db
 
         public static Either<Error, List<Installation>> ReplaceInstallations2(List<Installation> installations) =>
             ReplaceInstallations(App.Database.Connection)(installations);
-    }
 
-    public sealed class SqlError : Error
-    {
-        public SqlError(string message)
+        public static Func<SQLiteConnection,
+                Func<List<(Measurements, Installation)>, Either<Error, List<(Measurements, Installation)>>>>
+            ReplaceCurrents => connection => list =>
         {
-            Message = message;
-        }
+            try
+            {
+                connection.RunInTransaction(() =>
+                {
+                    connection.DeleteAll<CurrentEntity>();
+                    connection.DeleteAll<StandardEntity>();
+                    connection.DeleteAll<IndexEntity>();
+                    connection.DeleteAll<ValueEntity>();
 
-        public override string Message { get; }
+                    list.ForEach(it => it.Item1.current.ToCurrentEntity2(it.Item2.id)
+                        .Pipe(currentEntity =>
+                        {
+                            var installationEntity = connection.Get<InstallationEntity>(it.Item2.id);
+
+                            if (installationEntity.CurrentEntities == null)
+                                installationEntity.CurrentEntities = new List<CurrentEntity> {currentEntity};
+                            else
+                                installationEntity.CurrentEntities.Add(currentEntity);
+
+                            connection.InsertWithChildren(currentEntity, true);
+                            connection.UpdateWithChildren(installationEntity);
+                        }));
+                });
+
+                return list;
+            }
+            catch (SQLiteException e)
+            {
+                return new SqlError(e.Message);
+            }
+        };
+
+        public static Either<Error, List<(Measurements, Installation)>> ReplaceCurrents2(
+            List<(Measurements, Installation)> measurementInstallations) =>
+            ReplaceCurrents(App.Database.Connection)(measurementInstallations);
+
+        public static Either<Error, List<(Measurements, Installation)>> ReplaceCurrents3(
+            Either<Error, List<(Measurements, Installation)>> measurementInstallations) =>
+            measurementInstallations.Bind(ReplaceCurrents(App.Database.Connection));
+
+        public sealed class SqlError : Error
+        {
+            public SqlError(string message)
+            {
+                Message = message;
+            }
+
+            public override string Message { get; }
+        }
     }
 }

@@ -9,14 +9,17 @@ namespace FirstLab.entities
         public string FromDateTime { get; set; }
         public string TillDateTime { get; set; }
 
-        [OneToMany(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+        [OneToMany(CascadeOperations =
+            CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert | CascadeOperation.CascadeDelete)]
         public List<ValueEntity> Values { get; set; }
 
-        [OneToMany(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+        [OneToMany(CascadeOperations =
+            CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert | CascadeOperation.CascadeDelete)]
 
         public List<StandardEntity> Standards { get; set; }
 
-        [OneToMany(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+        [OneToMany(CascadeOperations =
+            CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert | CascadeOperation.CascadeDelete)]
         public List<IndexEntity> IndexEntities { get; set; }
 
         [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]

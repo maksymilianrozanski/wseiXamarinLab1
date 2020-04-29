@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using FirstLab.db;
 using FirstLab.entities;
 using FirstLab.network.models;
@@ -49,6 +50,52 @@ namespace FirstLabUnitTests.db
             Assert.AreEqual(0, connection.Table<ValueEntity>().Count(), "Should delete all children");
             Assert.AreEqual(0, connection.Table<StandardEntity>().Count(), "Should delete all children");
             Assert.AreEqual(0, connection.Table<IndexEntity>().Count(), "Should delete all children");
+        }
+
+        [Test]
+        public void ShouldReplaceAllMeasurementEntities()
+        {
+            var connection = new SQLiteConnection(":memory:");
+            DatabaseHelper.CreateTables(connection);
+            connection.InsertWithChildren(_installationEntity1, true);
+
+            var newMeasurements = new List<(Measurements, Installation)>
+            {
+                (new Measurements(new Current(
+                        "2020-05-08T07:31:50.230Z", "2020-05-08T08:31:50.230Z",
+                        new List<Value> {new Value("PM10", 40.0), new Value("PM25", 19.76)},
+                        new List<Index>
+                        {
+                            new Index("AIRLY_CAQI", 140.0, "HIGH", "Air is not good.",
+                                "Don't miss this day! The clean air calls!", "#D1CF1E")
+                        },
+                        new List<Standard> {new Standard("WHO", "PM25", 25.0, 80.0)})),
+                    new Installation(10, new Location(50.2, 22.2), new Address("PL", "UnknownCity", "Str")))
+            };
+
+            var result = DatabaseHelper.ReplaceCurrents(connection)(newMeasurements);
+
+            //verify
+            var updatedEntity = connection.GetWithChildren<InstallationEntity>(10, true);
+            var expectedCurrent = newMeasurements.First().Item1.current;
+            var resultCurrentEntity = updatedEntity.CurrentEntities.First();
+            Assert.AreEqual(expectedCurrent.fromDateTime, resultCurrentEntity.FromDateTime);
+            Assert.AreEqual(expectedCurrent.tillDateTime, resultCurrentEntity.TillDateTime);
+            Assert.AreEqual(expectedCurrent.values.First().name, resultCurrentEntity.Values.First().Name);
+            Assert.AreEqual(expectedCurrent.values.First().value, resultCurrentEntity.Values.First().Value);
+            Assert.AreEqual(expectedCurrent.values[1].name, resultCurrentEntity.Values[1].Name);
+            Assert.AreEqual(expectedCurrent.values[1].value, resultCurrentEntity.Values[1].Value);
+            Assert.AreEqual(expectedCurrent.indexes.First().value, resultCurrentEntity.IndexEntities.First().Value);
+            Assert.AreEqual(expectedCurrent.indexes.First().description,
+                resultCurrentEntity.IndexEntities.First().Description);
+            Assert.AreEqual(expectedCurrent.standards.First().percent, resultCurrentEntity.Standards.First().Percent);
+
+            result.Match(error => Assert.Fail("Should return result"), list =>
+            {
+                Assert.AreEqual(newMeasurements.First().Item1, list.First().Item1);
+                Assert.AreEqual(newMeasurements.First().Item2, list.First().Item2);
+                Assert.AreEqual(1, list.Count);
+            });
         }
     }
 }

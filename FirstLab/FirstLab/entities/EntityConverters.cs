@@ -23,6 +23,17 @@ namespace FirstLab.entities
                 it.standards.Select(ToStandardEntity).ToList(),
                 it.indexes.Select(ToIndexEntity).ToList()));
 
+        public static CurrentEntity ToCurrentEntity2(this Current current, int installationId) =>
+            current.Pipe(it =>
+                new CurrentEntity(it.fromDateTime, it.tillDateTime,
+                    it.values.Select(ToValueEntity).ToList(),
+                    it.standards.Select(ToStandardEntity).ToList(),
+                    it.indexes.Select(ToIndexEntity).ToList())).Pipe(entity =>
+            {
+                entity.InstallationId = installationId;
+                return entity;
+            });
+
         public static InstallationEntity ToInstallationEntity(this Installation installation, List<Current> currents) =>
             installation.Pipe(it =>
                 {
