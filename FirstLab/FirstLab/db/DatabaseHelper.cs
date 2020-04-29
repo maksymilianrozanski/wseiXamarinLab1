@@ -125,9 +125,17 @@ namespace FirstLab.db
                     }
                 };
 
+        public static Either<Error, (Measurements, Installation)> ReplaceCurrent2(
+            Either<Error, (Measurements, Installation)> measurementInstallation)
+            => measurementInstallation.Bind(ReplaceCurrent(App.Database.Connection));
+
         public static Either<Error, List<(Measurements, Installation)>> ReplaceCurrents2(
             List<(Measurements, Installation)> measurementInstallations) =>
             ReplaceCurrents(App.Database.Connection)(measurementInstallations);
+
+        public static Either<Error, (Measurements, Installation)> ReplaceCurrent3(
+            (Measurements, Installation) measurementInstallation)
+            => ReplaceCurrent(App.Database.Connection)(measurementInstallation);
 
         public static Either<Error, List<(Measurements, Installation)>> ReplaceCurrents3(
             Either<Error, List<(Measurements, Installation)>> measurementInstallations) =>

@@ -87,7 +87,10 @@ namespace FirstLabUnitTests.viewModels
             var installation1 = new Installation(8077, new Location(50.062006, 19.940984),
                 address1);
 
-            HomeViewModel.FetchVmItems(i => measurements1)(location => new List<Installation> {installation1})(
+            HomeViewModel.FetchVmItems
+                    (i => (measurements1, installation1))
+                (location => new List<Installation> {installation1})
+                (l => l)(mi => mi)(
                     new Location(50.062006, 19.940984))
                 .Match(error => Assert.Fail("Should not return error"), tuple =>
                 {
@@ -109,8 +112,9 @@ namespace FirstLabUnitTests.viewModels
             var testError = new TestError("Error when fetching installations");
 
             HomeViewModel.FetchVmItems(i => throw new Exception("Should not call this function"))
-                (location => testError)(
-                    new Location(50.062006, 19.940984)).Match(
+                (l => testError)
+                (l => l)(mi => mi)
+                (new Location(50.062006, 19.940984)).Match(
                     error => Assert.Fail("Should match Right"),
                     tuple =>
                     {
@@ -130,15 +134,17 @@ namespace FirstLabUnitTests.viewModels
 
             var testError = new TestError("Fetching not successful...");
 
-            Either<Error, Measurements> ErrorIfSecond(int id)
+            Either<Error, (Measurements, Installation)> ErrorIfSecond(Installation i)
             {
-                if (id == installation2.id) return testError;
-                else return measurements1;
+                if (i.id == installation2.id) return testError;
+                else return (measurements1, installation1);
             }
 
             var installations = new List<Installation> {installation1, installation2};
 
-            HomeViewModel.FetchVmItems(ErrorIfSecond)(location => installations)(new Location(59.062006, 29.940984))
+            HomeViewModel.FetchVmItems(ErrorIfSecond)(location => installations)
+                (l => l)(mi => mi)
+                (new Location(59.062006, 29.940984))
                 .Match(
                     error => Assert.Fail("Should match Right"),
                     tuple =>

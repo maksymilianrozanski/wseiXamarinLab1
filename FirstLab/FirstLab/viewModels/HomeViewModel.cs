@@ -18,6 +18,16 @@ using InstallationsByLocation =
 using InstallationsReplacingFunc =
     System.Func<System.Collections.Generic.List<FirstLab.network.models.Installation>, LaYumba.Functional.Either<
         LaYumba.Functional.Error, System.Collections.Generic.List<FirstLab.network.models.Installation>>>;
+using ReplaceInstallationsInDb =
+    System.Func<System.Collections.Generic.List<FirstLab.network.models.Installation>, LaYumba.Functional.Either<
+        LaYumba.Functional.Error,
+        System.Collections.Generic.List<FirstLab.network.models.Installation>>>;
+using ReplaceMeasurementInDb =
+    System.Func<(FirstLab.network.models.Measurements, FirstLab.network.models.Installation), LaYumba.Functional.Either<
+        LaYumba.Functional.Error, (FirstLab.network.models.Measurements, FirstLab.network.models.Installation)>>;
+using MeasurementsOfInstallation =
+    System.Func<FirstLab.network.models.Installation, LaYumba.Functional.Either<LaYumba.Functional.Error, (
+        FirstLab.network.models.Measurements, FirstLab.network.models.Installation)>>;
 
 [assembly: InternalsVisibleTo("FirstLabUnitTests")]
 
@@ -67,8 +77,10 @@ namespace FirstLab.viewModels
             IsLoading = true;
             var location = await LocationProvider.GetLocation();
 
-            FetchVmItems(_network.GetMeasurementsRequest)(
-                    FetchInstallationsAndReplace(DatabaseHelper.ReplaceInstallations2)(FetchInstallations))(location)
+            FetchVmItems(
+                    FetchMeasurements(_network.GetMeasurementsRequest))(FetchInstallations)
+                (DatabaseHelper.ReplaceInstallations(App.Database.Connection))
+                (DatabaseHelper.ReplaceCurrent3)(location)
                 .Match(error =>
                 {
                     ErrorMessage = "Something went wrong...";
@@ -83,14 +95,23 @@ namespace FirstLab.viewModels
             IsLoading = false;
         }
 
-        internal static Func<MeasurementById, Func<InstallationsByLocation,
-            Func<Location, Either<Error, (List<Error>, List<MeasurementVmItem>)>>>> FetchVmItems =>
-            measurementById => installationByLocation => currentLocation =>
-                installationByLocation(currentLocation)
-                    .Map(it => it.Map(FetchMeasurements(measurementById)))
-                    .Map(AggregateEithers)
-                    .Match(error => (new List<Error> {error}, new List<MeasurementVmItem>()), tuple =>
-                        (tuple.Item1, MeasurementsInstallationToVmItem(tuple.Item2)));
+        internal static Func<
+            MeasurementsOfInstallation, Func<InstallationsByLocation,
+                Func<ReplaceInstallationsInDb, Func<ReplaceMeasurementInDb,
+                    Func<Location, Either<Error, (List<Error>, List<MeasurementVmItem>)>>>>>> FetchVmItems =>
+            measurementsOfInstallation => installationByLocation =>
+                replaceInstallations => replaceMeasurements =>
+                    currentLocation =>
+                        installationByLocation(currentLocation)
+                            .Bind(replaceInstallations)
+                            .Map(it => it.Map(measurementsOfInstallation))
+                            .Map(it => it.Map(it2 => it2.Bind(replaceMeasurements)))
+                            .Map(AggregateEithers)
+                            .Match(error => (new List<Error>
+                            {
+                                error
+                            }, new List<MeasurementVmItem>()), tuple =>
+                                (tuple.Item1, MeasurementsInstallationToVmItem(tuple.Item2)));
 
         private static Func<MeasurementById, Func<Installation, Either<Error, (Measurements, Installation)>>>
             FetchMeasurements => networkGet => installation =>
