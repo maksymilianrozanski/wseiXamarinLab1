@@ -12,7 +12,7 @@ using Xamarin.Essentials;
 using Xamarin.Forms;
 using MeasurementById =
     System.Func<int, LaYumba.Functional.Either<LaYumba.Functional.Error, FirstLab.network.models.Measurements>>;
-using InstallationsByLocation =
+using FetchInstallationsByLocation =
     System.Func<Xamarin.Essentials.Location, LaYumba.Functional.Either<LaYumba.Functional.Error,
         System.Collections.Generic.List<FirstLab.network.models.Installation>>>;
 using InstallationsReplacingFunc =
@@ -25,7 +25,7 @@ using ReplaceInstallationsInDb =
 using ReplaceMeasurementInDb =
     System.Func<(FirstLab.network.models.Measurements, FirstLab.network.models.Installation), LaYumba.Functional.Either<
         LaYumba.Functional.Error, (FirstLab.network.models.Measurements, FirstLab.network.models.Installation)>>;
-using MeasurementsOfInstallation =
+using FetchMeasurementsOfInstallation =
     System.Func<FirstLab.network.models.Installation, LaYumba.Functional.Either<LaYumba.Functional.Error, (
         FirstLab.network.models.Measurements, FirstLab.network.models.Installation)>>;
 
@@ -95,10 +95,12 @@ namespace FirstLab.viewModels
             IsLoading = false;
         }
 
-        internal static Func<
-            MeasurementsOfInstallation, Func<InstallationsByLocation,
-                Func<ReplaceInstallationsInDb, Func<ReplaceMeasurementInDb,
-                    Func<Location, Either<Error, (List<Error>, List<MeasurementVmItem>)>>>>>> FetchVmItems =>
+        internal static Func<FetchMeasurementsOfInstallation,
+            Func<FetchInstallationsByLocation,
+                Func<ReplaceInstallationsInDb,
+                    Func<ReplaceMeasurementInDb,
+                        Func<Location,
+                            Either<Error, (List<Error>, List<MeasurementVmItem>)>>>>>> FetchVmItems =>
             measurementsOfInstallation => installationByLocation =>
                 replaceInstallations => replaceMeasurements =>
                     currentLocation =>
@@ -117,10 +119,10 @@ namespace FirstLab.viewModels
             FetchMeasurements => networkGet => installation =>
             networkGet(installation.id).Map(measurement => (measurement, installation));
 
-        private InstallationsByLocation FetchInstallations =>
+        private FetchInstallationsByLocation FetchInstallations =>
             location => _network.GetNearestInstallationsRequest2(2)(location);
 
-        private Func<InstallationsReplacingFunc, Func<InstallationsByLocation, InstallationsByLocation>>
+        private Func<InstallationsReplacingFunc, Func<FetchInstallationsByLocation, FetchInstallationsByLocation>>
             FetchInstallationsAndReplace => (installationsReplacingFunc) =>
             installationFetching =>
                 (Location location) =>
