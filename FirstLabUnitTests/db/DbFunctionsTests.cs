@@ -64,6 +64,7 @@ namespace FirstLabUnitTests.db
             Assert.AreEqual(0, connection.Table<ValueEntity>().Count(), "Should delete all children");
             Assert.AreEqual(0, connection.Table<StandardEntity>().Count(), "Should delete all children");
             Assert.AreEqual(0, connection.Table<IndexEntity>().Count(), "Should delete all children");
+            Assert.AreEqual(0, connection.Table<CurrentEntity>().Count(), "Should delete all children");
         }
 
         [Test]

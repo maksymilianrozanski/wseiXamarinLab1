@@ -53,6 +53,7 @@ namespace FirstLab.db
                     connection.DeleteAll<StandardEntity>();
                     connection.DeleteAll<IndexEntity>();
                     connection.DeleteAll<ValueEntity>();
+                    connection.DeleteAll<CurrentEntity>();
                     connection.InsertAllWithChildren(list.Map(
                         it => it.ToInstallationEntity()), recursive: true);
                 });
@@ -156,6 +157,9 @@ namespace FirstLab.db
                     return new SqlError(e.Message);
                 }
             };
+
+        public static Func<int, Either<Error, Option<CurrentEntity>>> LoadMeasurementByInstallationId2 =>
+            LoadMeasurementByInstallationId(App.Database.Connection);
 
         public static Either<Error, (Measurements, Installation)> ReplaceCurrent2(
             Either<Error, (Measurements, Installation)> measurementInstallation)

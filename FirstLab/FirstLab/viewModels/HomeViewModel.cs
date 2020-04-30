@@ -21,8 +21,7 @@ using InstallationsReplacingFunc =
         LaYumba.Functional.Error, System.Collections.Generic.List<FirstLab.network.models.Installation>>>;
 using ReplaceInstallationsInDb =
     System.Func<System.Collections.Generic.List<FirstLab.network.models.Installation>, LaYumba.Functional.Either<
-        LaYumba.Functional.Error,
-        System.Collections.Generic.List<FirstLab.network.models.Installation>>>;
+        LaYumba.Functional.Error, System.Collections.Generic.List<FirstLab.network.models.Installation>>>;
 using ReplaceMeasurementInDb =
     System.Func<(FirstLab.network.models.Measurements, FirstLab.network.models.Installation), LaYumba.Functional.Either<
         LaYumba.Functional.Error, (FirstLab.network.models.Measurements, FirstLab.network.models.Installation)>>;
@@ -78,9 +77,13 @@ namespace FirstLab.viewModels
             IsLoading = true;
             var location = await LocationProvider.GetLocation();
 
-            FetchVmItems(
-                    FetchMeasurements(_network.GetMeasurementsRequest))(FetchInstallations)
-                (DatabaseHelper.ReplaceInstallations(App.Database.Connection))
+            var fetchMeasurementsFromDbOrNetwork =
+                FetchMeasurementsFromDbOrNet2(() => DateTime.Now)(DatabaseHelper.LoadMeasurementByInstallationId2)
+                    (_network.GetMeasurementsRequest);
+            var installationByLocation = FetchInstallations;
+            var replaceInstallationsInDb = DatabaseHelper.ReplaceInstallations(App.Database.Connection);
+
+            FetchVmItems(fetchMeasurementsFromDbOrNetwork)(installationByLocation)(replaceInstallationsInDb)
                 (DatabaseHelper.ReplaceCurrent3)(location)
                 .Match(error =>
                 {
