@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using FirstLab.entities;
 using FirstLab.network.models;
 using FirstLab.viewModels;
 using LaYumba.Functional;
@@ -161,6 +162,70 @@ namespace FirstLabUnitTests.viewModels
                     });
         }
 
+        [Test]
+        public void ShouldReturnItemFromDatabaseFunction()
+        {
+            TestItems(out var installation1, out _, out var measurementFromDb, out _,
+                out _, out _);
+
+            var functionUnderTest = HomeViewModel.FetchMeasurementsFromDbOrNet2(() =>
+                    DateTime.Parse(measurementFromDb.current.tillDateTime).AddMinutes(20))(i =>
+                    (Option<CurrentEntity>) measurementFromDb.current.ToCurrentEntity())
+                (i => throw new Exception("Should not fetch from network"));
+
+            var result = functionUnderTest(installation1);
+
+            result.Match(error => Assert.Fail("Should match to the right"), tuple =>
+            {
+                var (measurements, installation) = tuple;
+                Assert.AreEqual(measurementFromDb, measurements);
+                Assert.AreEqual(installation1, installation);
+            });
+        }
+
+        [Test]
+        public void ShouldReturnItemFromNetworkFunc_NoItemInDb()
+        {
+            TestItems(out var installation1, out _, out var measurementFromNetwork, out _,
+                out _, out _);
+
+            var functionUnderTest = HomeViewModel.FetchMeasurementsFromDbOrNet2(
+                    () => throw new Exception("Should not call this function"))
+                (i => (Option<CurrentEntity>) null)
+                (i => measurementFromNetwork);
+
+            var result = functionUnderTest(installation1);
+
+            result.Match(error => Assert.Fail("Should match to the right"), tuple =>
+            {
+                var (measurements, installation) = tuple;
+                Assert.AreEqual(measurementFromNetwork, measurements);
+                Assert.AreEqual(installation1, installation);
+            });
+        }
+
+        [Test]
+        public void ShouldReturnItemFromNetworkFunc_ObsoleteMeasurement()
+        {
+            TestItems(out var installation1, out _, out var obsoleteMeasurementFromDb, out var measurementFromNetwork,
+                out _, out _);
+
+            var functionUnderTest = HomeViewModel.FetchMeasurementsFromDbOrNet2(() =>
+                    DateTime.Parse(obsoleteMeasurementFromDb.current.tillDateTime).AddMinutes(70))(i =>
+                    (Option<CurrentEntity>) obsoleteMeasurementFromDb.current.ToCurrentEntity())
+                (i => measurementFromNetwork);
+
+            var result = functionUnderTest(installation1);
+
+            result.Match(error => Assert.Fail("Should match to the right"), tuple =>
+            {
+                var (measurements, installation) = tuple;
+                Assert.AreEqual(measurementFromNetwork, measurements,
+                    "Should return item from network function (not form database)");
+                Assert.AreEqual(installation1, installation);
+            });
+        }
+
         private static void TestItems(out Installation installation1, out Installation installation2,
             out Measurements measurements1, out Measurements measurements2, out Address address1,
             out Address address2)
@@ -207,7 +272,7 @@ namespace FirstLabUnitTests.viewModels
             DateTime TimeFunc() => DateTime.Parse(measurements1.current.tillDateTime).AddMinutes(50);
 
             var result = HomeViewModel.IsMeasurementObsolete(TimeFunc, measurements1);
-            Assert.IsTrue(result, "Should return true - difference less than 1h");
+            Assert.IsFalse(result, "Should return false - difference less than 1h");
         }
 
         [Test]
@@ -218,7 +283,7 @@ namespace FirstLabUnitTests.viewModels
             DateTime TimeFunc() => DateTime.Parse(measurements1.current.tillDateTime).AddMinutes(70);
 
             var result = HomeViewModel.IsMeasurementObsolete(TimeFunc, measurements1);
-            Assert.IsFalse(result, "Should return false - difference more than 1h");
+            Assert.IsTrue(result, "Should return true - difference more than 1h");
         }
 
         private sealed class TestError : Error

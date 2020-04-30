@@ -138,6 +138,22 @@ namespace FirstLab.viewModels
                     ));
             };
 
+        internal static Func<
+                Func<DateTime>,
+                Func<Func<int, Either<Error, Option<CurrentEntity>>>,
+                    Func<MeasurementById,
+                        Func<Installation, Either<Error, (Measurements, Installation)>>>>>
+            FetchMeasurementsFromDbOrNet2
+            => dateFunc => measurementFromDbByInstallationId => networkGet => installation =>
+            {
+                var eitherOption = measurementFromDbByInstallationId(installation.id);
+                return eitherOption.Bind(it =>
+                    it.Match(() => FetchMeasurements(networkGet)(installation),
+                        entity => IsMeasurementObsolete(dateFunc, entity.ToMeasurement())
+                            ? FetchMeasurements(networkGet)(installation)
+                            : (entity.ToMeasurement(), installation)));
+            };
+
         private FetchInstallationsByLocation FetchInstallations =>
             location => _network.GetNearestInstallationsRequest2(2)(location);
 
@@ -151,7 +167,7 @@ namespace FirstLab.viewModels
         {
             if (!DateTime.TryParse(measurement.current.tillDateTime, out var tillDate)) return false;
             var difference = getTime().Subtract(tillDate).TotalMinutes;
-            return difference <= 60;
+            return difference >= 60;
         }
 
         internal static (List<Error>, List<TR> ) AggregateEithers<TR>(IEnumerable<Either<Error, TR>> list) =>
