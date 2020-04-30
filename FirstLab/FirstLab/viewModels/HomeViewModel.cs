@@ -102,12 +102,12 @@ namespace FirstLab.viewModels
                         Func<Location,
                             Either<Error, (List<Error>, List<MeasurementVmItem>)>>>>>> FetchVmItems =>
             measurementsOfInstallation => installationByLocation =>
-                replaceInstallations => replaceMeasurements =>
+                replaceInstallations => replaceMeasurement =>
                     currentLocation =>
                         installationByLocation(currentLocation)
                             .Bind(replaceInstallations)
                             .Map(it => it.Map(measurementsOfInstallation))
-                            .Map(it => it.Map(it2 => it2.Bind(replaceMeasurements)))
+                            .Map(it => it.Map(it2 => it2.Bind(replaceMeasurement)))
                             .Map(AggregateEithers)
                             .Match(error => (new List<Error>
                             {
