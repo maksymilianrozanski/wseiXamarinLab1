@@ -125,6 +125,22 @@ namespace FirstLab.db
                     }
                 };
 
+
+        public static Func<SQLiteConnection,
+            Func<Either<Error, List<InstallationEntity>>>> LoadInstallationEntities =>
+            connection => () =>
+            {
+                try
+                {
+                    return connection.GetAllWithChildren<InstallationEntity>(entity => true, true);
+                }
+                catch (SQLiteException e)
+                {
+                    return new SqlError(e.Message);
+                }
+            };
+
+
         public static Either<Error, (Measurements, Installation)> ReplaceCurrent2(
             Either<Error, (Measurements, Installation)> measurementInstallation)
             => measurementInstallation.Bind(ReplaceCurrent(App.Database.Connection));

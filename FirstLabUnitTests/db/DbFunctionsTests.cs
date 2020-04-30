@@ -26,11 +26,25 @@ namespace FirstLabUnitTests.db
                         new List<Standard> {new Standard("WHO", "PM25", 25.0, 79.05)})
                 );
 
-        private readonly Installation _installationEntity2 =
+        private readonly Installation _installation2 =
             new Installation(11, new Location(51.2, 23.2), new Address("PL", "UnknownCity2", "Str"));
 
-        private readonly Installation _installationEntity3 =
+        private readonly Installation _installation3 =
             new Installation(12, new Location(51.2, 23.2), new Address("PL", "UnknownCity3", "Str"));
+
+        private readonly InstallationEntity _installationEntity4 =
+            new Installation(13, new Location(51.2, 22.2), new Address("PL", "UnknownCity4", "Str"))
+                .ToInstallationEntity(
+                    new Current(
+                        "2020-04-08T07:31:50.230Z", "2020-04-08T08:31:50.230Z",
+                        new List<Value> {new Value("PM1", 13.61), new Value("PM25", 19.76)},
+                        new List<Index>
+                        {
+                            new Index("AIRLY_CAQI", 90.0, "LOW", "Hello",
+                                "Don't miss this day! The clean air calls!", "#D1CF1E")
+                        },
+                        new List<Standard> {new Standard("WHO", "PM25", 25.0, 79.05)})
+                );
 
         [Test]
         public void ShouldReplaceAllInstallationEntities()
@@ -41,7 +55,7 @@ namespace FirstLabUnitTests.db
             Assert.AreEqual(0, connection.Table<InstallationEntity>().Count(), "Table should be empty at start");
             connection.InsertWithChildren(_installationEntity1, true);
 
-            var installations = new List<Installation> {_installationEntity2, _installationEntity3};
+            var installations = new List<Installation> {_installation2, _installation3};
 
             DatabaseHelper.ReplaceInstallations(connection)(installations);
             Assert.AreEqual(2, connection.Table<InstallationEntity>().Count(),
@@ -189,6 +203,35 @@ namespace FirstLabUnitTests.db
 
             Assert.AreEqual(2, connection.Table<CurrentEntity>().Count(),
                 "Should delete previous values from database");
+        }
+
+        [Test]
+        public void ShouldLoadInstallationEntitiesWithChildren()
+        {
+            var connection = new SQLiteConnection(":memory:");
+            DatabaseHelper.CreateTables(connection);
+            connection.InsertWithChildren(_installationEntity1, true);
+            connection.InsertWithChildren(_installationEntity4, true);
+
+            var expected = new List<InstallationEntity> {_installationEntity1, _installationEntity4};
+            expected.Sort((i1, i2) => i1.Id.CompareTo(i2.Id));
+
+            var result = DatabaseHelper.LoadInstallationEntities(connection)();
+            //verify
+            result.Match(error => Assert.Fail("Should return result"),
+                list =>
+                {
+                    list.Sort((i1, i2) => i1.Id.CompareTo(i2.Id));
+                    Assert.AreEqual(expected.First().Id, list.First().Id);
+                    Assert.AreEqual(expected[1].Id, list[1].Id);
+                    Assert.AreEqual(expected.First().CurrentEntity.Id, list.First().CurrentEntity.Id);
+                    Assert.AreEqual(expected[1].CurrentEntity.Id, list[1].CurrentEntity.Id);
+                    Assert.AreEqual(expected.First().CurrentEntity.IndexEntities.First().Description,
+                        list.First().CurrentEntity.IndexEntities.First().Description);
+                    Assert.AreEqual(expected[1].CurrentEntity.IndexEntities.First().Description,
+                        list[1].CurrentEntity.IndexEntities.First().Description);
+                }
+            );
         }
     }
 }
