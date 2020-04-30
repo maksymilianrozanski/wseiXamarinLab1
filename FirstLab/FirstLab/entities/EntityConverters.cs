@@ -33,6 +33,22 @@ namespace FirstLab.entities
                 return entity;
             });
 
+        public static Measurements ToMeasurement(this CurrentEntity currentEntity)
+            => currentEntity.Pipe(it => new Measurements(
+                new Current(it.FromDateTime, it.TillDateTime, it.Values.Map(v => v.ToValue()).ToList(),
+                    it.IndexEntities.Map(i => i.ToIndex()).ToList(),
+                    it.Standards.Map(s => s.ToStandard()).ToList()
+                )));
+
+        public static Value ToValue(this ValueEntity valueEntity)
+            => valueEntity.Pipe(it => new Value(it.Name, it.Value));
+
+        public static Index ToIndex(this IndexEntity indexEntity)
+            => indexEntity.Pipe(it => new Index(it.Name, it.Value, it.Level, it.Description, it.Advice, it.Color));
+
+        public static Standard ToStandard(this StandardEntity standardEntity)
+            => standardEntity.Pipe(it => new Standard(it.Name, it.Pollutant, it.Limit, it.Percent));
+
         public static InstallationEntity ToInstallationEntity(this Installation installation, Current current) =>
             installation.Pipe(it =>
                 {

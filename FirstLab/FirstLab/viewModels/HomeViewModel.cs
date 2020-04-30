@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using FirstLab.db;
+using FirstLab.entities;
 using FirstLab.location;
 using FirstLab.network;
 using FirstLab.network.models;
@@ -119,6 +120,23 @@ namespace FirstLab.viewModels
         private static Func<MeasurementById, Func<Installation, Either<Error, (Measurements, Installation)>>>
             FetchMeasurements => networkGet => installation =>
             networkGet(installation.id).Map(measurement => (measurement, installation));
+
+        private static Func<MeasurementById, Func<Installation, Either<Error, (Measurements, Installation)>>>
+            FetchMeasurementsFromDbOrNet
+            => networkGet => installation =>
+            {
+                var eitherOption =
+                    DatabaseHelper.LoadMeasurementByInstallationId(App.Database.Connection)(installation.id);
+                return eitherOption.Bind(it =>
+                    it.Match(() => FetchMeasurements(networkGet)(installation),
+                        entity =>
+                        {
+                            return IsMeasurementObsolete(() => DateTime.Now, entity.ToMeasurement())
+                                ? FetchMeasurements(networkGet)(installation)
+                                : (entity.ToMeasurement(), installation);
+                        }
+                    ));
+            };
 
         private FetchInstallationsByLocation FetchInstallations =>
             location => _network.GetNearestInstallationsRequest2(2)(location);
