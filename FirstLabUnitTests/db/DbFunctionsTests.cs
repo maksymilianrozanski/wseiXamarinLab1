@@ -3,6 +3,7 @@ using System.Linq;
 using FirstLab.db;
 using FirstLab.entities;
 using FirstLab.network.models;
+using LaYumba.Functional;
 using NUnit.Framework;
 using SQLite;
 using SQLiteNetExtensions.Extensions;
@@ -231,6 +232,39 @@ namespace FirstLabUnitTests.db
                     Assert.AreEqual(expected[1].CurrentEntity.IndexEntities.First().Description,
                         list[1].CurrentEntity.IndexEntities.First().Description);
                 }
+            );
+        }
+
+        [Test]
+        public void ShouldReturnCurrentEntity()
+        {
+            var connection = new SQLiteConnection(":memory:");
+            DatabaseHelper.CreateTables(connection);
+
+            connection.InsertWithChildren(_installationEntity1, true);
+
+            var result = DatabaseHelper.LoadMeasurementByInstallationId(connection)(10);
+            result.Match(error => Assert.Fail("Should match to the right"),
+                option => option.Match(() => Assert.Fail("Should contain value"),
+                    entity =>
+                    {
+                        Assert.AreEqual(_installationEntity1.Id, entity.InstallationId);
+                        Assert.AreEqual(_installationEntity1.CurrentEntity.Id, entity.Id);
+                        Assert.AreEqual(_installationEntity1.CurrentEntity.Values.First().Value,
+                            entity.Values.First().Value, "Should fetch children recursively");
+                    }));
+        }
+
+        [Test]
+        public void ShouldReturnNone()
+        {
+            var connection = new SQLiteConnection(":memory:");
+            DatabaseHelper.CreateTables(connection);
+
+            connection.InsertWithChildren(_installationEntity1, true);
+            var result = DatabaseHelper.LoadMeasurementByInstallationId(connection)(11);
+            result.Match(error => Assert.Fail("Should match to the right"),
+                option => option.Match(() => { }, entity => Assert.Fail("Should match to None"))
             );
         }
     }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using FirstLab.entities;
 using FirstLab.network.models;
 using LaYumba.Functional;
@@ -140,6 +141,21 @@ namespace FirstLab.db
                 }
             };
 
+        public static Func<SQLiteConnection,
+            Func<int, Either<Error, Option<CurrentEntity>>>> LoadMeasurementByInstallationId =>
+            connection => installationId =>
+            {
+                try
+                {
+                    return (Option<CurrentEntity>) connection.GetAllWithChildren<CurrentEntity>(
+                            it => it.InstallationId == installationId, true)
+                        .FirstOrDefault();
+                }
+                catch (SQLiteException e)
+                {
+                    return new SqlError(e.Message);
+                }
+            };
 
         public static Either<Error, (Measurements, Installation)> ReplaceCurrent2(
             Either<Error, (Measurements, Installation)> measurementInstallation)
