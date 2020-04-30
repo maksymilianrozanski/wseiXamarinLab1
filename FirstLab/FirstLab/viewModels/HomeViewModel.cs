@@ -106,6 +106,7 @@ namespace FirstLab.viewModels
                     currentLocation =>
                         installationByLocation(currentLocation)
                             .Bind(replaceInstallations)
+                            //TODO: try to load measurements from db, fetch new if measurements are old
                             .Map(it => it.Map(measurementsOfInstallation))
                             .Map(it => it.Map(it2 => it2.Bind(replaceMeasurement)))
                             .Map(AggregateEithers)
@@ -127,6 +128,13 @@ namespace FirstLab.viewModels
             installationFetching =>
                 (Location location) =>
                     installationFetching(location).Bind(installationsReplacingFunc);
+
+        internal static bool IsMeasurementObsolete(Func<DateTime> getTime, Measurements measurement)
+        {
+            if (!DateTime.TryParse(measurement.current.tillDateTime, out var tillDate)) return false;
+            var difference = getTime().Subtract(tillDate).TotalMinutes;
+            return difference <= 60;
+        }
 
         internal static (List<Error>, List<TR> ) AggregateEithers<TR>(IEnumerable<Either<Error, TR>> list) =>
             list.Aggregate((new List<Error>(), new List<TR>()), (acc, either) =>

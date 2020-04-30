@@ -199,6 +199,27 @@ namespace FirstLabUnitTests.viewModels
                 address2);
         }
 
+        [Test]
+        public void ShouldReturnTrueForRecentMeasurement()
+        {
+            TestItems(out _, out _, out var measurements1, out _,
+                out _, out _);
+            DateTime TimeFunc() => DateTime.Parse(measurements1.current.tillDateTime).AddMinutes(50);
+
+            var result = HomeViewModel.IsMeasurementObsolete(TimeFunc, measurements1);
+            Assert.IsTrue(result, "Should return true - difference less than 1h");
+        }
+
+        [Test]
+        public void ShouldReturnFalseForObsoleteMeasurement()
+        {
+            TestItems(out _, out _, out var measurements1, out _,
+                out _, out _);
+            DateTime TimeFunc() => DateTime.Parse(measurements1.current.tillDateTime).AddMinutes(70);
+
+            var result = HomeViewModel.IsMeasurementObsolete(TimeFunc, measurements1);
+            Assert.IsFalse(result, "Should return false - difference more than 1h");
+        }
 
         private sealed class TestError : Error
         {
