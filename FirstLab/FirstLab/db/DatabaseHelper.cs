@@ -66,6 +66,8 @@ namespace FirstLab.db
             }
         };
 
+        public static InstallationsReplacingFunc ReplaceInstallations2 => ReplaceInstallations(App.Database.Connection);
+
         public static Func<SQLiteConnection,
             Func<(Measurements, Installation), Either<Error, (Measurements, Installation)>>> ReplaceCurrent =>
             connection =>

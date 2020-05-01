@@ -78,13 +78,14 @@ namespace FirstLab.viewModels
             IsLoading = true;
             var location = await LocationProvider.GetLocation();
 
-            var fetchMeasurementsFromDbOrNetwork =
+            var installationsFromDbOrNetwork = FetchInstallationsFromDbOrNetwork(
+                DatabaseHelper.LoadInstallationEntities2)(DatabaseHelper.ReplaceInstallations2)(FetchInstallations);
+            var measurementsFromDbOrNetwork =
                 FetchMeasurementsFromDbOrNetwork(() => DateTime.Now)(DatabaseHelper.LoadMeasurementByInstallationId2)
                     (_network.GetMeasurementsRequest);
-            var installationByLocation = FetchInstallations;
             var replaceInstallationsInDb = DatabaseHelper.ReplaceInstallations(App.Database.Connection);
 
-            FetchVmItems(fetchMeasurementsFromDbOrNetwork)(installationByLocation)(replaceInstallationsInDb)
+            FetchVmItems(measurementsFromDbOrNetwork)(installationsFromDbOrNetwork)(replaceInstallationsInDb)
                 (DatabaseHelper.ReplaceCurrent2)(location)
                 .Match(error =>
                 {
@@ -110,7 +111,6 @@ namespace FirstLab.viewModels
                 replaceInstallations => replaceMeasurement =>
                     currentLocation =>
                         installationByLocation(currentLocation)
-                            .Bind(replaceInstallations)
                             .Map(it => it.Map(measurementsOfInstallation))
                             .Map(it => it.Map(it2 => it2.Bind(replaceMeasurement)))
                             .Map(AggregateEithers)
