@@ -29,6 +29,9 @@ using FetchMeasurementsOfInstallation =
 using LoadInstallationsFromDb =
     System.Func<LaYumba.Functional.Either<LaYumba.Functional.Error,
         System.Collections.Generic.List<FirstLab.entities.InstallationEntity>>>;
+using InstallationsReplacingFunc =
+    System.Func<System.Collections.Generic.List<FirstLab.network.models.Installation>, LaYumba.Functional.Either<
+        LaYumba.Functional.Error, System.Collections.Generic.List<FirstLab.network.models.Installation>>>;
 
 [assembly: InternalsVisibleTo("FirstLabUnitTests")]
 
@@ -51,7 +54,8 @@ namespace FirstLab.viewModels
                 vmListItem => { navigation.PushAsync(new DetailsPage(vmListItem)); }
             );
 
-            Task.Run(LoadMultipleValues);
+            var normalLoading = NormalLoading(FetchVmItemsWithSavingFunctions);
+            Task.Run(() => LoadMultipleValues(normalLoading));
         }
 
         public ICommand MyCommand { get; set; }
@@ -74,26 +78,36 @@ namespace FirstLab.viewModels
             set => SetProperty(ref _errorMessage, value);
         }
 
-        private async void LoadMultipleValues()
-        {
-            IsLoading = true;
-            var location = await LocationProvider.GetLocation();
+        private static readonly Func<FetchMeasurementsOfInstallation, Func<FetchInstallationsByLocation,
+            Func<Location, Either<Error, (List<Error>, List<MeasurementVmItem>)>>>> FetchVmItemsWithSavingFunctions
+            = FetchVmItems(DatabaseHelper.ReplaceInstallations(App.Database.Connection))(DatabaseHelper
+                .ReplaceCurrent2);
 
-            var installationsFromDbOrNetwork = FetchInstallationsFromDbOrNetwork(
-                DatabaseHelper.LoadInstallationEntities2)(DatabaseHelper.ReplaceInstallations2)(FetchInstallations);
+        private Func<Location, Either<Error, (List<Error>, List<MeasurementVmItem>)>> ForceLoading(
+            Func<FetchMeasurementsOfInstallation, Func<FetchInstallationsByLocation,
+                Func<Location, Either<Error, (List<Error>, List<MeasurementVmItem>)>>>> fetchWithSaving) =>
+            fetchWithSaving(FetchMeasurements(_network.GetMeasurementsRequest))(FetchInstallations);
+
+        private Func<Location, Either<Error, (List<Error>, List<MeasurementVmItem>)>> NormalLoading(
+            Func<FetchMeasurementsOfInstallation, Func<FetchInstallationsByLocation,
+                Func<Location, Either<Error, (List<Error>, List<MeasurementVmItem>)>>>> fetchWithSaving)
+        {
             var measurementsFromDbOrNetwork =
                 FetchMeasurementsFromDbOrNetwork(() => DateTime.Now)(DatabaseHelper.LoadMeasurementByInstallationId2)
                     (_network.GetMeasurementsRequest);
-            var replaceInstallationsInDb = DatabaseHelper.ReplaceInstallations(App.Database.Connection);
 
-            var fetchVmItemsWithSavingFunctions =
-                FetchVmItems(replaceInstallationsInDb)(DatabaseHelper.ReplaceCurrent2);
+            var installationsFromDbOrNetwork = FetchInstallationsFromDbOrNetwork
+                (DatabaseHelper.LoadInstallationEntities2)(DatabaseHelper.ReplaceInstallations2)(FetchInstallations);
 
-            var fetchVmItemsFromDbOrNetwork =
-                fetchVmItemsWithSavingFunctions(measurementsFromDbOrNetwork)(installationsFromDbOrNetwork);
+            return fetchWithSaving(measurementsFromDbOrNetwork)(installationsFromDbOrNetwork);
+        }
 
-            DisplayValues(fetchVmItemsFromDbOrNetwork(location));
-
+        private async void LoadMultipleValues(
+            Func<Location, Either<Error, (List<Error>, List<MeasurementVmItem>)>> fetchingFunc)
+        {
+            IsLoading = true;
+            var location = await LocationProvider.GetLocation();
+            DisplayValues(fetchingFunc(location));
             IsLoading = false;
         }
 
