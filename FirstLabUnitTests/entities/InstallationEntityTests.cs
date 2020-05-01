@@ -73,5 +73,16 @@ namespace FirstLabUnitTests.entities
             Assert.AreEqual(_installationEntity.CurrentEntity.IndexEntities.First(),
                 result.CurrentEntity.IndexEntities.First());
         }
+
+        [Test]
+        public void ShouldConvertInstallationEntityToInstallationAndBack()
+        {
+            var installation = new Installation(10, new Location(50.2, 22.2), new Address("PL", "UnknownCity", "Str"));
+            var result = installation.ToInstallationEntity().ToInstallation();
+            Assert.AreEqual(installation.id, result.id);
+            Assert.AreEqual(installation.location.Latitude, result.location.Latitude, 0.0001);
+            Assert.AreEqual(installation.location.Longitude, result.location.Longitude, 0.0001);
+            Assert.AreEqual(installation.address, result.address);
+        }
     }
 }

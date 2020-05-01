@@ -318,6 +318,83 @@ namespace FirstLabUnitTests.viewModels
                 $"Location not changed - test location is closer than ${maxDistance} km from installation2");
         }
 
+        [Test]
+        public void ShouldFetchInstallationsFromNetworkFunc_LocationChanged()
+        {
+            TestItems(out var installation1, out var installation2, out _, out _,
+                out _, out _);
+
+            Either<Error, List<InstallationEntity>> InstallationsFromDb() => new List<InstallationEntity>
+                {installation1.ToInstallationEntity(), installation2.ToInstallationEntity()};
+
+            var replacedInstallationsCounter = 0;
+
+            Either<Error, List<Installation>> ReplacingInstallationsFunc(List<Installation> list)
+            {
+                replacedInstallationsCounter += 1;
+                return list;
+            }
+
+            Either<Error, List<Installation>> FetchingFromNetworkFunc(Location location) =>
+                new List<Installation> {installation2};
+
+            var functionUnderTest =
+                HomeViewModel.FetchInstallationsFromDbOrNetwork(InstallationsFromDb)(ReplacingInstallationsFunc)(
+                    FetchingFromNetworkFunc);
+
+            var result = functionUnderTest(new Location(-80.0, -80.0));
+
+            Assert.AreEqual(1, replacedInstallationsCounter, "Should try to replace installations in database once");
+            result.Match(error => Assert.Fail("Should match to the right"), list =>
+            {
+                Assert.AreEqual(1, list.Count,
+                    "Should return list from FetchingFromNetworkFunc, which contains 1 item");
+                Assert.AreEqual(installation2, list.First(),
+                    "Should return installation from FetchingFromNetworkFunc");
+            });
+        }
+
+        [Test]
+        public void ShouldReturnInstallationsFromDatabaseFunc_LocationNotChanged()
+        {
+            TestItems(out var installation1, out var installation2, out _, out _,
+                out _, out _);
+
+            Either<Error, List<InstallationEntity>> InstallationsFromDb() => new List<InstallationEntity>
+                {installation1.ToInstallationEntity(), installation2.ToInstallationEntity()};
+
+            var replacedInstallationsCounter = 0;
+
+            Either<Error, List<Installation>> ReplacingInstallationsFunc(List<Installation> list)
+            {
+                replacedInstallationsCounter += 1;
+                return list;
+            }
+
+            static Either<Error, List<Installation>> FetchingFromNetworkFunc(Location location) =>
+                throw new Exception("Should not fetch from network function - location not changed");
+
+            var functionUnderTest =
+                HomeViewModel.FetchInstallationsFromDbOrNetwork(InstallationsFromDb)(ReplacingInstallationsFunc)(
+                    FetchingFromNetworkFunc);
+
+            var result = functionUnderTest(installation1.location);
+            Assert.AreEqual(0, replacedInstallationsCounter,
+                "Should not replace installations when location not changed");
+            result.Match(error => Assert.Fail("Should match to the right"), list =>
+            {
+                Assert.AreEqual(2, list.Count(), "Should return list from InstallationsFromDb, which contains 2 items");
+                Assert.AreEqual(installation1.id, list[0].id);
+                Assert.AreEqual(installation2.id, list[1].id);
+                Assert.AreEqual(installation1.address, list[0].address);
+                Assert.AreEqual(installation2.address, list[1].address);
+                Assert.AreEqual(installation1.location.Latitude, list[0].location.Latitude, 0.0001);
+                Assert.AreEqual(installation1.location.Longitude, list[0].location.Longitude, 0.0001);
+                Assert.AreEqual(installation2.location.Latitude, list[1].location.Latitude, 0.0001);
+                Assert.AreEqual(installation2.location.Longitude, list[1].location.Longitude, 0.0001);
+            });
+        }
+
         private sealed class TestError : Error
         {
             public TestError(string message)

@@ -112,6 +112,9 @@ namespace FirstLab.db
                 }
             };
 
+        public static Func<Either<Error, List<InstallationEntity>>> LoadInstallationEntities2 =>
+            LoadInstallationEntities(App.Database.Connection);
+
         public static Func<SQLiteConnection,
             Func<int, Either<Error, Option<CurrentEntity>>>> LoadMeasurementByInstallationId =>
             connection => installationId =>

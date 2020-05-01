@@ -25,6 +25,9 @@ using ReplaceMeasurementInDb =
 using FetchMeasurementsOfInstallation =
     System.Func<FirstLab.network.models.Installation, LaYumba.Functional.Either<LaYumba.Functional.Error, (
         FirstLab.network.models.Measurements, FirstLab.network.models.Installation)>>;
+using LoadInstallationsFromDb =
+    System.Func<LaYumba.Functional.Either<LaYumba.Functional.Error,
+        System.Collections.Generic.List<FirstLab.entities.InstallationEntity>>>;
 
 [assembly: InternalsVisibleTo("FirstLabUnitTests")]
 
@@ -36,6 +39,7 @@ namespace FirstLab.viewModels
         private string _errorMessage;
         private bool _isLoading;
         private List<MeasurementVmItem> _measurementVmItems;
+        private const double MaxInstallationDistance = 100.0;
 
         public HomeViewModel(INavigation navigation) : base(navigation)
         {
@@ -138,6 +142,20 @@ namespace FirstLab.viewModels
 
         private FetchInstallationsByLocation FetchInstallations =>
             location => _network.GetNearestInstallationsRequest2(2)(location);
+
+        public static Func<LoadInstallationsFromDb,
+                Func<ReplaceInstallationsInDb,
+                    Func<FetchInstallationsByLocation,
+                        FetchInstallationsByLocation>>>
+            FetchInstallationsFromDbOrNetwork =>
+            loadInstallationsFromDb => replaceInstallationsInDb =>
+                fetchInstallationsFromNetwork =>
+                    location => loadInstallationsFromDb()
+                        .Map(it => it.Map(it2 => it2.ToInstallation()))
+                        .Map(it => it.ToList())
+                        .Bind(it => IsLocationChanged(MaxInstallationDistance)(it, location)
+                            ? fetchInstallationsFromNetwork(location).Bind(replaceInstallationsInDb)
+                            : it);
 
         internal static bool IsMeasurementObsolete(Func<DateTime> getTime, Measurements measurement)
         {

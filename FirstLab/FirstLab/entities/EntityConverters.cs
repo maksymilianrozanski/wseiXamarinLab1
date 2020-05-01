@@ -2,6 +2,7 @@ using System.Linq;
 using FirstLab.network.models;
 using LaYumba.Functional;
 using Newtonsoft.Json;
+using Xamarin.Essentials;
 
 namespace FirstLab.entities
 {
@@ -66,5 +67,10 @@ namespace FirstLab.entities
                     return new InstallationEntity(it.id, location, address, null);
                 }
             );
+
+        public static Installation ToInstallation(this InstallationEntity installationEntity) =>
+            installationEntity.Pipe(it =>
+                new Installation(it.Id, JsonConvert.DeserializeObject<Location>(it.Location),
+                    JsonConvert.DeserializeObject<Address>(it.Address)));
     }
 }
