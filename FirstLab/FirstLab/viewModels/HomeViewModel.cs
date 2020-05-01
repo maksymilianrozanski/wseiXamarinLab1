@@ -16,9 +16,6 @@ using MeasurementById =
 using FetchInstallationsByLocation =
     System.Func<Xamarin.Essentials.Location, LaYumba.Functional.Either<LaYumba.Functional.Error,
         System.Collections.Generic.List<FirstLab.network.models.Installation>>>;
-using InstallationsReplacingFunc =
-    System.Func<System.Collections.Generic.List<FirstLab.network.models.Installation>, LaYumba.Functional.Either<
-        LaYumba.Functional.Error, System.Collections.Generic.List<FirstLab.network.models.Installation>>>;
 using ReplaceInstallationsInDb =
     System.Func<System.Collections.Generic.List<FirstLab.network.models.Installation>, LaYumba.Functional.Either<
         LaYumba.Functional.Error, System.Collections.Generic.List<FirstLab.network.models.Installation>>>;
@@ -78,13 +75,13 @@ namespace FirstLab.viewModels
             var location = await LocationProvider.GetLocation();
 
             var fetchMeasurementsFromDbOrNetwork =
-                FetchMeasurementsFromDbOrNet2(() => DateTime.Now)(DatabaseHelper.LoadMeasurementByInstallationId2)
+                FetchMeasurementsFromDbOrNetwork(() => DateTime.Now)(DatabaseHelper.LoadMeasurementByInstallationId2)
                     (_network.GetMeasurementsRequest);
             var installationByLocation = FetchInstallations;
             var replaceInstallationsInDb = DatabaseHelper.ReplaceInstallations(App.Database.Connection);
 
             FetchVmItems(fetchMeasurementsFromDbOrNetwork)(installationByLocation)(replaceInstallationsInDb)
-                (DatabaseHelper.ReplaceCurrent3)(location)
+                (DatabaseHelper.ReplaceCurrent2)(location)
                 .Match(error =>
                 {
                     ErrorMessage = "Something went wrong...";
@@ -110,7 +107,6 @@ namespace FirstLab.viewModels
                     currentLocation =>
                         installationByLocation(currentLocation)
                             .Bind(replaceInstallations)
-                            //TODO: try to load measurements from db, fetch new if measurements are old
                             .Map(it => it.Map(measurementsOfInstallation))
                             .Map(it => it.Map(it2 => it2.Bind(replaceMeasurement)))
                             .Map(AggregateEithers)
@@ -124,29 +120,12 @@ namespace FirstLab.viewModels
             FetchMeasurements => networkGet => installation =>
             networkGet(installation.id).Map(measurement => (measurement, installation));
 
-        private static Func<MeasurementById, Func<Installation, Either<Error, (Measurements, Installation)>>>
-            FetchMeasurementsFromDbOrNet
-            => networkGet => installation =>
-            {
-                var eitherOption =
-                    DatabaseHelper.LoadMeasurementByInstallationId(App.Database.Connection)(installation.id);
-                return eitherOption.Bind(it =>
-                    it.Match(() => FetchMeasurements(networkGet)(installation),
-                        entity =>
-                        {
-                            return IsMeasurementObsolete(() => DateTime.Now, entity.ToMeasurement())
-                                ? FetchMeasurements(networkGet)(installation)
-                                : (entity.ToMeasurement(), installation);
-                        }
-                    ));
-            };
-
         internal static Func<
                 Func<DateTime>,
                 Func<Func<int, Either<Error, Option<CurrentEntity>>>,
                     Func<MeasurementById,
                         Func<Installation, Either<Error, (Measurements, Installation)>>>>>
-            FetchMeasurementsFromDbOrNet2
+            FetchMeasurementsFromDbOrNetwork
             => dateFunc => measurementFromDbByInstallationId => networkGet => installation =>
             {
                 var eitherOption = measurementFromDbByInstallationId(installation.id);
@@ -159,12 +138,6 @@ namespace FirstLab.viewModels
 
         private FetchInstallationsByLocation FetchInstallations =>
             location => _network.GetNearestInstallationsRequest2(2)(location);
-
-        private Func<InstallationsReplacingFunc, Func<FetchInstallationsByLocation, FetchInstallationsByLocation>>
-            FetchInstallationsAndReplace => (installationsReplacingFunc) =>
-            installationFetching =>
-                (Location location) =>
-                    installationFetching(location).Bind(installationsReplacingFunc);
 
         internal static bool IsMeasurementObsolete(Func<DateTime> getTime, Measurements measurement)
         {

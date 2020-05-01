@@ -168,7 +168,7 @@ namespace FirstLabUnitTests.viewModels
             TestItems(out var installation1, out _, out var measurementFromDb, out _,
                 out _, out _);
 
-            var functionUnderTest = HomeViewModel.FetchMeasurementsFromDbOrNet2(() =>
+            var functionUnderTest = HomeViewModel.FetchMeasurementsFromDbOrNetwork(() =>
                     DateTime.Parse(measurementFromDb.current.tillDateTime).AddMinutes(20))(i =>
                     (Option<CurrentEntity>) measurementFromDb.current.ToCurrentEntity())
                 (i => throw new Exception("Should not fetch from network"));
@@ -189,7 +189,7 @@ namespace FirstLabUnitTests.viewModels
             TestItems(out var installation1, out _, out var measurementFromNetwork, out _,
                 out _, out _);
 
-            var functionUnderTest = HomeViewModel.FetchMeasurementsFromDbOrNet2(
+            var functionUnderTest = HomeViewModel.FetchMeasurementsFromDbOrNetwork(
                     () => throw new Exception("Should not call this function"))
                 (i => (Option<CurrentEntity>) null)
                 (i => measurementFromNetwork);
@@ -210,7 +210,7 @@ namespace FirstLabUnitTests.viewModels
             TestItems(out var installation1, out _, out var obsoleteMeasurementFromDb, out var measurementFromNetwork,
                 out _, out _);
 
-            var functionUnderTest = HomeViewModel.FetchMeasurementsFromDbOrNet2(() =>
+            var functionUnderTest = HomeViewModel.FetchMeasurementsFromDbOrNetwork(() =>
                     DateTime.Parse(obsoleteMeasurementFromDb.current.tillDateTime).AddMinutes(70))(i =>
                     (Option<CurrentEntity>) obsoleteMeasurementFromDb.current.ToCurrentEntity())
                 (i => measurementFromNetwork);

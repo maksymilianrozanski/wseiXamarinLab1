@@ -66,39 +66,6 @@ namespace FirstLab.db
             }
         };
 
-        public static Either<Error, List<Installation>> ReplaceInstallations2(List<Installation> installations) =>
-            ReplaceInstallations(App.Database.Connection)(installations);
-
-        public static Func<SQLiteConnection,
-                Func<List<(Measurements, Installation)>, Either<Error, List<(Measurements, Installation)>>>>
-            ReplaceCurrents => connection => list =>
-        {
-            try
-            {
-                connection.RunInTransaction(() =>
-                {
-                    list.ForEach(it => it.Item1.current.ToCurrentEntity()
-                        .Pipe(currentEntity =>
-                        {
-                            var installationEntity = connection.Get<InstallationEntity>(it.Item2.id);
-
-                            connection.Execute(
-                                $"DELETE FROM CURRENTENTITY WHERE CURRENTENTITY.InstallationId = ${it.Item2.id};");
-
-                            connection.InsertWithChildren(currentEntity, true);
-                            installationEntity.CurrentEntity = currentEntity;
-                            connection.UpdateWithChildren(installationEntity);
-                        }));
-                });
-
-                return list;
-            }
-            catch (SQLiteException e)
-            {
-                return new SqlError(e.Message);
-            }
-        };
-
         public static Func<SQLiteConnection,
             Func<(Measurements, Installation), Either<Error, (Measurements, Installation)>>> ReplaceCurrent =>
             connection =>
@@ -127,6 +94,9 @@ namespace FirstLab.db
                     }
                 };
 
+        public static Either<Error, (Measurements, Installation)> ReplaceCurrent2(
+            (Measurements, Installation) measurementInstallation)
+            => ReplaceCurrent(App.Database.Connection)(measurementInstallation);
 
         public static Func<SQLiteConnection,
             Func<Either<Error, List<InstallationEntity>>>> LoadInstallationEntities =>
@@ -161,21 +131,6 @@ namespace FirstLab.db
         public static Func<int, Either<Error, Option<CurrentEntity>>> LoadMeasurementByInstallationId2 =>
             LoadMeasurementByInstallationId(App.Database.Connection);
 
-        public static Either<Error, (Measurements, Installation)> ReplaceCurrent2(
-            Either<Error, (Measurements, Installation)> measurementInstallation)
-            => measurementInstallation.Bind(ReplaceCurrent(App.Database.Connection));
-
-        public static Either<Error, List<(Measurements, Installation)>> ReplaceCurrents2(
-            List<(Measurements, Installation)> measurementInstallations) =>
-            ReplaceCurrents(App.Database.Connection)(measurementInstallations);
-
-        public static Either<Error, (Measurements, Installation)> ReplaceCurrent3(
-            (Measurements, Installation) measurementInstallation)
-            => ReplaceCurrent(App.Database.Connection)(measurementInstallation);
-
-        public static Either<Error, List<(Measurements, Installation)>> ReplaceCurrents3(
-            Either<Error, List<(Measurements, Installation)>> measurementInstallations) =>
-            measurementInstallations.Bind(ReplaceCurrents(App.Database.Connection));
 
         public sealed class SqlError : Error
         {
