@@ -55,10 +55,13 @@ namespace FirstLab.viewModels
             );
 
             var normalLoading = NormalLoading(FetchVmItemsWithSavingFunctions);
-            Task.Run(() => LoadMultipleValues(normalLoading));
+            Task.Run(async () => await LoadMultipleValues(normalLoading));
         }
 
         public ICommand MyCommand { get; set; }
+
+        public ICommand ForceRefreshCommand => new Command(async () =>
+            await LoadMultipleValues(ForceLoading(FetchVmItemsWithSavingFunctions)));
 
         public bool IsLoading
         {
@@ -102,16 +105,16 @@ namespace FirstLab.viewModels
             return fetchWithSaving(measurementsFromDbOrNetwork)(installationsFromDbOrNetwork);
         }
 
-        private async void LoadMultipleValues(
+        private async Task LoadMultipleValues(
             Func<Location, Either<Error, (List<Error>, List<MeasurementVmItem>)>> fetchingFunc)
         {
             IsLoading = true;
             var location = await LocationProvider.GetLocation();
-            DisplayValues(fetchingFunc(location));
+            await DisplayValues(fetchingFunc(location));
             IsLoading = false;
         }
 
-        private void DisplayValues(Either<Error, (List<Error>, List<MeasurementVmItem>)> values)
+        private async Task DisplayValues(Either<Error, (List<Error>, List<MeasurementVmItem>)> values)
         {
             values.Match(error =>
             {
