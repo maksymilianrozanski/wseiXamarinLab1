@@ -56,6 +56,8 @@ namespace FirstLab
         protected override void OnSleep()
         {
             // Handle when your app sleeps
+            _database?.Dispose();
+            _database = null;
         }
 
         protected override void OnResume()
