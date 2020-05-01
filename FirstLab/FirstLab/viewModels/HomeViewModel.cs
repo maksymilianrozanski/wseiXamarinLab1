@@ -146,6 +146,14 @@ namespace FirstLab.viewModels
             return difference >= 60;
         }
 
+        /// <summary>
+        /// returns true if none of installations is in maxDistance range (in kilometers)
+        /// </summary>
+        public static Func<double, Func<List<Installation>, Location, bool>> IsLocationChanged =>
+            maxDistance => (installations, currentLocation) =>
+                !installations.Exists(installation =>
+                    installation.location.CalculateDistance(currentLocation, DistanceUnits.Kilometers) <= maxDistance);
+
         internal static (List<Error>, List<TR> ) AggregateEithers<TR>(IEnumerable<Either<Error, TR>> list) =>
             list.Aggregate((new List<Error>(), new List<TR>()), (acc, either) =>
             {

@@ -286,6 +286,38 @@ namespace FirstLabUnitTests.viewModels
             Assert.IsTrue(result, "Should return true - difference more than 1h");
         }
 
+        [Test]
+        public void ShouldReturnTrue_LocationChanged()
+        {
+            TestItems(out var installation1, out var installation2, out _, out _,
+                out _, out _);
+
+            var maxDistance = 50.0;
+            var installations = new List<Installation> {installation1, installation2};
+            //1 deg. Latitude is about 111km
+            var testLocation = new Location(installation2.location.Latitude + 1.0, installation2.location.Longitude);
+
+            var result = HomeViewModel.IsLocationChanged(maxDistance)(installations, testLocation);
+            Assert.IsTrue(result,
+                $"Location changed - test location is farther than ${maxDistance} km from both installations");
+        }
+
+        [Test]
+        public void ShouldReturnFalse_LocationNotChanged()
+        {
+            TestItems(out var installation1, out var installation2, out _, out _,
+                out _, out _);
+
+            var maxDistance = 50.0;
+            var installations = new List<Installation> {installation1, installation2};
+            //1 deg. Latitude is about 111km
+            var testLocation = new Location(installation2.location.Latitude + 0.001, installation2.location.Longitude);
+
+            var result = HomeViewModel.IsLocationChanged(maxDistance)(installations, testLocation);
+            Assert.IsFalse(result,
+                $"Location not changed - test location is closer than ${maxDistance} km from installation2");
+        }
+
         private sealed class TestError : Error
         {
             public TestError(string message)
