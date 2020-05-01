@@ -86,9 +86,14 @@ namespace FirstLab.viewModels
                     (_network.GetMeasurementsRequest);
             var replaceInstallationsInDb = DatabaseHelper.ReplaceInstallations(App.Database.Connection);
 
-            FetchVmItems(replaceInstallationsInDb)(DatabaseHelper.ReplaceCurrent2)(measurementsFromDbOrNetwork)(
-                    installationsFromDbOrNetwork)
-                (location)
+            var fetchVmItemsWithSavingFunctions =
+                FetchVmItems(replaceInstallationsInDb)(DatabaseHelper.ReplaceCurrent2);
+
+            var fetchVmItemsFromDbOrNetwork =
+                fetchVmItemsWithSavingFunctions(measurementsFromDbOrNetwork)(installationsFromDbOrNetwork);
+
+            fetchVmItemsFromDbOrNetwork
+                    (location)
                 .Match(error =>
                 {
                     ErrorMessage = "Something went wrong...";
