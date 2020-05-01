@@ -92,20 +92,24 @@ namespace FirstLab.viewModels
             var fetchVmItemsFromDbOrNetwork =
                 fetchVmItemsWithSavingFunctions(measurementsFromDbOrNetwork)(installationsFromDbOrNetwork);
 
-            fetchVmItemsFromDbOrNetwork
-                    (location)
-                .Match(error =>
-                {
-                    ErrorMessage = "Something went wrong...";
-                    Console.WriteLine(error.Message);
-                }, list =>
-                {
-                    var (errors, measurementVmItems) = list;
-                    MeasurementInstallationVmItems = measurementVmItems;
-                    var numberOfErrors = errors.Count;
-                    ErrorMessage = numberOfErrors > 0 ? "Number of errors: " + numberOfErrors : "";
-                });
+            DisplayValues(fetchVmItemsFromDbOrNetwork(location));
+
             IsLoading = false;
+        }
+
+        private void DisplayValues(Either<Error, (List<Error>, List<MeasurementVmItem>)> values)
+        {
+            values.Match(error =>
+            {
+                ErrorMessage = "Something went wrong...";
+                Console.WriteLine(error.Message);
+            }, list =>
+            {
+                var (errors, measurementVmItems) = list;
+                MeasurementInstallationVmItems = measurementVmItems;
+                var numberOfErrors = errors.Count;
+                ErrorMessage = numberOfErrors > 0 ? "Number of errors: " + numberOfErrors : "";
+            });
         }
 
         internal static Func<ReplaceInstallationsInDb,
