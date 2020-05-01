@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using FirstLab.db;
 using FirstLab.entities;
@@ -50,7 +51,7 @@ namespace FirstLab.viewModels
                 vmListItem => { navigation.PushAsync(new DetailsPage(vmListItem)); }
             );
 
-            LoadMultipleValues();
+            Task.Run(LoadMultipleValues);
         }
 
         public ICommand MyCommand { get; set; }
