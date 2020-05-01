@@ -14,7 +14,7 @@ using InstallationsReplacingFunc =
 
 namespace FirstLab.db
 {
-    public class DatabaseHelper
+    public class DatabaseHelper : IDisposable
     {
         public SQLiteConnection Connection { get; }
 
@@ -146,5 +146,7 @@ namespace FirstLab.db
 
             public override string Message { get; }
         }
+
+        public void Dispose() => Connection?.Dispose();
     }
 }
