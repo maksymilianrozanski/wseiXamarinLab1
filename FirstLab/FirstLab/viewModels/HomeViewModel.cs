@@ -86,8 +86,9 @@ namespace FirstLab.viewModels
                     (_network.GetMeasurementsRequest);
             var replaceInstallationsInDb = DatabaseHelper.ReplaceInstallations(App.Database.Connection);
 
-            FetchVmItems(measurementsFromDbOrNetwork)(installationsFromDbOrNetwork)(replaceInstallationsInDb)
-                (DatabaseHelper.ReplaceCurrent2)(location)
+            FetchVmItems(replaceInstallationsInDb)(DatabaseHelper.ReplaceCurrent2)(measurementsFromDbOrNetwork)(
+                    installationsFromDbOrNetwork)
+                (location)
                 .Match(error =>
                 {
                     ErrorMessage = "Something went wrong...";
@@ -102,14 +103,13 @@ namespace FirstLab.viewModels
             IsLoading = false;
         }
 
-        internal static Func<FetchMeasurementsOfInstallation,
-            Func<FetchInstallationsByLocation,
-                Func<ReplaceInstallationsInDb,
-                    Func<ReplaceMeasurementInDb,
-                        Func<Location,
-                            Either<Error, (List<Error>, List<MeasurementVmItem>)>>>>>> FetchVmItems =>
-            measurementsOfInstallation => installationByLocation =>
-                replaceInstallations => replaceMeasurement =>
+        internal static Func<ReplaceInstallationsInDb,
+            Func<ReplaceMeasurementInDb,
+                Func<FetchMeasurementsOfInstallation,
+                    Func<FetchInstallationsByLocation,
+                        Func<Location, Either<Error, (List<Error>, List<MeasurementVmItem>)>>>>>> FetchVmItems =>
+            replaceInstallations => replaceMeasurement =>
+                measurementsOfInstallation => installationByLocation =>
                     currentLocation =>
                         installationByLocation(currentLocation)
                             .Map(it => it.Map(measurementsOfInstallation))
