@@ -20,5 +20,14 @@
     <ItemGroup>
         <None Remove="apiKey.json"/>
         <EmbeddedResource Include="apiKey.json"/>
+        <EmbeddedResource Update="MapPage.xaml">
+            <SubType>Designer</SubType>
+            <Generator></Generator>
+        </EmbeddedResource>
+    </ItemGroup>
+    <ItemGroup>
+        <Compile Update="MapPage.xaml.cs">
+            <DependentUpon>MapPage.xaml</DependentUpon>
+        </Compile>
     </ItemGroup>
 </Project>

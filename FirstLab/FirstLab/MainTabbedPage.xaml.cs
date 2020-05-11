@@ -33,6 +33,12 @@ namespace FirstLab
                 IconImageSource =
                     ImageSource.FromUri(new Uri("https://cdn.airly.eu/assets/brand/logo/primary/airly-1024.png"))
             });
+
+            Children.Add(new NavigationPage(new MapPage())
+            {
+                Title = "Map",
+                IconImageSource = "map_icon.png"
+            });
             Children.Add(new NavigationPage(new SettingsPage()) {Title = "Settings"});
         }
 
