@@ -19,6 +19,7 @@ namespace FirstLab.Android
             base.OnCreate(savedInstanceState);
             Forms.Init(this, savedInstanceState);
             Platform.Init(this, savedInstanceState);
+            Xamarin.FormsMaps.Init(this, savedInstanceState);
             LoadApplication(new App());
         }
     }
