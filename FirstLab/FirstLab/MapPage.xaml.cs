@@ -1,4 +1,5 @@
 using Xamarin.Forms;
+using Xamarin.Forms.Maps;
 using Xamarin.Forms.Xaml;
 
 namespace FirstLab
@@ -9,6 +10,7 @@ namespace FirstLab
         public MapPage()
         {
             InitializeComponent();
+            Content = new Map();
         }
     }
 }
