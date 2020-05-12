@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Linq;
 using FirstLab.network.models;
 using FirstLab.viewModels;
 using Xamarin.Forms;
@@ -15,8 +16,6 @@ namespace FirstLab
         public MapPage(HomeViewModel viewModel)
         {
             InitializeComponent();
-
-            BindingContext = viewModel;
             var map = new Map
             {
                 IsShowingUser = true,
@@ -27,10 +26,17 @@ namespace FirstLab
                     p.SetBinding(Pin.PositionProperty, nameof(MapLocation.Position));
                     p.SetBinding(Pin.AddressProperty, nameof(MapLocation.Address));
                     p.SetBinding(Pin.LabelProperty, nameof(MapLocation.Description));
+                    p.InfoWindowClicked += (sender, args) =>
+                    {
+                        var item = viewModel.MeasurementInstallationVmItems.First(it =>
+                            it.Installation.address.ToString().Equals((sender as Pin).Address.ToString()));
+                        viewModel.MyCommand.Execute(item);
+                    };
                     return p;
                 }),
             };
             map.SetBinding(Map.ItemsSourceProperty, new Binding(nameof(HomeViewModel.MapLocations)));
+            BindingContext = viewModel;
             Content = map;
         }
     }

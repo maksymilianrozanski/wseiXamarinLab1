@@ -139,7 +139,7 @@ namespace FirstLab.viewModels
         }
 
         internal static List<MapLocation> CreateMapLocations(IEnumerable<MeasurementVmItem> vmItems) =>
-            vmItems.Map(it => new MapLocation(it.City + " " + it.Street + " " + it.Country,
+            vmItems.Map(it => new MapLocation(it.Installation.address,
                 "CAQI: " + it.Measurements.current.indexes.First().description,
                 new Position(it.Installation.location.Latitude, it.Installation.location.Longitude))).ToList();
 

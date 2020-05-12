@@ -417,11 +417,11 @@ namespace FirstLabUnitTests.viewModels
             {
                 new MapLocation
                 (
-                    address1.city + " " + address1.street + " " + address1.country,
+                    address1,
                     "CAQI: " + measurements1.current.indexes.First().description,
                     new Position(installation1.location.Latitude, installation1.location.Longitude)
                 ),
-                new MapLocation(address2.city + " " + address2.street + " " + address2.country,
+                new MapLocation(address2,
                     "CAQI: " + measurements2.current.indexes.First().description,
                     new Position(installation2.location.Latitude, installation2.location.Longitude)
                 )

@@ -4,11 +4,11 @@ namespace FirstLab.network.models
 {
     public readonly struct MapLocation
     {
-        public string Address { get; }
+        public Address Address { get; }
         public string Description { get; }
         public Position Position { get; }
 
-        public MapLocation(string address, string description, Position position)
+        public MapLocation(Address address, string description, Position position)
         {
             Address = address;
             Description = description;
