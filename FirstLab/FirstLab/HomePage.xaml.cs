@@ -11,17 +11,15 @@ namespace FirstLab
     {
         public ObservableCollection<MeasurementVmItem> MeasurementItems;
 
-        public HomePage()
+        public HomePage(HomeViewModel viewModel)
         {
             InitializeComponent();
-
-            var vm = new HomeViewModel(Navigation);
-            BindingContext = vm;
+            BindingContext = viewModel;
 
             HomePageStackLayout.Children.Add(CreateStatusIndicator());
             HomePageStackLayout.Children.Add(CreateErrorLabel());
 
-            var listView = MeasurementsList.CreateMeasurementsListView(MeasurementItems, vm.MyCommand);
+            var listView = MeasurementsList.CreateMeasurementsListView(MeasurementItems, viewModel.MyCommand);
             HomePageStackLayout.Children.Add(listView);
         }
 

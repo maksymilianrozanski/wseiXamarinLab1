@@ -1,5 +1,6 @@
 using System;
 using FirstLab.styles;
+using FirstLab.viewModels;
 using Xamarin.Forms;
 using Xamarin.Forms.PlatformConfiguration;
 using Xamarin.Forms.PlatformConfiguration.AndroidSpecific;
@@ -27,14 +28,16 @@ namespace FirstLab
                 HorizontalOptions = LayoutOptions.Center
             });
 
-            Children.Add(new NavigationPage(new HomePage())
+            var homeViewModel = new HomeViewModel(Navigation);
+
+            Children.Add(new NavigationPage(new HomePage(homeViewModel))
             {
                 Title = "Home",
                 IconImageSource =
                     ImageSource.FromUri(new Uri("https://cdn.airly.eu/assets/brand/logo/primary/airly-1024.png"))
             });
 
-            Children.Add(new NavigationPage(new MapPage())
+            Children.Add(new NavigationPage(new MapPage(homeViewModel))
             {
                 Title = "Map",
                 IconImageSource = "map_icon.png"

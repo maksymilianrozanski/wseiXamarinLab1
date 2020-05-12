@@ -132,6 +132,7 @@ namespace FirstLab.viewModels
             {
                 var (errors, measurementVmItems) = list;
                 MeasurementInstallationVmItems = measurementVmItems;
+                MapLocations = CreateMapLocations(measurementVmItems);
                 var numberOfErrors = errors.Count;
                 ErrorMessage = numberOfErrors > 0 ? "Number of errors: " + numberOfErrors : "";
             });
