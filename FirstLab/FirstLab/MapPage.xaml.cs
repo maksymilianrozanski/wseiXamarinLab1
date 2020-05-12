@@ -1,3 +1,4 @@
+using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using FirstLab.network.models;
@@ -28,8 +29,8 @@ namespace FirstLab
                     p.SetBinding(Pin.LabelProperty, nameof(MapLocation.Description));
                     p.InfoWindowClicked += (sender, args) =>
                     {
-                        var item = viewModel.MeasurementInstallationVmItems.First(it =>
-                            it.Installation.address.ToString().Equals((sender as Pin).Address.ToString()));
+                        var item = viewModel.MeasurementInstallationVmItems.First(
+                            CompareAddresses((sender as Pin)?.Address));
                         viewModel.MyCommand.Execute(item);
                     };
                     return p;
@@ -39,5 +40,8 @@ namespace FirstLab
             BindingContext = viewModel;
             Content = map;
         }
+
+        private static readonly Func<string, Func<MeasurementVmItem, bool>> CompareAddresses =
+            address => vmItem => vmItem.Installation.address.ToString().Equals(address);
     }
 }
