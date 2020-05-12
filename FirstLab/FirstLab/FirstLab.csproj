@@ -10,17 +10,17 @@
         <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="LaYumba.Functional" Version="0.10.0"/>
-        <PackageReference Include="Newtonsoft.Json" Version="12.0.3"/>
-        <PackageReference Include="sqlite-net-pcl" Version="1.6.292"/>
-        <PackageReference Include="SQLiteNetExtensions" Version="2.1.0"/>
-        <PackageReference Include="Xamarin.Essentials" Version="1.5.2"/>
-        <PackageReference Include="Xamarin.Forms" Version="4.6.0.726"/>
-        <PackageReference Include="Xamarin.Forms.Maps" Version="4.6.0.726"/>
+        <PackageReference Include="LaYumba.Functional" Version="0.10.0" />
+        <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+        <PackageReference Include="sqlite-net-pcl" Version="1.6.292" />
+        <PackageReference Include="SQLiteNetExtensions" Version="2.1.0" />
+        <PackageReference Include="Xamarin.Essentials" Version="1.5.2" />
+        <PackageReference Include="Xamarin.Forms" Version="4.6.0.726" />
+        <PackageReference Include="Xamarin.Forms.Maps" Version="4.6.0.726" />
     </ItemGroup>
     <ItemGroup>
-        <None Remove="apiKey.json"/>
-        <EmbeddedResource Include="apiKey.json"/>
+        <None Remove="apiKey.json" />
+        <EmbeddedResource Include="apiKey.json" />
         <EmbeddedResource Update="MapPage.xaml">
             <SubType>Designer</SubType>
             <Generator></Generator>

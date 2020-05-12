@@ -12,6 +12,7 @@ using FirstLab.network.models;
 using LaYumba.Functional;
 using Xamarin.Essentials;
 using Xamarin.Forms;
+using Xamarin.Forms.Maps;
 using MeasurementById =
     System.Func<int, LaYumba.Functional.Either<LaYumba.Functional.Error, FirstLab.network.models.Measurements>>;
 using FetchInstallationsByLocation =
@@ -43,6 +44,7 @@ namespace FirstLab.viewModels
         private string _errorMessage;
         private bool _isLoading;
         private List<MeasurementVmItem> _measurementVmItems;
+        private List<MapLocation> _mapLocations;
         private const double MaxInstallationDistance = 100.0;
 
         public HomeViewModel(INavigation navigation) : base(navigation)
@@ -79,6 +81,12 @@ namespace FirstLab.viewModels
         {
             get => _errorMessage;
             set => SetProperty(ref _errorMessage, value);
+        }
+
+        public List<MapLocation> MapLocations
+        {
+            get => _mapLocations;
+            set => SetProperty(ref _mapLocations, value);
         }
 
         private static readonly Func<FetchMeasurementsOfInstallation, Func<FetchInstallationsByLocation,
@@ -128,6 +136,11 @@ namespace FirstLab.viewModels
                 ErrorMessage = numberOfErrors > 0 ? "Number of errors: " + numberOfErrors : "";
             });
         }
+
+        internal static List<MapLocation> CreateMapLocations(IEnumerable<MeasurementVmItem> vmItems) =>
+            vmItems.Map(it => new MapLocation(it.City + " " + it.Street + " " + it.Country,
+                "CAQI: " + it.Measurements.current.indexes.First().description,
+                new Position(it.Installation.location.Latitude, it.Installation.location.Longitude))).ToList();
 
         internal static Func<ReplaceInstallationsInDb,
             Func<ReplaceMeasurementInDb,

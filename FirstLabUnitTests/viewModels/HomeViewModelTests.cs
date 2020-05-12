@@ -7,6 +7,7 @@ using FirstLab.viewModels;
 using LaYumba.Functional;
 using NUnit.Framework;
 using Xamarin.Essentials;
+using Xamarin.Forms.Maps;
 using Index = FirstLab.network.models.Index;
 
 namespace FirstLabUnitTests.viewModels
@@ -390,6 +391,45 @@ namespace FirstLabUnitTests.viewModels
                 Assert.AreEqual(installation2.location.Latitude, list[1].location.Latitude, 0.0001);
                 Assert.AreEqual(installation2.location.Longitude, list[1].location.Longitude, 0.0001);
             });
+        }
+
+        [Test]
+        public void ShouldCreateListOfMapLocation()
+        {
+            TestItems(out var installation1, out var installation2, out var measurements1, out var measurements2,
+                out var address1, out var address2);
+
+            var vmItems = new List<MeasurementVmItem>
+            {
+                new MeasurementVmItem
+                {
+                    City = address1.city, Country = address1.country, Street = address1.street,
+                    Measurements = measurements1, Installation = installation1
+                },
+                new MeasurementVmItem
+                {
+                    City = address2.city, Country = address2.country, Street = address2.street,
+                    Measurements = measurements2, Installation = installation2
+                }
+            };
+
+            var expected = new List<MapLocation>
+            {
+                new MapLocation
+                (
+                    address1.city + " " + address1.street + " " + address1.country,
+                    "CAQI: " + measurements1.current.indexes.First().description,
+                    new Position(installation1.location.Latitude, installation1.location.Longitude)
+                ),
+                new MapLocation(address2.city + " " + address2.street + " " + address2.country,
+                    "CAQI: " + measurements2.current.indexes.First().description,
+                    new Position(installation2.location.Latitude, installation2.location.Longitude)
+                )
+            };
+
+            var result = HomeViewModel.CreateMapLocations(vmItems);
+            Assert.AreEqual(expected[0], result[0]);
+            Assert.AreEqual(expected[1], result[1]);
         }
 
         private sealed class TestError : Error
