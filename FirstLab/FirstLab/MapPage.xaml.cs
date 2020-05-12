@@ -10,7 +10,10 @@ namespace FirstLab
         public MapPage()
         {
             InitializeComponent();
-            Content = new Map();
+            Content = new Map
+            {
+                IsShowingUser = true
+            };
         }
     }
 }
