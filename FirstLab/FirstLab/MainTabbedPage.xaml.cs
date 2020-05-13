@@ -1,6 +1,6 @@
 using System;
 using FirstLab.styles;
-using FirstLab.viewModels;
+using FirstLab.viewModels.home;
 using Xamarin.Forms;
 using Xamarin.Forms.PlatformConfiguration;
 using Xamarin.Forms.PlatformConfiguration.AndroidSpecific;

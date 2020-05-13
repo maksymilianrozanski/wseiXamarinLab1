@@ -96,9 +96,8 @@ namespace FirstLab.db
                     }
                 };
 
-        public static Either<Error, (Measurements, Installation)> ReplaceCurrent2(
-            (Measurements, Installation) measurementInstallation)
-            => ReplaceCurrent(App.Database.Connection)(measurementInstallation);
+        public static Func<(Measurements, Installation), Either<Error, (Measurements, Installation)>> ReplaceCurrent2 =>
+            ReplaceCurrent(App.Database.Connection);
 
         public static Func<SQLiteConnection,
             Func<Either<Error, List<InstallationEntity>>>> LoadInstallationEntities =>

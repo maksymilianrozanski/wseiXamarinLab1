@@ -2,8 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using FirstLab.entities;
+using FirstLab.models.home;
 using FirstLab.network.models;
-using FirstLab.viewModels;
+using FirstLab.viewModels.home;
 using LaYumba.Functional;
 using NUnit.Framework;
 using Xamarin.Essentials;
@@ -65,12 +66,12 @@ namespace FirstLabUnitTests.viewModels
 
             var expected = (expectedErrors, expectedValues);
 
-            var result = HomeViewModel.AggregateEithers(input);
+            var result = HomeModel.AggregateEithers(input);
             Assert.AreEqual(expected, result);
         }
 
         [Test]
-        public void ShouldReturnVmItems()
+        public void ShouldReturnVmItems2()
         {
             var value1 = new Value("PM1", 13.61);
             var value2 = new Value("PM25", 19.76);
@@ -89,8 +90,8 @@ namespace FirstLabUnitTests.viewModels
             var installation1 = new Installation(8077, new Location(50.062006, 19.940984),
                 address1);
 
-            HomeViewModel.FetchVmItems(mi => mi)(l => l)
-                (i => (measurements1, installation1))(location => new List<Installation> {installation1})
+            HomeModel.FetchVmItems.Apply(i => (measurements1, installation1))
+                .Apply(location => new List<Installation> {installation1})
                 (new Location(50.062006, 19.940984))
                 .Match(error => Assert.Fail("Should not return error"), tuple =>
                 {
@@ -107,12 +108,13 @@ namespace FirstLabUnitTests.viewModels
         }
 
         [Test]
-        public void ErrorWhenFetchingInstallations()
+        public void ErrorWhenFetchingInstallations2()
         {
             var testError = new TestError("Error when fetching installations");
 
-            HomeViewModel.FetchVmItems(mi => mi)(l => l)
-                (i => throw new Exception("Should not call this function"))(l => testError)
+            HomeModel.FetchVmItems
+                .Apply(i => throw new Exception("Should not call this function"))
+                .Apply(l => testError)
                 (new Location(50.062006, 19.940984)).Match(
                     error => Assert.Fail("Should match Right"),
                     tuple =>
@@ -126,7 +128,7 @@ namespace FirstLabUnitTests.viewModels
         }
 
         [Test]
-        public void ErrorWhenFetchingOneOfMeasurements()
+        public void ErrorWhenFetchingOneOfMeasurements2()
         {
             TestItems(out var installation1, out var installation2, out var measurements1, out _,
                 out _, out _);
@@ -141,8 +143,9 @@ namespace FirstLabUnitTests.viewModels
 
             var installations = new List<Installation> {installation1, installation2};
 
-            HomeViewModel.FetchVmItems(mi => mi)(l => l)
-                (ErrorIfSecond)(location => installations)
+            HomeModel.FetchVmItems
+                .Apply(ErrorIfSecond)
+                .Apply(location => installations)
                 (new Location(59.062006, 29.940984))
                 .Match(
                     error => Assert.Fail("Should match Right"),
@@ -166,10 +169,11 @@ namespace FirstLabUnitTests.viewModels
             TestItems(out var installation1, out _, out var measurementFromDb, out _,
                 out _, out _);
 
-            var functionUnderTest = HomeViewModel.FetchMeasurementsFromDbOrNetwork(() =>
-                    DateTime.Parse(measurementFromDb.current.tillDateTime).AddMinutes(20))(i =>
-                    (Option<CurrentEntity>) measurementFromDb.current.ToCurrentEntity())
-                (i => throw new Exception("Should not fetch from network"));
+            var functionUnderTest = HomeModel.FetchMeasurementsFromDbOrNetwork
+                .Apply(() => DateTime.Parse(measurementFromDb.current.tillDateTime).AddMinutes(20))
+                .Apply(i => (Option<CurrentEntity>) measurementFromDb.current.ToCurrentEntity())
+                .Apply(i => throw new Exception("Should not save items loaded from database"))
+                .Apply(i => throw new Exception("Should not fetch from network"));
 
             var result = functionUnderTest(installation1);
 
@@ -187,10 +191,11 @@ namespace FirstLabUnitTests.viewModels
             TestItems(out var installation1, out _, out var measurementFromNetwork, out _,
                 out _, out _);
 
-            var functionUnderTest = HomeViewModel.FetchMeasurementsFromDbOrNetwork(
-                    () => throw new Exception("Should not call this function"))
-                (i => (Option<CurrentEntity>) null)
-                (i => measurementFromNetwork);
+            var functionUnderTest = HomeModel.FetchMeasurementsFromDbOrNetwork
+                .Apply(() => throw new Exception("Should not call this function"))
+                .Apply(i => (Option<CurrentEntity>) null)
+                .Apply(i => throw new Exception("Should not save items loaded from database"))
+                .Apply(i => (measurementFromNetwork, installation1));
 
             var result = functionUnderTest(installation1);
 
@@ -208,10 +213,20 @@ namespace FirstLabUnitTests.viewModels
             TestItems(out var installation1, out _, out var obsoleteMeasurementFromDb, out var measurementFromNetwork,
                 out _, out _);
 
-            var functionUnderTest = HomeViewModel.FetchMeasurementsFromDbOrNetwork(() =>
-                    DateTime.Parse(obsoleteMeasurementFromDb.current.tillDateTime).AddMinutes(70))(i =>
-                    (Option<CurrentEntity>) obsoleteMeasurementFromDb.current.ToCurrentEntity())
-                (i => measurementFromNetwork);
+            var timesDbSaveCalled = 0;
+
+            var functionUnderTest = HomeModel.FetchMeasurementsFromDbOrNetwork
+                .Apply(() => DateTime.Parse(obsoleteMeasurementFromDb.current.tillDateTime).AddMinutes(70))
+                .Apply(i => (Option<CurrentEntity>) obsoleteMeasurementFromDb.current.ToCurrentEntity())
+                .Apply(i =>
+                {
+                    timesDbSaveCalled += 1;
+                    Assert.AreEqual(installation1, i.Item2,
+                        "Should pass installation from network function to database-saving function");
+                    Assert.AreEqual(measurementFromNetwork, i.Item1,
+                        "Should pass measurement from network function to database-saving function");
+                    return i;
+                }).Apply(i => (measurementFromNetwork, installation1));
 
             var result = functionUnderTest(installation1);
 
@@ -222,6 +237,8 @@ namespace FirstLabUnitTests.viewModels
                     "Should return item from network function (not form database)");
                 Assert.AreEqual(installation1, installation);
             });
+
+            Assert.AreEqual(1, timesDbSaveCalled, "Should save two database once");
         }
 
         private static void TestItems(out Installation installation1, out Installation installation2,
@@ -269,7 +286,7 @@ namespace FirstLabUnitTests.viewModels
                 out _, out _);
             DateTime TimeFunc() => DateTime.Parse(measurements1.current.tillDateTime).AddMinutes(50);
 
-            var result = HomeViewModel.IsMeasurementObsolete(TimeFunc, measurements1);
+            var result = HomeModel.IsMeasurementObsolete(TimeFunc, measurements1);
             Assert.IsFalse(result, "Should return false - difference less than 1h");
         }
 
@@ -280,7 +297,7 @@ namespace FirstLabUnitTests.viewModels
                 out _, out _);
             DateTime TimeFunc() => DateTime.Parse(measurements1.current.tillDateTime).AddMinutes(70);
 
-            var result = HomeViewModel.IsMeasurementObsolete(TimeFunc, measurements1);
+            var result = HomeModel.IsMeasurementObsolete(TimeFunc, measurements1);
             Assert.IsTrue(result, "Should return true - difference more than 1h");
         }
 
@@ -295,7 +312,7 @@ namespace FirstLabUnitTests.viewModels
             //1 deg. Latitude is about 111km
             var testLocation = new Location(installation2.location.Latitude + 1.0, installation2.location.Longitude);
 
-            var result = HomeViewModel.IsLocationChanged(maxDistance)(installations, testLocation);
+            var result = HomeModel.IsLocationChanged(maxDistance)(installations, testLocation);
             Assert.IsTrue(result,
                 $"Location changed - test location is farther than ${maxDistance} km from both installations");
         }
@@ -311,7 +328,7 @@ namespace FirstLabUnitTests.viewModels
             //1 deg. Latitude is about 111km
             var testLocation = new Location(installation2.location.Latitude + 0.001, installation2.location.Longitude);
 
-            var result = HomeViewModel.IsLocationChanged(maxDistance)(installations, testLocation);
+            var result = HomeModel.IsLocationChanged(maxDistance)(installations, testLocation);
             Assert.IsFalse(result,
                 $"Location not changed - test location is closer than ${maxDistance} km from installation2");
         }
@@ -337,7 +354,7 @@ namespace FirstLabUnitTests.viewModels
                 new List<Installation> {installation2};
 
             var functionUnderTest =
-                HomeViewModel.FetchInstallationsFromDbOrNetwork(InstallationsFromDb)(ReplacingInstallationsFunc)(
+                HomeModel.FetchInstallationsFromDbOrNetwork(InstallationsFromDb)(ReplacingInstallationsFunc)(
                     FetchingFromNetworkFunc);
 
             var result = functionUnderTest(new Location(-80.0, -80.0));
@@ -373,7 +390,7 @@ namespace FirstLabUnitTests.viewModels
                 throw new Exception("Should not fetch from network function - location not changed");
 
             var functionUnderTest =
-                HomeViewModel.FetchInstallationsFromDbOrNetwork(InstallationsFromDb)(ReplacingInstallationsFunc)(
+                HomeModel.FetchInstallationsFromDbOrNetwork(InstallationsFromDb)(ReplacingInstallationsFunc)(
                     FetchingFromNetworkFunc);
 
             var result = functionUnderTest(installation1.location);

@@ -3,6 +3,7 @@ using FirstLab.controls.gridItem;
 using FirstLab.controls.qualityText;
 using FirstLab.controls.slider;
 using FirstLab.viewModels;
+using FirstLab.viewModels.home;
 using Xamarin.Forms;
 
 namespace FirstLab

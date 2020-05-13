@@ -1,6 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Windows.Input;
-using FirstLab.viewModels;
+using FirstLab.viewModels.home;
 using Xamarin.Forms;
 
 namespace FirstLab.controls.homePage
