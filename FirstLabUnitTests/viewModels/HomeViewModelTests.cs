@@ -423,6 +423,40 @@ namespace FirstLabUnitTests.viewModels
         }
 
         [Test]
+        public void ShouldReturnInstallationsFromNetworkFunc_NoItemsInDb()
+        {
+            TestItems(out var installation1, out var installation2, out _, out _,
+                out _, out _);
+
+            Either<Error, List<InstallationEntity>> InstallationsFromDb() => new List<InstallationEntity>();
+            var replacedInstallationsCounter = 0;
+
+            Either<Error, List<Installation>> ReplacingInstallationsFunc(List<Installation> list)
+            {
+                replacedInstallationsCounter += 1;
+                return list;
+            }
+
+            Either<Error, List<Installation>> FetchingFromNetworkFunc(Location location) =>
+                new List<Installation> {installation2};
+
+            var functionUnderTest =
+                HomeModel.FetchInstallationsFromDbOrNetwork(InstallationsFromDb)(ReplacingInstallationsFunc)(
+                    FetchingFromNetworkFunc);
+
+            var result = functionUnderTest(installation1.location);
+
+            Assert.AreEqual(1, replacedInstallationsCounter, "Should try to replace installations in database once");
+            result.Match(error => Assert.Fail("Should match to the right"), list =>
+            {
+                Assert.AreEqual(1, list.Count,
+                    "Should return list from FetchingFromNetworkFunc, which contains 1 item");
+                Assert.AreEqual(installation2, list.First(),
+                    "Should return installation from FetchingFromNetworkFunc");
+            });
+        }
+
+        [Test]
         public void ShouldCreateListOfMapLocation()
         {
             TestItems(out var installation1, out var installation2, out var measurements1, out var measurements2,
