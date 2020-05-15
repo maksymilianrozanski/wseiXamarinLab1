@@ -238,7 +238,7 @@ namespace FirstLabUnitTests.viewModels
                 Assert.AreEqual(installation1, installation);
             });
 
-            Assert.AreEqual(1, timesDbSaveCalled, "Should save two database once");
+            Assert.AreEqual(1, timesDbSaveCalled, "Should save to database once");
         }
 
         private static void TestItems(out Installation installation1, out Installation installation2,
