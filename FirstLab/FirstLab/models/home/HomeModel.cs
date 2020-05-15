@@ -57,7 +57,8 @@ namespace FirstLab.models.home
                 measurementFromDbByInstallationId(installation.id)
                     .Bind(it =>
                         it.Match(
-                            None: () => fetchMeasurementsOfInstallation(installation),
+                            None: () => fetchMeasurementsOfInstallation(installation)
+                                .Bind(replaceMeasurementInDb),
                             Some: entity => IsMeasurementObsolete(dateFunc, entity.ToMeasurement())
                                 ? fetchMeasurementsOfInstallation(installation)
                                     .Bind(replaceMeasurementInDb)

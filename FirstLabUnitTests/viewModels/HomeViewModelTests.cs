@@ -191,10 +191,20 @@ namespace FirstLabUnitTests.viewModels
             TestItems(out var installation1, out _, out var measurementFromNetwork, out _,
                 out _, out _);
 
+            var timesDbSaveCalled = 0;
+
             var functionUnderTest = HomeModel.FetchMeasurementsFromDbOrNetwork
                 .Apply(() => throw new Exception("Should not call this function"))
                 .Apply(i => (Option<CurrentEntity>) null)
-                .Apply(i => throw new Exception("Should not save items loaded from database"))
+                .Apply(i =>
+                {
+                    timesDbSaveCalled += 1;
+                    Assert.AreEqual(installation1, i.Item2,
+                        "Should pass installation from network function to database-saving function");
+                    Assert.AreEqual(measurementFromNetwork, i.Item1,
+                        "Should pass measurement from network function to database-saving function");
+                    return i;
+                })
                 .Apply(i => (measurementFromNetwork, installation1));
 
             var result = functionUnderTest(installation1);
@@ -205,6 +215,8 @@ namespace FirstLabUnitTests.viewModels
                 Assert.AreEqual(measurementFromNetwork, measurements);
                 Assert.AreEqual(installation1, installation);
             });
+
+            Assert.AreEqual(1, timesDbSaveCalled, "Should save to database once");
         }
 
         [Test]
